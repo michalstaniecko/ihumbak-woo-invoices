@@ -1,0 +1,176 @@
+<?php
+/**
+ * Document items table partial.
+ *
+ * @package IHumbak\Invoices
+ *
+ * @var array<int, array<string, mixed>> $items     Document items.
+ * @var array<int|string, string>        $tax_rates Available tax rates.
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+use IHumbak\Invoices\Modules\Invoice\CalculationService;
+
+$tax_rates = $tax_rates ?? CalculationService::getTaxRates();
+$items     = $items ?? [];
+?>
+
+<div class="ihumbak-card ihumbak-items-card">
+    <h3><?php esc_html_e( 'Items', 'ihumbak-invoices' ); ?></h3>
+
+    <table class="widefat ihumbak-items-table" id="ihumbak-items-table">
+        <thead>
+            <tr>
+                <th class="column-name"><?php esc_html_e( 'Name', 'ihumbak-invoices' ); ?></th>
+                <th class="column-quantity"><?php esc_html_e( 'Qty', 'ihumbak-invoices' ); ?></th>
+                <th class="column-unit"><?php esc_html_e( 'Unit', 'ihumbak-invoices' ); ?></th>
+                <th class="column-price-net"><?php esc_html_e( 'Price Net', 'ihumbak-invoices' ); ?></th>
+                <th class="column-tax-rate"><?php esc_html_e( 'VAT %', 'ihumbak-invoices' ); ?></th>
+                <th class="column-price-gross"><?php esc_html_e( 'Price Gross', 'ihumbak-invoices' ); ?></th>
+                <th class="column-total-net"><?php esc_html_e( 'Total Net', 'ihumbak-invoices' ); ?></th>
+                <th class="column-tax-amount"><?php esc_html_e( 'VAT', 'ihumbak-invoices' ); ?></th>
+                <th class="column-total-gross"><?php esc_html_e( 'Total Gross', 'ihumbak-invoices' ); ?></th>
+                <th class="column-actions"></th>
+            </tr>
+        </thead>
+        <tbody id="ihumbak-items-body">
+            <?php if ( ! empty( $items ) ) : ?>
+                <?php foreach ( $items as $index => $item ) : ?>
+                    <tr class="ihumbak-item-row" data-index="<?php echo esc_attr( $index ); ?>">
+                        <td class="column-name">
+                            <input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
+                                   value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
+                                   class="item-name" required>
+                        </td>
+                        <td class="column-quantity">
+                            <input type="number" name="items[<?php echo esc_attr( $index ); ?>][quantity]"
+                                   value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>"
+                                   class="item-quantity" step="0.001" min="0.001" required>
+                        </td>
+                        <td class="column-unit">
+                            <input type="text" name="items[<?php echo esc_attr( $index ); ?>][unit]"
+                                   value="<?php echo esc_attr( $item['unit'] ?? 'szt.' ); ?>"
+                                   class="item-unit">
+                        </td>
+                        <td class="column-price-net">
+                            <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_net]"
+                                   value="<?php echo esc_attr( $item['unit_price_net'] ?? '' ); ?>"
+                                   class="item-price-net" step="0.01" min="0">
+                        </td>
+                        <td class="column-tax-rate">
+                            <select name="items[<?php echo esc_attr( $index ); ?>][tax_rate]" class="item-tax-rate">
+                                <?php foreach ( $tax_rates as $rate => $label ) : ?>
+                                    <option value="<?php echo esc_attr( $rate ); ?>"
+                                            <?php selected( ( $item['tax_rate'] ?? 23 ), $rate ); ?>>
+                                        <?php echo esc_html( $label ); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td class="column-price-gross">
+                            <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_gross]"
+                                   value="<?php echo esc_attr( $item['unit_price_gross'] ?? '' ); ?>"
+                                   class="item-price-gross" step="0.01" min="0" readonly>
+                        </td>
+                        <td class="column-total-net">
+                            <span class="item-total-net-display"><?php echo esc_html( number_format( (float) ( $item['line_total_net'] ?? 0 ), 2, ',', ' ' ) ); ?></span>
+                            <input type="hidden" name="items[<?php echo esc_attr( $index ); ?>][line_total_net]"
+                                   value="<?php echo esc_attr( $item['line_total_net'] ?? 0 ); ?>"
+                                   class="item-total-net">
+                        </td>
+                        <td class="column-tax-amount">
+                            <span class="item-tax-amount-display"><?php echo esc_html( number_format( (float) ( $item['tax_amount'] ?? 0 ), 2, ',', ' ' ) ); ?></span>
+                            <input type="hidden" name="items[<?php echo esc_attr( $index ); ?>][tax_amount]"
+                                   value="<?php echo esc_attr( $item['tax_amount'] ?? 0 ); ?>"
+                                   class="item-tax-amount">
+                        </td>
+                        <td class="column-total-gross">
+                            <span class="item-total-gross-display"><?php echo esc_html( number_format( (float) ( $item['line_total_gross'] ?? 0 ), 2, ',', ' ' ) ); ?></span>
+                            <input type="hidden" name="items[<?php echo esc_attr( $index ); ?>][line_total_gross]"
+                                   value="<?php echo esc_attr( $item['line_total_gross'] ?? 0 ); ?>"
+                                   class="item-total-gross">
+                        </td>
+                        <td class="column-actions">
+                            <button type="button" class="button button-small ihumbak-remove-item" title="<?php esc_attr_e( 'Remove', 'ihumbak-invoices' ); ?>">
+                                <span class="dashicons dashicons-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+        <tfoot>
+            <tr class="ihumbak-totals-row">
+                <td colspan="6" class="text-right"><strong><?php esc_html_e( 'Totals:', 'ihumbak-invoices' ); ?></strong></td>
+                <td class="column-total-net">
+                    <strong id="document-subtotal-display">0,00</strong>
+                    <input type="hidden" name="subtotal" id="document-subtotal" value="0">
+                </td>
+                <td class="column-tax-amount">
+                    <strong id="document-tax-total-display">0,00</strong>
+                    <input type="hidden" name="tax_total" id="document-tax-total" value="0">
+                </td>
+                <td class="column-total-gross">
+                    <strong id="document-total-display">0,00</strong>
+                    <input type="hidden" name="total" id="document-total" value="0">
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <p>
+        <button type="button" class="button" id="ihumbak-add-item">
+            <span class="dashicons dashicons-plus-alt2"></span>
+            <?php esc_html_e( 'Add Item', 'ihumbak-invoices' ); ?>
+        </button>
+    </p>
+</div>
+
+<!-- Item row template for JS -->
+<script type="text/template" id="ihumbak-item-row-template">
+    <tr class="ihumbak-item-row" data-index="{{index}}">
+        <td class="column-name">
+            <input type="text" name="items[{{index}}][name]" value="" class="item-name" required>
+        </td>
+        <td class="column-quantity">
+            <input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001" min="0.001" required>
+        </td>
+        <td class="column-unit">
+            <input type="text" name="items[{{index}}][unit]" value="szt." class="item-unit">
+        </td>
+        <td class="column-price-net">
+            <input type="number" name="items[{{index}}][unit_price_net]" value="" class="item-price-net" step="0.01" min="0">
+        </td>
+        <td class="column-tax-rate">
+            <select name="items[{{index}}][tax_rate]" class="item-tax-rate">
+                <?php foreach ( $tax_rates as $rate => $label ) : ?>
+                    <option value="<?php echo esc_attr( $rate ); ?>" <?php selected( 23, $rate ); ?>>
+                        <?php echo esc_html( $label ); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </td>
+        <td class="column-price-gross">
+            <input type="number" name="items[{{index}}][unit_price_gross]" value="" class="item-price-gross" step="0.01" min="0" readonly>
+        </td>
+        <td class="column-total-net">
+            <span class="item-total-net-display">0,00</span>
+            <input type="hidden" name="items[{{index}}][line_total_net]" value="0" class="item-total-net">
+        </td>
+        <td class="column-tax-amount">
+            <span class="item-tax-amount-display">0,00</span>
+            <input type="hidden" name="items[{{index}}][tax_amount]" value="0" class="item-tax-amount">
+        </td>
+        <td class="column-total-gross">
+            <span class="item-total-gross-display">0,00</span>
+            <input type="hidden" name="items[{{index}}][line_total_gross]" value="0" class="item-total-gross">
+        </td>
+        <td class="column-actions">
+            <button type="button" class="button button-small ihumbak-remove-item" title="<?php esc_attr_e( 'Remove', 'ihumbak-invoices' ); ?>">
+                <span class="dashicons dashicons-trash"></span>
+            </button>
+        </td>
+    </tr>
+</script>

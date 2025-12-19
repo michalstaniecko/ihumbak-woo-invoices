@@ -1,0 +1,62 @@
+<?php
+/**
+ * WooCommerce stubs for PHPStan.
+ */
+
+define('WC_VERSION', '9.0.0');
+
+/**
+ * @return bool
+ */
+function is_account_page(): bool {}
+
+class WC_Order {
+    public function get_id(): int {}
+    public function get_status(): string {}
+    public function get_billing_first_name(): string {}
+    public function get_billing_last_name(): string {}
+    public function get_billing_company(): string {}
+    public function get_billing_address_1(): string {}
+    public function get_billing_address_2(): string {}
+    public function get_billing_city(): string {}
+    public function get_billing_postcode(): string {}
+    public function get_billing_country(): string {}
+    public function get_billing_email(): string {}
+    public function get_billing_phone(): string {}
+    public function get_items(): array {}
+    public function get_total(): string {}
+    public function get_subtotal(): string {}
+    public function get_total_tax(): string {}
+    public function get_currency(): string {}
+    public function get_date_created(): ?\WC_DateTime {}
+    public function get_date_paid(): ?\WC_DateTime {}
+    public function get_meta(string $key, bool $single = true): mixed {}
+    public function update_meta_data(string $key, mixed $value): void {}
+    public function save(): int {}
+}
+
+class WC_Order_Item_Product {
+    public function get_id(): int {}
+    public function get_name(): string {}
+    public function get_quantity(): int {}
+    public function get_product_id(): int {}
+    public function get_total(): string {}
+    public function get_subtotal(): string {}
+    public function get_total_tax(): string {}
+    public function get_subtotal_tax(): string {}
+}
+
+class WC_DateTime extends \DateTime {}
+
+class WC_Product {
+    public function get_id(): int {}
+    public function get_name(): string {}
+    public function get_price(): string {}
+    public function get_sku(): string {}
+}
+
+namespace Automattic\WooCommerce\Utilities;
+
+class FeaturesUtil {
+    public static function declare_compatibility(string $feature, string $plugin, bool $positive = true): void {}
+}

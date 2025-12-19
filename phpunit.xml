@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    colors="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    cacheDirectory=".phpunit.cache"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>tests</directory>
+        </exclude>
+        <report>
+            <html outputDirectory="coverage"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
+    <php>
+        <const name="ABSPATH" value="/tmp/wordpress/"/>
+        <const name="IHUMBAK_INVOICES_VERSION" value="0.1.0"/>
+        <const name="IHUMBAK_INVOICES_FILE" value="/tmp/wordpress/wp-content/plugins/ihumbak-woo-invoices/ihumbak-invoices.php"/>
+        <const name="IHUMBAK_INVOICES_PATH" value="/tmp/wordpress/wp-content/plugins/ihumbak-woo-invoices/"/>
+        <const name="IHUMBAK_INVOICES_URL" value="http://localhost/wp-content/plugins/ihumbak-woo-invoices/"/>
+        <const name="IHUMBAK_INVOICES_BASENAME" value="ihumbak-woo-invoices/ihumbak-invoices.php"/>
+    </php>
+</phpunit>

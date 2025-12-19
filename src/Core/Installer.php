@@ -1,0 +1,209 @@
+<?php
+/**
+ * Database Installer.
+ *
+ * @package IHumbak\Invoices\Core
+ */
+
+declare(strict_types=1);
+
+namespace IHumbak\Invoices\Core;
+
+/**
+ * Handles database table creation and updates.
+ */
+class Installer {
+
+	/**
+	 * Database version.
+	 *
+	 * @var string
+	 */
+	private const DB_VERSION = '1.0.0';
+
+	/**
+	 * Option name for storing database version.
+	 *
+	 * @var string
+	 */
+	private const DB_VERSION_OPTION = 'ihumbak_invoices_db_version';
+
+	/**
+	 * Install database tables.
+	 *
+	 * @return void
+	 */
+	public function install(): void {
+		$installed_version = get_option( self::DB_VERSION_OPTION, '0' );
+
+		if ( version_compare( $installed_version, self::DB_VERSION, '<' ) ) {
+			$this->create_tables();
+			update_option( self::DB_VERSION_OPTION, self::DB_VERSION );
+		}
+	}
+
+	/**
+	 * Create database tables.
+	 *
+	 * @return void
+	 */
+	private function create_tables(): void {
+		global $wpdb;
+
+		$charset_collate = $wpdb->get_charset_collate();
+
+		$sql  = $this->get_documents_table_sql( $charset_collate );
+		$sql .= $this->get_document_items_table_sql( $charset_collate );
+		$sql .= $this->get_numbering_table_sql( $charset_collate );
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta( $sql );
+	}
+
+	/**
+	 * Get SQL for documents table.
+	 *
+	 * @param string $charset_collate Charset and collation.
+	 * @return string
+	 */
+	private function get_documents_table_sql( string $charset_collate ): string {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'ihumbak_documents';
+
+		return "CREATE TABLE {$table_name} (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            order_id bigint(20) unsigned NOT NULL,
+            document_type varchar(20) NOT NULL DEFAULT 'invoice',
+            document_number varchar(50) NOT NULL,
+            issue_date date NOT NULL,
+            sale_date date NOT NULL,
+            due_date date DEFAULT NULL,
+            corrected_document_id bigint(20) unsigned DEFAULT NULL,
+            buyer_data longtext NOT NULL,
+            seller_data longtext NOT NULL,
+            subtotal decimal(10,2) NOT NULL DEFAULT 0.00,
+            tax_total decimal(10,2) NOT NULL DEFAULT 0.00,
+            total decimal(10,2) NOT NULL DEFAULT 0.00,
+            currency varchar(3) NOT NULL DEFAULT 'PLN',
+            status varchar(20) NOT NULL DEFAULT 'draft',
+            pdf_path varchar(255) DEFAULT NULL,
+            notes text DEFAULT NULL,
+            created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY order_id (order_id),
+            KEY document_type (document_type),
+            KEY document_number (document_number),
+            KEY status (status),
+            KEY issue_date (issue_date),
+            KEY corrected_document_id (corrected_document_id)
+        ) {$charset_collate};\n\n";
+	}
+
+	/**
+	 * Get SQL for document items table.
+	 *
+	 * @param string $charset_collate Charset and collation.
+	 * @return string
+	 */
+	private function get_document_items_table_sql( string $charset_collate ): string {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'ihumbak_document_items';
+
+		return "CREATE TABLE {$table_name} (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            document_id bigint(20) unsigned NOT NULL,
+            product_id bigint(20) unsigned DEFAULT NULL,
+            name varchar(255) NOT NULL,
+            quantity decimal(10,3) NOT NULL DEFAULT 1.000,
+            unit varchar(20) NOT NULL DEFAULT 'szt.',
+            unit_price_net decimal(10,2) NOT NULL DEFAULT 0.00,
+            unit_price_gross decimal(10,2) NOT NULL DEFAULT 0.00,
+            tax_rate decimal(5,2) NOT NULL DEFAULT 0.00,
+            tax_amount decimal(10,2) NOT NULL DEFAULT 0.00,
+            line_total_net decimal(10,2) NOT NULL DEFAULT 0.00,
+            line_total_gross decimal(10,2) NOT NULL DEFAULT 0.00,
+            PRIMARY KEY (id),
+            KEY document_id (document_id),
+            KEY product_id (product_id)
+        ) {$charset_collate};\n\n";
+	}
+
+	/**
+	 * Get SQL for numbering table.
+	 *
+	 * @param string $charset_collate Charset and collation.
+	 * @return string
+	 */
+	private function get_numbering_table_sql( string $charset_collate ): string {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . 'ihumbak_numbering';
+
+		return "CREATE TABLE {$table_name} (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            document_type varchar(20) NOT NULL,
+            year int(4) NOT NULL,
+            month int(2) DEFAULT NULL,
+            last_number int(10) unsigned NOT NULL DEFAULT 0,
+            pattern varchar(100) NOT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY type_year_month (document_type, year, month)
+        ) {$charset_collate};\n\n";
+	}
+
+	/**
+	 * Uninstall - drop all tables.
+	 *
+	 * @return void
+	 */
+	public function uninstall(): void {
+		global $wpdb;
+
+		$tables = array(
+			$wpdb->prefix . 'ihumbak_document_items',
+			$wpdb->prefix . 'ihumbak_documents',
+			$wpdb->prefix . 'ihumbak_numbering',
+		);
+
+		foreach ( $tables as $table ) {
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		}
+
+		delete_option( self::DB_VERSION_OPTION );
+		delete_option( 'ihumbak_invoices_settings' );
+		delete_option( 'ihumbak_invoices_version' );
+	}
+
+	/**
+	 * Get the documents table name.
+	 *
+	 * @return string
+	 */
+	public static function get_documents_table(): string {
+		global $wpdb;
+		return $wpdb->prefix . 'ihumbak_documents';
+	}
+
+	/**
+	 * Get the document items table name.
+	 *
+	 * @return string
+	 */
+	public static function get_document_items_table(): string {
+		global $wpdb;
+		return $wpdb->prefix . 'ihumbak_document_items';
+	}
+
+	/**
+	 * Get the numbering table name.
+	 *
+	 * @return string
+	 */
+	public static function get_numbering_table(): string {
+		global $wpdb;
+		return $wpdb->prefix . 'ihumbak_numbering';
+	}
+}

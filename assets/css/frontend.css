@@ -1,0 +1,61 @@
+/**
+ * iHumbak Invoices - Frontend Styles
+ *
+ * @package IHumbak\Invoices
+ */
+
+/* Customer invoices list in My Account */
+.woocommerce-invoices-table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.woocommerce-invoices-table th,
+.woocommerce-invoices-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.woocommerce-invoices-table th {
+    font-weight: 600;
+    background: #f8f8f8;
+}
+
+.woocommerce-invoices-table .invoice-number {
+    font-weight: 500;
+}
+
+.woocommerce-invoices-table .invoice-actions {
+    text-align: right;
+}
+
+.woocommerce-invoices-table .invoice-actions .button {
+    margin-left: 5px;
+}
+
+/* Invoice download button */
+.invoice-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.invoice-download-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Empty state */
+.woocommerce-invoices-empty {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f8f8;
+    border-radius: 4px;
+}
+
+.woocommerce-invoices-empty p {
+    margin: 0;
+    color: #666;
+}

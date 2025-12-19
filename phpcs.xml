@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<ruleset name="iHumbak Invoices Coding Standards">
+    <description>PHP Code Sniffer configuration for iHumbak WooCommerce Invoices</description>
+
+    <!-- What to scan -->
+    <file>./src</file>
+    <file>./ihumbak-invoices.php</file>
+    <file>./uninstall.php</file>
+
+    <!-- Exclude patterns -->
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>/tests/*</exclude-pattern>
+    <exclude-pattern>*.min.js</exclude-pattern>
+    <exclude-pattern>*.min.css</exclude-pattern>
+
+    <!-- How to scan -->
+    <arg value="sp"/>
+    <arg name="basepath" value="."/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+
+    <!-- Rules: WordPress Coding Standards -->
+    <rule ref="WordPress">
+        <!-- Allow PSR-4 file naming -->
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+    </rule>
+
+    <!-- Rules: WordPress Extra -->
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.Files.FileName"/>
+    </rule>
+
+    <!-- Rules: WordPress Docs -->
+    <rule ref="WordPress-Docs"/>
+
+    <!-- Minimum WordPress version -->
+    <config name="minimum_supported_wp_version" value="6.0"/>
+
+    <!-- Text domain -->
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="ihumbak-invoices"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Prefix for functions, classes, etc. -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="ihumbak"/>
+                <element value="IHumbak"/>
+                <element value="IHUMBAK"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Allow short array syntax -->
+    <rule ref="Generic.Arrays.DisallowShortArraySyntax.Found">
+        <severity>0</severity>
+    </rule>
+
+    <!--
+        PSR-4 Architecture: Allow camelCase method names in src/ directory.
+        Project uses PSR-4 autoloading with camelCase methods (getters, setters, etc.)
+        which is standard for modern PHP OOP but conflicts with WordPress snake_case convention.
+    -->
+    <rule ref="WordPress.NamingConventions.ValidFunctionName">
+        <exclude-pattern>src/*</exclude-pattern>
+    </rule>
+
+    <!--
+        Allow short ternary operator in src/ directory.
+        Modern PHP style for null coalescing patterns.
+    -->
+    <rule ref="Universal.Operators.DisallowShortTernary">
+        <exclude-pattern>src/*</exclude-pattern>
+    </rule>
+
+    <!--
+        WooCommerce custom capabilities.
+        The 'manage_woocommerce' capability is provided by WooCommerce plugin.
+    -->
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="manage_woocommerce"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!--
+        Allow interpolated table names in SQL queries within repositories.
+        Table names come from Installer class and are safe (not user input).
+        Queries use $wpdb->prepare() for user input, but table names are interpolated.
+    -->
+    <rule ref="WordPress.DB.PreparedSQL.InterpolatedNotPrepared">
+        <exclude-pattern>src/Infrastructure/Database/*</exclude-pattern>
+        <exclude-pattern>src/Modules/Invoice/NumberingService.php</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.DB.PreparedSQL.NotPrepared">
+        <exclude-pattern>src/Infrastructure/Database/*</exclude-pattern>
+        <exclude-pattern>src/Modules/Invoice/NumberingService.php</exclude-pattern>
+    </rule>
+
+    <!-- PHP 8.0 compatibility -->
+    <config name="testVersion" value="8.0-"/>
+</ruleset>

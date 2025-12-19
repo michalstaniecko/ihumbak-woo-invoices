@@ -1,0 +1,50 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+/dist/
+/build/
+
+# Testing
+/coverage/
+.phpunit.cache/
+.phpunit.result.cache
+
+# Logs
+*.log
+debug.log
+
+# Compiled assets
+*.min.css
+*.min.js
+*.map
+
+# WordPress
+wp-config.php
+wp-content/uploads/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Package lock files (optional, uncomment if you want to ignore)
+# package-lock.json
+# composer.lock

@@ -1,0 +1,28 @@
+parameters:
+    level: 6
+    paths:
+        - src
+        - ihumbak-invoices.php
+    excludePaths:
+        - vendor
+        - tests
+    bootstrapFiles:
+        - vendor/autoload.php
+    scanDirectories:
+        - vendor/szepeviktor/phpstan-wordpress/bootstrap
+    stubFiles:
+        - stubs/woocommerce.stub
+
+    # WordPress specific settings
+    checkGenericClassInNonGenericObjectType: false
+    treatPhpDocTypesAsCertain: false
+
+    # Ignore patterns
+    ignoreErrors:
+        - '#Function apply_filters invoked with \d+ parameters, \d+ required\.#'
+        - '#Function do_action invoked with \d+ parameters, \d+ required\.#'
+        - '#Constant ABSPATH not found\.#'
+        - '#Constant WP_DEBUG not found\.#'
+
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
