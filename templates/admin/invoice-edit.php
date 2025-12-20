@@ -4,12 +4,11 @@
  *
  * @package IHumbak\Invoices
  *
- * @var \IHumbak\Invoices\Models\Invoice|null $document      Document being edited (null for new).
- * @var array<string, string>                 $seller        Seller data.
- * @var array<string, string>                 $buyer         Buyer data.
- * @var array<int, array<string, mixed>>      $items         Document items.
- * @var string                                $next_number   Preview of next document number.
- * @var array<int|string, string>             $tax_rates     Available tax rates.
+ * @var \IHumbak\Invoices\Models\Invoice|null $document    Document being edited (null for new).
+ * @var array<string, string>                 $seller      Seller data.
+ * @var array<string, string>                 $buyer       Buyer data.
+ * @var array<int, array<string, mixed>>      $items       Document items.
+ * @var string                                $next_number Preview of next document number.
  */
 
 defined( 'ABSPATH' ) || exit;

@@ -4,16 +4,12 @@
  *
  * @package IHumbak\Invoices
  *
- * @var array<int, array<string, mixed>> $items     Document items.
- * @var array<int|string, string>        $tax_rates Available tax rates.
+ * @var array<int, array<string, mixed>> $items Document items.
  */
 
 defined( 'ABSPATH' ) || exit;
 
-use IHumbak\Invoices\Modules\Invoice\CalculationService;
-
-$tax_rates = $tax_rates ?? CalculationService::getTaxRates();
-$items     = $items ?? [];
+$items = $items ?? [];
 ?>
 
 <div class="ihumbak-card ihumbak-items-card">
@@ -59,14 +55,9 @@ $items     = $items ?? [];
                                    class="item-price-net" step="0.01" min="0">
                         </td>
                         <td class="column-tax-rate">
-                            <select name="items[<?php echo esc_attr( $index ); ?>][tax_rate]" class="item-tax-rate">
-                                <?php foreach ( $tax_rates as $rate => $label ) : ?>
-                                    <option value="<?php echo esc_attr( $rate ); ?>"
-                                            <?php selected( ( $item['tax_rate'] ?? 23 ), $rate ); ?>>
-                                        <?php echo esc_html( $label ); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <input type="number" name="items[<?php echo esc_attr( $index ); ?>][tax_rate]"
+                                   value="<?php echo esc_attr( $item['tax_rate'] ?? 23 ); ?>"
+                                   class="item-tax-rate" step="0.01" min="0" max="100">
                         </td>
                         <td class="column-price-gross">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_gross]"
@@ -144,13 +135,7 @@ $items     = $items ?? [];
             <input type="number" name="items[{{index}}][unit_price_net]" value="" class="item-price-net" step="0.01" min="0">
         </td>
         <td class="column-tax-rate">
-            <select name="items[{{index}}][tax_rate]" class="item-tax-rate">
-                <?php foreach ( $tax_rates as $rate => $label ) : ?>
-                    <option value="<?php echo esc_attr( $rate ); ?>" <?php selected( 23, $rate ); ?>>
-                        <?php echo esc_html( $label ); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <input type="number" name="items[{{index}}][tax_rate]" value="23" class="item-tax-rate" step="0.01" min="0" max="100">
         </td>
         <td class="column-price-gross">
             <input type="number" name="items[{{index}}][unit_price_gross]" value="" class="item-price-gross" step="0.01" min="0" readonly>

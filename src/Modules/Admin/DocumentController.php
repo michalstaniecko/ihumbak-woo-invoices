@@ -18,7 +18,6 @@ use IHumbak\Invoices\Models\DocumentItem;
 use IHumbak\Invoices\Models\Buyer;
 use IHumbak\Invoices\Models\Seller;
 use IHumbak\Invoices\Modules\Invoice\NumberingService;
-use IHumbak\Invoices\Modules\Invoice\CalculationService;
 use IHumbak\Invoices\Core\Plugin;
 
 /**
@@ -48,20 +47,12 @@ class DocumentController {
 	private NumberingService $numbering_service;
 
 	/**
-	 * Calculation service.
-	 *
-	 * @var CalculationService
-	 */
-	private CalculationService $calculation_service;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->document_repository = new DocumentRepository();
 		$this->item_repository     = new DocumentItemRepository();
 		$this->numbering_service   = new NumberingService();
-		$this->calculation_service = new CalculationService();
 	}
 
 	/**
@@ -107,7 +98,6 @@ class DocumentController {
 		$seller      = $document ? $document->getSeller()?->toArray() : ( $settings['seller'] ?? array() );
 		$buyer       = $document ? $document->getBuyer()?->toArray() : array();
 		$items       = array_map( fn( $item ) => $item->toArray(), $items );
-		$tax_rates   = CalculationService::getTaxRates();
 		$next_number = $this->numbering_service->previewNextNumber(
 			'invoice',
 			$settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}',
@@ -138,7 +128,6 @@ class DocumentController {
 		$seller      = $document ? $document->getSeller()?->toArray() : ( $settings['seller'] ?? array() );
 		$buyer       = $document ? $document->getBuyer()?->toArray() : array();
 		$items       = array_map( fn( $item ) => $item->toArray(), $items );
-		$tax_rates   = CalculationService::getTaxRates();
 		$next_number = $this->numbering_service->previewNextNumber(
 			'receipt',
 			$settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}',
