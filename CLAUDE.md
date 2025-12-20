@@ -40,31 +40,58 @@ ihumbak-woo-invoices/
 │   │   ├── Activator.php     # Aktywacja pluginu
 │   │   ├── Deactivator.php   # Dezaktywacja pluginu
 │   │   └── Installer.php     # Instalacja bazy danych
-│   ├── Contracts/            # Interfejsy
-│   ├── Models/               # Modele domenowe
-│   │   ├── Invoice.php
-│   │   ├── InvoiceItem.php
-│   │   ├── Buyer.php
-│   │   └── Seller.php
+│   ├── Contracts/            # Interfejsy (do implementacji)
 │   ├── Exceptions/           # Wyjątki
+│   │   ├── ContainerException.php
+│   │   └── NotFoundException.php
+│   ├── Models/               # Modele domenowe
+│   │   ├── Document.php      # Abstrakcyjna klasa bazowa
+│   │   ├── Invoice.php       # Faktura VAT (extends Document)
+│   │   ├── Receipt.php       # Paragon (extends Document)
+│   │   ├── DocumentItem.php  # Pozycja na dokumencie
+│   │   ├── Buyer.php         # Value Object - dane nabywcy
+│   │   └── Seller.php        # Value Object - dane sprzedawcy
 │   ├── Infrastructure/
-│   │   ├── Database/         # Repozytoria
-│   │   └── Logger/           # Logowanie
+│   │   └── Database/         # Repozytoria
+│   │       ├── DocumentRepository.php
+│   │       └── DocumentItemRepository.php
 │   └── Modules/
-│       ├── Invoice/          # Generowanie dokumentów
-│       ├── PDF/              # Eksport PDF (DOMPDF)
-│       ├── Email/            # Wysyłka email
+│       ├── Invoice/          # Serwisy dokumentów
+│       │   ├── NumberingService.php
+│       │   └── CalculationService.php
 │       ├── Admin/            # Panel administracyjny
-│       └── Portal/           # Portal klienta
+│       │   ├── DocumentListTable.php
+│       │   ├── DocumentController.php
+│       │   └── AjaxController.php
+│       ├── PDF/              # Eksport PDF (do implementacji)
+│       ├── Email/            # Wysyłka email (do implementacji)
+│       └── Portal/           # Portal klienta (do implementacji)
 ├── templates/                # Szablony PHP
 │   ├── admin/
-│   ├── pdf/
-│   └── frontend/
+│   │   ├── documents-list.php
+│   │   ├── invoice-edit.php
+│   │   ├── receipt-edit.php
+│   │   ├── settings.php
+│   │   └── partials/
+│   │       ├── items-table.php
+│   │       ├── buyer-fields.php
+│   │       └── seller-fields.php
+│   ├── pdf/                  # (do implementacji)
+│   └── frontend/             # (do implementacji)
 ├── assets/                   # Zasoby frontend
 │   ├── css/
+│   │   ├── admin.css
+│   │   └── frontend.css
 │   └── js/
+│       ├── admin.js
+│       └── document-edit.js
 ├── tests/                    # Testy PHPUnit
-├── languages/                # Pliki tłumaczeń (.pot/.po/.mo)
+│   ├── bootstrap.php
+│   ├── Unit/
+│   │   ├── Core/
+│   │   └── Models/
+│   └── Integration/          # (do implementacji)
+├── languages/                # Pliki tłumaczeń (do implementacji)
 └── docs/                     # Dokumentacja
 ```
 
@@ -303,7 +330,7 @@ Typy:
 
 - `/coordinator` - Koordynator projektu
 - `/php-dev` - Deweloper PHP
-- `/review` - Code review
+- `/code-review` - Code review
 - `/devops` - CI/CD i automatyzacja
 - `/docs` - Dokumentacja
 - `/qa` - Testy i QA
@@ -330,6 +357,43 @@ composer check            # Wszystkie sprawdzenia
 - [ ] Uprawnienia są sprawdzane
 - [ ] Stringi używają text domain `ihumbak-invoices`
 - [ ] Dokumentacja jest aktualna
+
+## Status implementacji
+
+| Faza | Nazwa | Status |
+|------|-------|--------|
+| 1 | Fundament | UKONCZONA |
+| 2 | Panel administracyjny | UKONCZONA |
+| 3 | Eksport PDF | DO ZROBIENIA |
+| 4 | Rozszerzenia | DO ZROBIENIA |
+
+### Zaimplementowane komponenty
+
+**Core:**
+- Plugin.php, Container.php, Activator.php, Deactivator.php, Installer.php
+
+**Modele:**
+- Document (abstrakcyjna), Invoice, Receipt, DocumentItem, Buyer, Seller
+
+**Repozytoria:**
+- DocumentRepository, DocumentItemRepository
+
+**Serwisy:**
+- NumberingService, CalculationService
+
+**Admin:**
+- DocumentListTable, DocumentController, AjaxController
+
+**Testy:**
+- 56 testów jednostkowych, wszystkie przechodzą
+
+### Do implementacji
+
+- Generowanie PDF (DOMPDF)
+- Import pozycji z zamówień WC
+- Faktury korygujące
+- Portal klienta (My Account)
+- Wysyłka email z fakturą
 
 ## Plan prac
 
