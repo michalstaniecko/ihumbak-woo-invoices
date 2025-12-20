@@ -119,10 +119,19 @@ $page_title = $is_new
                         <tr>
                             <th><label for="order_id"><?php esc_html_e( 'WooCommerce Order', 'ihumbak-invoices' ); ?></label></th>
                             <td>
-                                <input type="number" id="order_id" name="order_id"
-                                       value="<?php echo esc_attr( $document ? $document->getOrderId() : '' ); ?>"
-                                       class="small-text" min="1" <?php disabled( ! $can_edit ); ?>>
-                                <p class="description"><?php esc_html_e( 'Optional. Enter order number to link this receipt.', 'ihumbak-invoices' ); ?></p>
+                                <div class="ihumbak-order-field-wrapper">
+                                    <input type="number" id="order_id" name="order_id"
+                                           value="<?php echo esc_attr( $document ? $document->getOrderId() : '' ); ?>"
+                                           class="small-text" min="1" <?php disabled( ! $can_edit ); ?>>
+                                    <?php if ( $can_edit ) : ?>
+                                    <button type="button" id="ihumbak-fetch-order" class="button" disabled>
+                                        <span class="dashicons dashicons-download" style="vertical-align: middle; margin-top: -2px;"></span>
+                                        <?php esc_html_e( 'Fetch Order Data', 'ihumbak-invoices' ); ?>
+                                    </button>
+                                    <span id="ihumbak-fetch-status" class="spinner" style="float: none; margin: 4px 0 0 0;"></span>
+                                    <?php endif; ?>
+                                </div>
+                                <p class="description"><?php esc_html_e( 'Enter order number and click "Fetch Order Data" to import items and buyer info.', 'ihumbak-invoices' ); ?></p>
                             </td>
                         </tr>
                     </table>

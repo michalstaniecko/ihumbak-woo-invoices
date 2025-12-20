@@ -272,9 +272,12 @@ final class Plugin {
 				'selectLogo' => __( 'Select Logo', 'ihumbak-invoices' ),
 				'useLogo'    => __( 'Use this logo', 'ihumbak-invoices' ),
 				'i18n'       => array(
-					'confirmDelete' => __( 'Are you sure you want to delete this item?', 'ihumbak-invoices' ),
-					'calculating'   => __( 'Calculating...', 'ihumbak-invoices' ),
-					'error'         => __( 'An error occurred. Please try again.', 'ihumbak-invoices' ),
+					'confirmDelete'       => __( 'Are you sure you want to delete this item?', 'ihumbak-invoices' ),
+					'calculating'         => __( 'Calculating...', 'ihumbak-invoices' ),
+					'error'               => __( 'An error occurred. Please try again.', 'ihumbak-invoices' ),
+					'orderDataLoaded'     => __( 'Order data loaded successfully.', 'ihumbak-invoices' ),
+					'orderNotFound'       => __( 'Order not found.', 'ihumbak-invoices' ),
+					'replaceItemsConfirm' => __( 'The form already contains items. Do you want to replace them with order data?', 'ihumbak-invoices' ),
 				),
 			)
 		);
@@ -521,6 +524,7 @@ final class Plugin {
 				'auto_generate_invoice' => false,
 				'auto_generate_receipt' => false,
 				'trigger_status'        => 'completed',
+				'nip_meta_key'          => '_billing_nip',
 			),
 		);
 	}
@@ -575,6 +579,7 @@ final class Plugin {
 				'auto_generate_invoice' => ! empty( $input['automation']['auto_generate_invoice'] ),
 				'auto_generate_receipt' => ! empty( $input['automation']['auto_generate_receipt'] ),
 				'trigger_status'        => sanitize_text_field( $input['automation']['trigger_status'] ?? 'completed' ),
+				'nip_meta_key'          => sanitize_text_field( $input['automation']['nip_meta_key'] ?? '_billing_nip' ),
 			);
 		}
 

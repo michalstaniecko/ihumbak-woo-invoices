@@ -185,7 +185,11 @@
 }
 
 .ihumbak-items-table .column-name {
-    width: 25%;
+    width: 20%;
+}
+
+.ihumbak-items-table .column-sku {
+    width: 100px;
 }
 
 .ihumbak-items-table .column-quantity {
@@ -273,6 +277,33 @@
 #ihumbak-add-item .dashicons {
     vertical-align: middle;
     margin-right: 5px;
+}
+
+/* ==========================================================================
+   Order Fetch Field
+   ========================================================================== */
+
+.ihumbak-order-field-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.ihumbak-order-field-wrapper .spinner {
+    float: none;
+    margin: 0;
+}
+
+#ihumbak-fetch-order .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Ajax notices */
+.ihumbak-ajax-notice {
+    margin: 10px 0 20px 0;
 }
 
 /* ==========================================================================

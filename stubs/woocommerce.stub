@@ -14,6 +14,26 @@ function is_account_page(): bool {
     return false;
 }
 
+/**
+ * Get order by ID.
+ *
+ * @param int|WC_Order $order_id Order ID or object.
+ * @return WC_Order|false
+ */
+function wc_get_order( int|WC_Order $order_id ): WC_Order|false {
+    return false;
+}
+
+/**
+ * Get product by ID.
+ *
+ * @param int $product_id Product ID.
+ * @return WC_Product|false
+ */
+function wc_get_product( int $product_id ): WC_Product|false {
+    return false;
+}
+
 class WC_Order {
     public function get_id(): int {}
     public function get_status(): string {}
@@ -38,6 +58,11 @@ class WC_Order {
     public function get_meta(string $key, bool $single = true): mixed {}
     public function update_meta_data(string $key, mixed $value): void {}
     public function save(): int {}
+    public function get_payment_method(): string {}
+    public function get_payment_method_title(): string {}
+    public function get_shipping_total(): string {}
+    public function get_shipping_tax(): string {}
+    public function get_shipping_method(): string {}
 }
 
 class WC_Order_Item_Product {
@@ -49,6 +74,8 @@ class WC_Order_Item_Product {
     public function get_subtotal(): string {}
     public function get_total_tax(): string {}
     public function get_subtotal_tax(): string {}
+    public function get_product(): ?WC_Product {}
+    public function get_variation_id(): int {}
 }
 
 class WC_DateTime extends \DateTime {}

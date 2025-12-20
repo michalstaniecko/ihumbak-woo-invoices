@@ -232,6 +232,15 @@ apply_filters('ihumbak_pdf_data', array $data, Invoice $invoice);
 
 // Modyfikacja szablonu email
 apply_filters('ihumbak_email_template', string $template, Invoice $invoice);
+
+// Modyfikacja jednostki dla pozycji faktury
+apply_filters('ihumbak_invoice_item_unit', string $unit, ?int $product_id, ?WC_Order_Item_Product $item);
+
+// Modyfikacja jednostki dla wysyłki
+apply_filters('ihumbak_invoice_shipping_unit', string $unit, WC_Order $order);
+
+// Modyfikacja mapowania metod płatności
+apply_filters('ihumbak_payment_method_map', array $map);
 ```
 
 ## Ustawienia pluginu
@@ -267,6 +276,7 @@ Zapisywane w `wp_options` pod kluczem `ihumbak_invoices_settings`.
         'auto_generate_invoice' => false,
         'auto_generate_receipt' => false,
         'trigger_status' => 'completed',
+        'nip_meta_key' => '_billing_nip',
     ],
 ]
 ```
@@ -387,7 +397,7 @@ composer check            # Wszystkie sprawdzenia
 - DocumentRepository, DocumentItemRepository
 
 **Serwisy:**
-- NumberingService, CalculationService
+- NumberingService, CalculationService, OrderDataExtractor
 
 **Admin:**
 - DocumentListTable, DocumentController, AjaxController
@@ -401,7 +411,6 @@ composer check            # Wszystkie sprawdzenia
 
 ### Do implementacji
 
-- Import pozycji z zamówień WC
 - Faktury korygujące
 - Portal klienta (My Account)
 - Wysyłka email z fakturą

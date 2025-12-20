@@ -165,6 +165,7 @@ class DocumentItemTest extends TestCase {
 			'document_id'      => 5,
 			'product_id'       => 10,
 			'name'             => 'Round Trip Product',
+			'sku'              => 'SKU-123',
 			'quantity'         => 1.5,
 			'unit'             => 'kg',
 			'unit_price_net'   => 50.00,

@@ -95,6 +95,7 @@ class DocumentItemRepository {
 			'document_id'      => $item->getDocumentId(),
 			'product_id'       => $item->getProductId(),
 			'name'             => $item->getName(),
+			'sku'              => $item->getSku(),
 			'quantity'         => $item->getQuantity(),
 			'unit'             => $item->getUnit(),
 			'unit_price_net'   => $item->getUnitPriceNet(),
@@ -105,7 +106,7 @@ class DocumentItemRepository {
 			'line_total_gross' => $item->getLineTotalGross(),
 		);
 
-		$formats = array( '%d', '%d', '%s', '%f', '%s', '%f', '%f', '%f', '%f', '%f', '%f' );
+		$formats = array( '%d', '%d', '%s', '%s', '%f', '%s', '%f', '%f', '%f', '%f', '%f', '%f' );
 
 		if ( $item->getId() ) {
 			// Update existing.

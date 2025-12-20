@@ -43,6 +43,13 @@ class DocumentItem {
 	private string $name = '';
 
 	/**
+	 * Product SKU.
+	 *
+	 * @var string
+	 */
+	private string $sku = '';
+
+	/**
 	 * Quantity.
 	 *
 	 * @var float
@@ -175,6 +182,26 @@ class DocumentItem {
 	 */
 	public function setName( string $name ): self {
 		$this->name = $name;
+		return $this;
+	}
+
+	/**
+	 * Get product SKU.
+	 *
+	 * @return string
+	 */
+	public function getSku(): string {
+		return $this->sku;
+	}
+
+	/**
+	 * Set product SKU.
+	 *
+	 * @param string $sku Product SKU.
+	 * @return self
+	 */
+	public function setSku( string $sku ): self {
+		$this->sku = $sku;
 		return $this;
 	}
 
@@ -358,6 +385,7 @@ class DocumentItem {
 		}
 
 		$item->setName( (string) ( $data['name'] ?? '' ) );
+		$item->setSku( (string) ( $data['sku'] ?? '' ) );
 		$item->setQuantity( (float) ( $data['quantity'] ?? 1.0 ) );
 		$item->setUnit( (string) ( $data['unit'] ?? 'szt.' ) );
 		$item->setUnitPriceNet( (float) ( $data['unit_price_net'] ?? 0.0 ) );
@@ -381,6 +409,7 @@ class DocumentItem {
 			'document_id'      => $this->document_id,
 			'product_id'       => $this->product_id,
 			'name'             => $this->name,
+			'sku'              => $this->sku,
 			'quantity'         => $this->quantity,
 			'unit'             => $this->unit,
 			'unit_price_net'   => $this->unit_price_net,

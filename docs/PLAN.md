@@ -169,9 +169,22 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
 ---
 
 ## Faza 4: Rozszerzenia
-**Status: DO ZROBIENIA**
+**Status: W TRAKCIE**
 
-- [ ] Import pozycji z zamowienia WC
+### Import pozycji z zamowienia WC
+- [x] Metoda 1: Przycisk "Fetch Order Data" w formularzu faktury/paragonu
+  - [x] Kolumna SKU w modelu DocumentItem i bazie danych
+  - [x] Ustawienie NIP meta key w konfiguracji
+  - [x] Serwis OrderDataExtractor (produkty, shipping, buyer, payment method)
+  - [x] Endpoint AJAX fetch_order_data
+  - [x] Modyfikacja formularzy (przycisk + spinner)
+  - [x] JavaScript (fetch, confirm replace/append, populate)
+  - [ ] Testy jednostkowe dla OrderDataExtractor
+- [ ] Metoda 2: Przyciski na stronie zamowienia WC
+  - [ ] OrderMetaBox (Utworz fakture / Utworz paragon)
+  - [ ] Pre-fill formularza z GET parameter order_id
+
+### Pozostale rozszerzenia
 - [ ] Faktury korygujace (correction.php)
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura

@@ -27,6 +27,7 @@
         init: function() {
             this.itemIndex = this.getMaxItemIndex() + 1;
             this.bindEvents();
+            this.initFetchOrder();
             this.recalculateDocument();
         },
 
@@ -220,6 +221,220 @@
             $('#document-subtotal-display').text(data.formatted.subtotal);
             $('#document-tax-total-display').text(data.formatted.tax_total);
             $('#document-total-display').text(data.formatted.total);
+        },
+
+        /**
+         * Initialize fetch order functionality.
+         */
+        initFetchOrder: function() {
+            var self = this;
+            var $orderIdInput = $('#order_id');
+            var $fetchButton = $('#ihumbak-fetch-order');
+
+            if (!$fetchButton.length) {
+                return;
+            }
+
+            // Enable/disable button based on input.
+            $orderIdInput.on('input', function() {
+                var orderId = parseInt($(this).val(), 10);
+                $fetchButton.prop('disabled', !orderId || orderId < 1);
+            });
+
+            // Trigger on load.
+            $orderIdInput.trigger('input');
+
+            // Fetch button click.
+            $fetchButton.on('click', function(e) {
+                e.preventDefault();
+                var orderId = parseInt($orderIdInput.val(), 10);
+                if (orderId > 0) {
+                    self.fetchOrderData(orderId);
+                }
+            });
+        },
+
+        /**
+         * Fetch order data via AJAX.
+         *
+         * @param {number} orderId Order ID.
+         */
+        fetchOrderData: function(orderId) {
+            var self = this;
+            var $button = $('#ihumbak-fetch-order');
+            var $spinner = $('#ihumbak-fetch-status');
+
+            // Show loading state.
+            $button.prop('disabled', true);
+            $spinner.addClass('is-active');
+
+            $.ajax({
+                url: ihumbakInvoices.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'ihumbak_fetch_order_data',
+                    nonce: ihumbakInvoices.nonce,
+                    order_id: orderId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.confirmAndPopulate(response.data);
+                    } else {
+                        self.showNotice('error', response.data.message || ihumbakInvoices.i18n.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    self.showNotice('error', ihumbakInvoices.i18n.error);
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                    $spinner.removeClass('is-active');
+                }
+            });
+        },
+
+        /**
+         * Confirm and populate form with order data.
+         *
+         * @param {Object} data Order data from AJAX response.
+         */
+        confirmAndPopulate: function(data) {
+            var hasItems = $('#ihumbak-items-body .ihumbak-item-row').length > 0;
+            var mode = 'replace';
+
+            if (hasItems) {
+                var confirmMsg = ihumbakInvoices.i18n.replaceItemsConfirm ||
+                    'The form already contains items. Do you want to replace them with order data?';
+
+                if (confirm(confirmMsg)) {
+                    mode = 'replace';
+                } else {
+                    mode = 'append';
+                }
+            }
+
+            this.populateFromOrderData(data, mode);
+            this.showNotice('success', ihumbakInvoices.i18n.orderDataLoaded || 'Order data loaded successfully.');
+        },
+
+        /**
+         * Populate form with order data.
+         *
+         * @param {Object} data Order data.
+         * @param {string} mode 'replace' or 'append'.
+         */
+        populateFromOrderData: function(data, mode) {
+            var self = this;
+
+            if (mode === 'replace') {
+                // Clear existing items.
+                $('#ihumbak-items-body').empty();
+                this.itemIndex = 0;
+            }
+
+            // Add items.
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(function(item) {
+                    self.addItemRowWithData(item);
+                });
+            }
+
+            // Populate buyer fields.
+            if (data.buyer) {
+                this.populateBuyerFields(data.buyer);
+            }
+
+            // Set payment method (invoice only).
+            if (data.payment_method && $('#payment_method').length) {
+                $('#payment_method').val(data.payment_method);
+            }
+
+            // Recalculate document totals.
+            this.recalculateDocument();
+        },
+
+        /**
+         * Add item row with pre-filled data.
+         *
+         * @param {Object} itemData Item data.
+         */
+        addItemRowWithData: function(itemData) {
+            var template = $('#ihumbak-item-row-template').html();
+            var html = template.replace(/\{\{index\}\}/g, this.itemIndex);
+
+            var $row = $(html);
+
+            // Fill in the data.
+            $row.find('.item-name').val(itemData.name || '');
+            $row.find('.item-sku').val(itemData.sku || '');
+            $row.find('.item-quantity').val(itemData.quantity || 1);
+            $row.find('.item-unit').val(itemData.unit || 'szt.');
+            $row.find('.item-price-net').val((itemData.unit_price_net || 0).toFixed(2));
+            $row.find('.item-tax-rate').val(itemData.tax_rate || 23);
+            $row.find('.item-price-gross').val((itemData.unit_price_gross || 0).toFixed(2));
+            $row.find('.item-total-net').val((itemData.line_total_net || 0).toFixed(2));
+            $row.find('.item-tax-amount').val((itemData.tax_amount || 0).toFixed(2));
+            $row.find('.item-total-gross').val((itemData.line_total_gross || 0).toFixed(2));
+
+            // Update display values.
+            if (itemData.formatted) {
+                $row.find('.item-total-net-display').text(itemData.formatted.line_total_net);
+                $row.find('.item-tax-amount-display').text(itemData.formatted.tax_amount);
+                $row.find('.item-total-gross-display').text(itemData.formatted.line_total_gross);
+            }
+
+            // Add hidden product_id if available.
+            if (itemData.product_id) {
+                $row.append('<input type="hidden" name="items[' + this.itemIndex + '][product_id]" value="' + itemData.product_id + '">');
+            }
+
+            $('#ihumbak-items-body').append($row);
+            this.itemIndex++;
+        },
+
+        /**
+         * Populate buyer fields from order data.
+         *
+         * @param {Object} buyerData Buyer data.
+         */
+        populateBuyerFields: function(buyerData) {
+            $('#buyer_name').val(buyerData.name || '');
+            $('#buyer_nip').val(buyerData.nip || '');
+            $('#buyer_address').val(buyerData.address || '');
+            $('#buyer_postcode').val(buyerData.postcode || '');
+            $('#buyer_city').val(buyerData.city || '');
+            $('#buyer_country').val(buyerData.country || 'PL');
+            $('#buyer_email').val(buyerData.email || '');
+            $('#buyer_phone').val(buyerData.phone || '');
+        },
+
+        /**
+         * Show notice message.
+         *
+         * @param {string} type 'success' or 'error'.
+         * @param {string} message Message to display.
+         */
+        showNotice: function(type, message) {
+            // Remove existing notices.
+            $('.ihumbak-ajax-notice').remove();
+
+            // Build notice safely using jQuery methods to prevent XSS.
+            var $notice = $('<div></div>')
+                .addClass('notice is-dismissible ihumbak-ajax-notice')
+                .addClass('notice-' + (type === 'error' ? 'error' : 'success'));
+
+            var $message = $('<p></p>').text(message);
+            $notice.append($message);
+
+            $('.wp-header-end').after($notice);
+
+            // Auto-dismiss after 5 seconds.
+            setTimeout(function() {
+                $notice.fadeOut(function() {
+                    $(this).remove();
+                });
+            }, 5000);
         }
     };
 

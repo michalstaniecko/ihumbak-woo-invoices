@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.0.1';
+	private const DB_VERSION = '1.1.0';
 
 	/**
 	 * Option name for storing database version.
@@ -70,6 +70,26 @@ class Installer {
 			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN sale_date date DEFAULT NULL" );
 			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN buyer_data longtext DEFAULT NULL" );
 			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN seller_data longtext DEFAULT NULL" );
+			// phpcs:enable
+		}
+
+		// Migration to 1.1.0: Add SKU column to document items.
+		if ( version_compare( $from_version, '1.1.0', '<' ) ) {
+			$items_table = self::get_document_items_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$items_table,
+					'sku'
+				)
+			);
+
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$items_table} ADD COLUMN sku varchar(100) DEFAULT '' AFTER name" );
+			}
 			// phpcs:enable
 		}
 	}
@@ -149,6 +169,7 @@ class Installer {
             document_id bigint(20) unsigned NOT NULL,
             product_id bigint(20) unsigned DEFAULT NULL,
             name varchar(255) NOT NULL,
+            sku varchar(100) DEFAULT '',
             quantity decimal(10,3) NOT NULL DEFAULT 1.000,
             unit varchar(20) NOT NULL DEFAULT 'szt.',
             unit_price_net decimal(10,2) NOT NULL DEFAULT 0.00,
@@ -201,7 +222,8 @@ class Installer {
 		);
 
 		foreach ( $tables as $table ) {
-			$wpdb->query( "DROP TABLE IF EXISTS {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+			$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
 		}
 
 		delete_option( self::DB_VERSION_OPTION );

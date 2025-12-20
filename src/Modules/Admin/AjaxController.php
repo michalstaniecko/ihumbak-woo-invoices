@@ -11,6 +11,7 @@ namespace IHumbak\Invoices\Modules\Admin;
 
 use IHumbak\Invoices\Modules\Invoice\CalculationService;
 use IHumbak\Invoices\Modules\Invoice\NumberingService;
+use IHumbak\Invoices\Modules\Invoice\OrderDataExtractor;
 use IHumbak\Invoices\Core\Plugin;
 
 /**
@@ -33,11 +34,19 @@ class AjaxController {
 	private NumberingService $numbering_service;
 
 	/**
+	 * Order data extractor.
+	 *
+	 * @var OrderDataExtractor
+	 */
+	private OrderDataExtractor $order_extractor;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->calculation_service = new CalculationService();
 		$this->numbering_service   = new NumberingService();
+		$this->order_extractor     = new OrderDataExtractor();
 	}
 
 	/**
@@ -49,6 +58,7 @@ class AjaxController {
 		add_action( 'wp_ajax_ihumbak_calculate_item', array( $this, 'calculate_item' ) );
 		add_action( 'wp_ajax_ihumbak_calculate_document', array( $this, 'calculate_document' ) );
 		add_action( 'wp_ajax_ihumbak_preview_number', array( $this, 'preview_number' ) );
+		add_action( 'wp_ajax_ihumbak_fetch_order_data', array( $this, 'fetch_order_data' ) );
 	}
 
 	/**
@@ -80,13 +90,7 @@ class AjaxController {
 		}
 
 		// Format values for display.
-		$result['formatted'] = array(
-			'unit_price_net'   => number_format( $result['unit_price_net'], 2, ',', ' ' ),
-			'unit_price_gross' => number_format( $result['unit_price_gross'], 2, ',', ' ' ),
-			'tax_amount'       => number_format( $result['tax_amount'], 2, ',', ' ' ),
-			'line_total_net'   => number_format( $result['line_total_net'], 2, ',', ' ' ),
-			'line_total_gross' => number_format( $result['line_total_gross'], 2, ',', ' ' ),
-		);
+		$result['formatted'] = $this->format_item_values( $result );
 
 		wp_send_json_success( $result );
 	}
@@ -136,13 +140,7 @@ class AjaxController {
 
 		// Format item values.
 		foreach ( $result['items'] as $index => $item ) {
-			$result['items'][ $index ]['formatted'] = array(
-				'unit_price_net'   => number_format( $item['unit_price_net'], 2, ',', ' ' ),
-				'unit_price_gross' => number_format( $item['unit_price_gross'], 2, ',', ' ' ),
-				'tax_amount'       => number_format( $item['tax_amount'], 2, ',', ' ' ),
-				'line_total_net'   => number_format( $item['line_total_net'], 2, ',', ' ' ),
-				'line_total_gross' => number_format( $item['line_total_gross'], 2, ',', ' ' ),
-			);
+			$result['items'][ $index ]['formatted'] = $this->format_item_values( $item );
 		}
 
 		wp_send_json_success( $result );
@@ -176,6 +174,22 @@ class AjaxController {
 	}
 
 	/**
+	 * Format item values for display.
+	 *
+	 * @param array<string, mixed> $item Item data with numeric values.
+	 * @return array<string, string>
+	 */
+	private function format_item_values( array $item ): array {
+		return array(
+			'unit_price_net'   => number_format( (float) ( $item['unit_price_net'] ?? 0 ), 2, ',', ' ' ),
+			'unit_price_gross' => number_format( (float) ( $item['unit_price_gross'] ?? 0 ), 2, ',', ' ' ),
+			'tax_amount'       => number_format( (float) ( $item['tax_amount'] ?? 0 ), 2, ',', ' ' ),
+			'line_total_net'   => number_format( (float) ( $item['line_total_net'] ?? 0 ), 2, ',', ' ' ),
+			'line_total_gross' => number_format( (float) ( $item['line_total_gross'] ?? 0 ), 2, ',', ' ' ),
+		);
+	}
+
+	/**
 	 * Sanitize items data from request.
 	 *
 	 * @param array<int, array<string, mixed>> $items Raw items data.
@@ -201,5 +215,49 @@ class AjaxController {
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * Fetch order data via AJAX.
+	 *
+	 * @return void
+	 */
+	public function fetch_order_data(): void {
+		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
+		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- absint sanitizes.
+		$order_id = isset( $_POST['order_id'] ) ? absint( wp_unslash( $_POST['order_id'] ) ) : 0;
+
+		if ( ! $order_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid order ID.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Check if WooCommerce is active.
+		if ( ! function_exists( 'wc_get_order' ) ) {
+			wp_send_json_error( array( 'message' => __( 'WooCommerce is not active.', 'ihumbak-invoices' ) ) );
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			wp_send_json_error( array( 'message' => __( 'Order not found.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Get NIP meta key from settings.
+		$settings     = Plugin::get_instance()->get_settings();
+		$nip_meta_key = $settings['automation']['nip_meta_key'] ?? '_billing_nip';
+
+		$data = $this->order_extractor->extractAll( $order, $nip_meta_key );
+
+		// Add formatted values for display.
+		foreach ( $data['items'] as $index => $item ) {
+			$data['items'][ $index ]['formatted'] = $this->format_item_values( $item );
+		}
+
+		wp_send_json_success( $data );
 	}
 }

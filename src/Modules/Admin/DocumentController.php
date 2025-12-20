@@ -357,6 +357,7 @@ class DocumentController {
 
 			$item = new DocumentItem();
 			$item->setName( sanitize_text_field( $item_data['name'] ?? '' ) );
+			$item->setSku( sanitize_text_field( $item_data['sku'] ?? '' ) );
 			$item->setQuantity( (float) ( $item_data['quantity'] ?? 1 ) );
 			$item->setUnit( sanitize_text_field( $item_data['unit'] ?? 'szt.' ) );
 			$item->setUnitPriceNet( (float) ( $item_data['unit_price_net'] ?? 0 ) );

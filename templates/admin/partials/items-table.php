@@ -19,6 +19,7 @@ $items = $items ?? [];
         <thead>
             <tr>
                 <th class="column-name"><?php esc_html_e( 'Name', 'ihumbak-invoices' ); ?></th>
+                <th class="column-sku"><?php esc_html_e( 'SKU', 'ihumbak-invoices' ); ?></th>
                 <th class="column-quantity"><?php esc_html_e( 'Qty', 'ihumbak-invoices' ); ?></th>
                 <th class="column-unit"><?php esc_html_e( 'Unit', 'ihumbak-invoices' ); ?></th>
                 <th class="column-price-net"><?php esc_html_e( 'Price Net', 'ihumbak-invoices' ); ?></th>
@@ -38,6 +39,11 @@ $items = $items ?? [];
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
                                    value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
                                    class="item-name" required>
+                        </td>
+                        <td class="column-sku">
+                            <input type="text" name="items[<?php echo esc_attr( $index ); ?>][sku]"
+                                   value="<?php echo esc_attr( $item['sku'] ?? '' ); ?>"
+                                   class="item-sku">
                         </td>
                         <td class="column-quantity">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][quantity]"
@@ -93,7 +99,7 @@ $items = $items ?? [];
         </tbody>
         <tfoot>
             <tr class="ihumbak-totals-row">
-                <td colspan="6" class="text-right"><strong><?php esc_html_e( 'Totals:', 'ihumbak-invoices' ); ?></strong></td>
+                <td colspan="7" class="text-right"><strong><?php esc_html_e( 'Totals:', 'ihumbak-invoices' ); ?></strong></td>
                 <td class="column-total-net">
                     <strong id="document-subtotal-display">0,00</strong>
                     <input type="hidden" name="subtotal" id="document-subtotal" value="0">
@@ -124,6 +130,9 @@ $items = $items ?? [];
     <tr class="ihumbak-item-row" data-index="{{index}}">
         <td class="column-name">
             <input type="text" name="items[{{index}}][name]" value="" class="item-name" required>
+        </td>
+        <td class="column-sku">
+            <input type="text" name="items[{{index}}][sku]" value="" class="item-sku">
         </td>
         <td class="column-quantity">
             <input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001" min="0.001" required>

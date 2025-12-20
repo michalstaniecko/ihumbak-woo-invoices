@@ -323,6 +323,22 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                         </p>
                     </td>
                 </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="nip_meta_key"><?php esc_html_e( 'NIP Meta Key', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <input type="text"
+                               id="nip_meta_key"
+                               name="ihumbak_invoices_settings[automation][nip_meta_key]"
+                               value="<?php echo esc_attr( $settings['automation']['nip_meta_key'] ?? '_billing_nip' ); ?>"
+                               class="regular-text"
+                               placeholder="_billing_nip">
+                        <p class="description">
+                            <?php esc_html_e( 'Order meta key where customer NIP/Tax ID is stored. Common values: _billing_nip, billing_nip, _vat_number', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
             </table>
         <?php endif; ?>
 
