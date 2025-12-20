@@ -63,8 +63,19 @@ class Invoice extends Document {
 	 *
 	 * @param string $method Payment method.
 	 * @return self
+	 * @throws \InvalidArgumentException If payment method is not valid.
 	 */
 	public function setPaymentMethod( string $method ): self {
+		if ( '' !== $method && ! array_key_exists( $method, self::getPaymentMethods() ) ) {
+			throw new \InvalidArgumentException(
+				sprintf(
+					/* translators: 1: Invalid payment method, 2: List of valid methods */
+					esc_html__( 'Invalid payment method "%1$s". Valid methods are: %2$s', 'ihumbak-invoices' ),
+					esc_html( $method ),
+					esc_html( implode( ', ', array_keys( self::getPaymentMethods() ) ) )
+				)
+			);
+		}
 		$this->payment_method = $method;
 		return $this;
 	}
@@ -81,20 +92,6 @@ class Invoice extends Document {
 			'card'     => __( 'Credit/Debit card', 'ihumbak-invoices' ),
 			'online'   => __( 'Online payment', 'ihumbak-invoices' ),
 		);
-	}
-
-	/**
-	 * Safely parse date string to DateTimeImmutable.
-	 *
-	 * @param string $date_string Date string to parse.
-	 * @return \DateTimeImmutable|null Parsed date or null on failure.
-	 */
-	private static function parseDate( string $date_string ): ?\DateTimeImmutable {
-		try {
-			return new \DateTimeImmutable( $date_string );
-		} catch ( \Exception $e ) {
-			return null;
-		}
 	}
 
 	/**
@@ -134,6 +131,11 @@ class Invoice extends Document {
 			if ( $date ) {
 				$invoice->setDueDate( $date );
 			}
+		}
+
+		// Corrected document ID (for corrections).
+		if ( isset( $data['corrected_document_id'] ) ) {
+			$invoice->setCorrectedDocumentId( (int) $data['corrected_document_id'] );
 		}
 
 		// Buyer/Seller.
@@ -180,6 +182,15 @@ class Invoice extends Document {
 			}
 		}
 
+		// Items.
+		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
+			foreach ( $data['items'] as $item_data ) {
+				if ( is_array( $item_data ) ) {
+					$invoice->addItem( DocumentItem::fromArray( $item_data ) );
+				}
+			}
+		}
+
 		return $invoice;
 	}
 
@@ -190,23 +201,28 @@ class Invoice extends Document {
 	 */
 	public function toArray(): array {
 		return array(
-			'id'              => $this->id,
-			'order_id'        => $this->order_id,
-			'document_type'   => $this->getDocumentType(),
-			'document_number' => $this->document_number,
-			'issue_date'      => $this->issue_date?->format( 'Y-m-d' ),
-			'sale_date'       => $this->sale_date?->format( 'Y-m-d' ),
-			'due_date'        => $this->due_date?->format( 'Y-m-d' ),
-			'buyer_data'      => $this->buyer?->toJson(),
-			'seller_data'     => $this->seller?->toJson(),
-			'subtotal'        => $this->subtotal,
-			'tax_total'       => $this->tax_total,
-			'total'           => $this->total,
-			'currency'        => $this->currency,
-			'status'          => $this->status,
-			'pdf_path'        => $this->pdf_path,
-			'notes'           => $this->notes,
-			'payment_method'  => $this->payment_method,
+			'id'                    => $this->id,
+			'order_id'              => $this->order_id,
+			'document_type'         => $this->getDocumentType(),
+			'document_number'       => $this->document_number,
+			'issue_date'            => $this->issue_date?->format( 'Y-m-d' ),
+			'sale_date'             => $this->sale_date?->format( 'Y-m-d' ),
+			'due_date'              => $this->due_date?->format( 'Y-m-d' ),
+			'corrected_document_id' => $this->corrected_document_id,
+			'buyer_data'            => $this->buyer?->toJson(),
+			'seller_data'           => $this->seller?->toJson(),
+			'subtotal'              => $this->subtotal,
+			'tax_total'             => $this->tax_total,
+			'total'                 => $this->total,
+			'currency'              => $this->currency,
+			'status'                => $this->status,
+			'pdf_path'              => $this->pdf_path,
+			'notes'                 => $this->notes,
+			'payment_method'        => $this->payment_method,
+			'items'                 => array_map(
+				static fn( DocumentItem $item ): array => $item->toArray(),
+				$this->items
+			),
 		);
 	}
 }

@@ -68,6 +68,13 @@ abstract class Document {
 	protected ?DateTimeImmutable $due_date = null;
 
 	/**
+	 * Corrected document ID (for corrections).
+	 *
+	 * @var int|null
+	 */
+	protected ?int $corrected_document_id = null;
+
+	/**
 	 * Buyer data.
 	 *
 	 * @var Buyer|null
@@ -283,6 +290,35 @@ abstract class Document {
 	public function setDueDate( ?DateTimeImmutable $date ): self {
 		$this->due_date = $date;
 		return $this;
+	}
+
+	/**
+	 * Get corrected document ID.
+	 *
+	 * @return int|null
+	 */
+	public function getCorrectedDocumentId(): ?int {
+		return $this->corrected_document_id;
+	}
+
+	/**
+	 * Set corrected document ID.
+	 *
+	 * @param int|null $id Corrected document ID.
+	 * @return self
+	 */
+	public function setCorrectedDocumentId( ?int $id ): self {
+		$this->corrected_document_id = $id;
+		return $this;
+	}
+
+	/**
+	 * Check if this document is a correction.
+	 *
+	 * @return bool
+	 */
+	public function isCorrection(): bool {
+		return null !== $this->corrected_document_id;
 	}
 
 	/**
@@ -615,5 +651,19 @@ abstract class Document {
 	public function getStatusLabel(): string {
 		$statuses = self::getStatuses();
 		return $statuses[ $this->status ] ?? $this->status;
+	}
+
+	/**
+	 * Safely parse date string to DateTimeImmutable.
+	 *
+	 * @param string $date_string Date string to parse.
+	 * @return DateTimeImmutable|null Parsed date or null on failure.
+	 */
+	protected static function parseDate( string $date_string ): ?DateTimeImmutable {
+		try {
+			return new DateTimeImmutable( $date_string );
+		} catch ( \Exception $e ) {
+			return null;
+		}
 	}
 }

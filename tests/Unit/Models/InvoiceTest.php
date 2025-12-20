@@ -307,4 +307,158 @@ class InvoiceTest extends TestCase {
 		$invoice->setStatus( Document::STATUS_PAID );
 		$this->assertFalse( $invoice->canBeEdited() );
 	}
+
+	/**
+	 * Test invalid payment method throws exception.
+	 */
+	public function test_invalid_payment_method_throws_exception(): void {
+		$invoice = new Invoice();
+
+		$this->expectException( \InvalidArgumentException::class );
+		$invoice->setPaymentMethod( 'invalid_method' );
+	}
+
+	/**
+	 * Test empty payment method is allowed.
+	 */
+	public function test_empty_payment_method_is_allowed(): void {
+		$invoice = new Invoice();
+
+		$invoice->setPaymentMethod( '' );
+		$this->assertEquals( '', $invoice->getPaymentMethod() );
+	}
+
+	/**
+	 * Test fromArray with invalid date returns null.
+	 */
+	public function test_from_array_with_invalid_date(): void {
+		$data = array(
+			'issue_date' => 'invalid-date-format',
+			'sale_date'  => 'not-a-date',
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertNull( $invoice->getIssueDate() );
+		$this->assertNull( $invoice->getSaleDate() );
+	}
+
+	/**
+	 * Test fromArray with items.
+	 */
+	public function test_from_array_with_items(): void {
+		$data = array(
+			'id'    => 1,
+			'items' => array(
+				array(
+					'name'           => 'Product 1',
+					'quantity'       => 2.0,
+					'unit_price_net' => 100.00,
+					'tax_rate'       => 23.0,
+				),
+				array(
+					'name'           => 'Product 2',
+					'quantity'       => 1.0,
+					'unit_price_net' => 50.00,
+					'tax_rate'       => 23.0,
+				),
+			),
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertCount( 2, $invoice->getItems() );
+		$this->assertEquals( 'Product 1', $invoice->getItems()[0]->getName() );
+		$this->assertEquals( 2.0, $invoice->getItems()[0]->getQuantity() );
+		$this->assertEquals( 'Product 2', $invoice->getItems()[1]->getName() );
+	}
+
+	/**
+	 * Test toArray includes items.
+	 */
+	public function test_to_array_includes_items(): void {
+		$invoice = new Invoice();
+		$invoice->setId( 1 );
+
+		$item1 = new DocumentItem();
+		$item1->setName( 'Item 1' )->setQuantity( 2.0 );
+
+		$item2 = new DocumentItem();
+		$item2->setName( 'Item 2' )->setQuantity( 3.0 );
+
+		$invoice->addItem( $item1 );
+		$invoice->addItem( $item2 );
+
+		$array = $invoice->toArray();
+
+		$this->assertArrayHasKey( 'items', $array );
+		$this->assertCount( 2, $array['items'] );
+		$this->assertEquals( 'Item 1', $array['items'][0]['name'] );
+		$this->assertEquals( 2.0, $array['items'][0]['quantity'] );
+		$this->assertEquals( 'Item 2', $array['items'][1]['name'] );
+	}
+
+	/**
+	 * Test toArray with null values.
+	 */
+	public function test_to_array_with_null_values(): void {
+		$invoice = new Invoice();
+
+		$array = $invoice->toArray();
+
+		$this->assertNull( $array['id'] );
+		$this->assertNull( $array['order_id'] );
+		$this->assertNull( $array['issue_date'] );
+		$this->assertNull( $array['sale_date'] );
+		$this->assertNull( $array['due_date'] );
+		$this->assertNull( $array['buyer_data'] );
+		$this->assertNull( $array['seller_data'] );
+		$this->assertNull( $array['corrected_document_id'] );
+		$this->assertEmpty( $array['items'] );
+	}
+
+	/**
+	 * Test corrected document ID.
+	 */
+	public function test_corrected_document_id(): void {
+		$invoice = new Invoice();
+
+		$this->assertNull( $invoice->getCorrectedDocumentId() );
+		$this->assertFalse( $invoice->isCorrection() );
+
+		$invoice->setCorrectedDocumentId( 5 );
+
+		$this->assertEquals( 5, $invoice->getCorrectedDocumentId() );
+		$this->assertTrue( $invoice->isCorrection() );
+	}
+
+	/**
+	 * Test fromArray with corrected_document_id.
+	 */
+	public function test_from_array_with_corrected_document_id(): void {
+		$data = array(
+			'id'                    => 10,
+			'corrected_document_id' => 5,
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertEquals( 10, $invoice->getId() );
+		$this->assertEquals( 5, $invoice->getCorrectedDocumentId() );
+		$this->assertTrue( $invoice->isCorrection() );
+	}
+
+	/**
+	 * Test toArray includes corrected_document_id.
+	 */
+	public function test_to_array_includes_corrected_document_id(): void {
+		$invoice = new Invoice();
+		$invoice->setId( 10 );
+		$invoice->setCorrectedDocumentId( 5 );
+
+		$array = $invoice->toArray();
+
+		$this->assertArrayHasKey( 'corrected_document_id', $array );
+		$this->assertEquals( 5, $array['corrected_document_id'] );
+	}
 }
