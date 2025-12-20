@@ -124,11 +124,47 @@
 ---
 
 ## Faza 3: Eksport PDF
-**Status: DO ZROBIENIA**
+**Status: UKONCZONA**
 
-- [ ] `PdfGenerator.php` - generowanie PDF z DOMPDF
-- [ ] `templates/pdf/invoice.php` - szablon PDF faktury
-- [ ] `templates/pdf/receipt.php` - szablon PDF paragonu
+### 3.1 Serwisy PDF
+**Katalog:** `src/Modules/PDF/`
+
+| Plik | Opis | Status |
+|------|------|--------|
+| `PdfCacheManager.php` | Zarzadzanie cache PDF w wp-content/uploads/ | [x] |
+| `TemplateLoader.php` | Ladowanie szablonow z hierarchia WP (theme override) | [x] |
+| `TemplateRegistry.php` | Wykrywanie dostepnych zestawow szablonow | [x] |
+| `PdfGenerator.php` | Generowanie PDF z DOMPDF | [x] |
+
+### 3.2 Szablony PDF
+**Katalog:** `templates/pdf/default/`
+
+| Plik | Opis | Status |
+|------|------|--------|
+| `styles.css` | Style CSS dla PDF (DOMPDF compatible) | [x] |
+| `invoice.php` | Szablon faktury VAT (EU Standard, English) | [x] |
+| `receipt.php` | Szablon paragonu (EU Standard, English) | [x] |
+
+### 3.3 Hierarchia szablonow
+
+Szablony moga byc nadpisywane przez motywy:
+1. `wp-content/themes/{child-theme}/ihumbak-invoices/{template-set}/`
+2. `wp-content/themes/{parent-theme}/ihumbak-invoices/{template-set}/`
+3. `{plugin}/templates/pdf/{template-set}/`
+
+Uzytkownicy moga tworzyc wlasne zestawy szablonow (np. `pl/`, `de/`, `custom/`)
+w katalogu motywu i wybrac je w ustawieniach pluginu.
+
+### 3.4 Testy jednostkowe
+**Katalog:** `tests/Unit/Modules/PDF/`
+
+| Plik | Opis | Status |
+|------|------|--------|
+| `TemplateLoaderTest.php` | Testy ladowania szablonow | [x] |
+| `TemplateRegistryTest.php` | Testy rejestru szablonow | [x] |
+| `PdfCacheManagerTest.php` | Testy cache PDF | [x] |
+
+**Podsumowanie testow:** 107 testow, 343 asercji - wszystkie przechodza
 
 ---
 
@@ -136,6 +172,6 @@
 **Status: DO ZROBIENIA**
 
 - [ ] Import pozycji z zamowienia WC
-- [ ] Faktury korygujace
+- [ ] Faktury korygujace (correction.php)
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura

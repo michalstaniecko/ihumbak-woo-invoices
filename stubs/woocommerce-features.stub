@@ -1,0 +1,10 @@
+<?php
+/**
+ * WooCommerce FeaturesUtil stubs for PHPStan.
+ */
+
+namespace Automattic\WooCommerce\Utilities;
+
+class FeaturesUtil {
+    public static function declare_compatibility(string $feature, string $plugin, bool $positive = true): void {}
+}

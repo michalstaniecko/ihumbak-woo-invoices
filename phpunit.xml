@@ -30,12 +30,5 @@
         </report>
     </coverage>
 
-    <php>
-        <const name="ABSPATH" value="/tmp/wordpress/"/>
-        <const name="IHUMBAK_INVOICES_VERSION" value="0.1.0"/>
-        <const name="IHUMBAK_INVOICES_FILE" value="/tmp/wordpress/wp-content/plugins/ihumbak-woo-invoices/ihumbak-invoices.php"/>
-        <const name="IHUMBAK_INVOICES_PATH" value="/tmp/wordpress/wp-content/plugins/ihumbak-woo-invoices/"/>
-        <const name="IHUMBAK_INVOICES_URL" value="http://localhost/wp-content/plugins/ihumbak-woo-invoices/"/>
-        <const name="IHUMBAK_INVOICES_BASENAME" value="ihumbak-woo-invoices/ihumbak-invoices.php"/>
-    </php>
+    <!-- Constants are defined in tests/bootstrap.php with correct paths -->
 </phpunit>

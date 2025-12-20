@@ -63,7 +63,11 @@ ihumbak-woo-invoices/
 │       │   ├── DocumentListTable.php
 │       │   ├── DocumentController.php
 │       │   └── AjaxController.php
-│       ├── PDF/              # Eksport PDF (do implementacji)
+│       ├── PDF/              # Eksport PDF
+│       │   ├── PdfGenerator.php      # Generator PDF z DOMPDF
+│       │   ├── PdfCacheManager.php   # Zarządzanie cache PDF
+│       │   ├── TemplateLoader.php    # Ładowanie szablonów
+│       │   └── TemplateRegistry.php  # Rejestr szablonów
 │       ├── Email/            # Wysyłka email (do implementacji)
 │       └── Portal/           # Portal klienta (do implementacji)
 ├── templates/                # Szablony PHP
@@ -76,7 +80,11 @@ ihumbak-woo-invoices/
 │   │       ├── items-table.php
 │   │       ├── buyer-fields.php
 │   │       └── seller-fields.php
-│   ├── pdf/                  # (do implementacji)
+│   ├── pdf/                  # Szablony PDF
+│   │   └── default/          # Domyślny zestaw szablonów
+│   │       ├── styles.css    # Style CSS dla PDF
+│   │       ├── invoice.php   # Szablon faktury VAT
+│   │       └── receipt.php   # Szablon paragonu
 │   └── frontend/             # (do implementacji)
 ├── assets/                   # Zasoby frontend
 │   ├── css/
@@ -364,7 +372,7 @@ composer check            # Wszystkie sprawdzenia
 |------|-------|--------|
 | 1 | Fundament | UKONCZONA |
 | 2 | Panel administracyjny | UKONCZONA |
-| 3 | Eksport PDF | DO ZROBIENIA |
+| 3 | Eksport PDF | UKONCZONA |
 | 4 | Rozszerzenia | DO ZROBIENIA |
 
 ### Zaimplementowane komponenty
@@ -384,12 +392,15 @@ composer check            # Wszystkie sprawdzenia
 **Admin:**
 - DocumentListTable, DocumentController, AjaxController
 
+**PDF:**
+- PdfGenerator, PdfCacheManager, TemplateLoader, TemplateRegistry
+- Szablony: invoice.php, receipt.php, styles.css
+
 **Testy:**
-- 56 testów jednostkowych, wszystkie przechodzą
+- 107 testów jednostkowych, wszystkie przechodzą
 
 ### Do implementacji
 
-- Generowanie PDF (DOMPDF)
 - Import pozycji z zamówień WC
 - Faktury korygujące
 - Portal klienta (My Account)

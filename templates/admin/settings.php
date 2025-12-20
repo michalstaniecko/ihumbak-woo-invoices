@@ -219,6 +219,11 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
             </table>
 
         <?php elseif ( 'pdf' === $active_tab ) : ?>
+            <?php
+            $template_registry   = \IHumbak\Invoices\Core\Plugin::get_instance()->container()->get( 'pdf.template_registry' );
+            $available_templates = $template_registry->getSelectOptions();
+            $current_template    = $settings['pdf']['template'] ?? 'default';
+            ?>
             <table class="form-table">
                 <tr>
                     <th scope="row">
@@ -226,10 +231,21 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                     </th>
                     <td>
                         <select id="pdf_template" name="ihumbak_invoices_settings[pdf][template]">
-                            <option value="default" <?php selected( ( $settings['pdf']['template'] ?? 'default' ), 'default' ); ?>>
-                                <?php esc_html_e( 'Default', 'ihumbak-invoices' ); ?>
-                            </option>
+                            <?php foreach ( $available_templates as $template_key => $template_label ) : ?>
+                                <option value="<?php echo esc_attr( $template_key ); ?>" <?php selected( $current_template, $template_key ); ?>>
+                                    <?php echo esc_html( $template_label ); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
+                        <p class="description">
+                            <?php
+                            printf(
+                                /* translators: %s: theme directory path */
+                                esc_html__( 'You can add custom templates in your theme: %s', 'ihumbak-invoices' ),
+                                '<code>' . esc_html( get_stylesheet_directory() ) . '/ihumbak-invoices/{template-name}/</code>'
+                            );
+                            ?>
+                        </p>
                     </td>
                 </tr>
                 <tr>

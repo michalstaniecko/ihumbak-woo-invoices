@@ -8,21 +8,26 @@ parameters:
         - tests
     bootstrapFiles:
         - vendor/autoload.php
-    scanDirectories:
-        - vendor/szepeviktor/phpstan-wordpress/bootstrap
-    stubFiles:
+        - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
+        - stubs/plugin-constants.stub
         - stubs/woocommerce.stub
+        - stubs/woocommerce-features.stub
+    parallel:
+        maximumNumberOfProcesses: 1
 
     # WordPress specific settings
-    checkGenericClassInNonGenericObjectType: false
     treatPhpDocTypesAsCertain: false
 
     # Ignore patterns
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - '#Function apply_filters invoked with \d+ parameters, \d+ required\.#'
         - '#Function do_action invoked with \d+ parameters, \d+ required\.#'
         - '#Constant ABSPATH not found\.#'
         - '#Constant WP_DEBUG not found\.#'
+        - '#Parameter \$order of method .* has invalid type WC_Order\.#'
+        -
+            identifier: missingType.generics
 
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

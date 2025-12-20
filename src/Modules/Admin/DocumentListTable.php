@@ -111,7 +111,7 @@ class DocumentListTable extends \WP_List_Table {
 			array(
 				'total_items' => $total_items,
 				'per_page'    => $per_page,
-				'total_pages' => ceil( $total_items / $per_page ),
+				'total_pages' => (int) ceil( $total_items / $per_page ),
 			)
 		);
 
@@ -185,19 +185,20 @@ class DocumentListTable extends \WP_List_Table {
 			),
 		);
 
-		if ( $item->getPdfPath() ) {
+		// Show PDF action for issued documents (not drafts).
+		if ( ! $item->isDraft() ) {
 			$pdf_url = add_query_arg(
 				array(
 					'page'   => 'ihumbak-invoices',
-					'action' => 'download_pdf',
+					'action' => 'pdf',
 					'id'     => $item->getId(),
-					'nonce'  => wp_create_nonce( 'download_pdf_' . $item->getId() ),
+					'nonce'  => wp_create_nonce( 'pdf_document_' . $item->getId() ),
 				),
 				admin_url( 'admin.php' )
 			);
 
 			$actions['pdf'] = sprintf(
-				'<a href="%s">%s</a>',
+				'<a href="%s" target="_blank">%s</a>',
 				esc_url( $pdf_url ),
 				esc_html__( 'Download PDF', 'ihumbak-invoices' )
 			);

@@ -11,6 +11,11 @@ namespace IHumbak\Invoices\Core;
 
 use IHumbak\Invoices\Modules\Admin\DocumentController;
 use IHumbak\Invoices\Modules\Admin\AjaxController;
+use IHumbak\Invoices\Modules\PDF\PdfGenerator;
+use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
+use IHumbak\Invoices\Modules\PDF\TemplateLoader;
+use IHumbak\Invoices\Modules\PDF\TemplateRegistry;
+use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 
 /**
  * Plugin singleton class.
@@ -111,6 +116,31 @@ final class Plugin {
 	private function register_services(): void {
 		// Register core services.
 		$this->container->register( 'installer', fn() => new Installer() );
+
+		// Register PDF services.
+		$this->container->register(
+			'pdf.cache_manager',
+			fn() => new PdfCacheManager()
+		);
+
+		$this->container->register(
+			'pdf.template_loader',
+			fn() => new TemplateLoader()
+		);
+
+		$this->container->register(
+			'pdf.template_registry',
+			fn( Container $c ) => new TemplateRegistry( $c->get( 'pdf.template_loader' ) )
+		);
+
+		$this->container->register(
+			'pdf.generator',
+			fn( Container $c ) => new PdfGenerator(
+				$c->get( 'pdf.template_loader' ),
+				$c->get( 'pdf.cache_manager' ),
+				$c->get( 'pdf.template_registry' )
+			)
+		);
 
 		// Initialize admin-only features.
 		if ( is_admin() ) {
@@ -292,6 +322,10 @@ final class Plugin {
 				}
 				break;
 
+			case 'pdf':
+				$this->handle_pdf_download( $id );
+				break;
+
 			case 'delete':
 				// Verify nonce for delete action.
 				if ( $id && isset( $_GET['nonce'] ) ) {
@@ -320,6 +354,60 @@ final class Plugin {
 		}
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/settings.php';
+	}
+
+	/**
+	 * Handle PDF download request.
+	 *
+	 * @param int|null $id Document ID.
+	 * @return void
+	 */
+	private function handle_pdf_download( ?int $id ): void {
+		// Check user permissions.
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to download this document.', 'ihumbak-invoices' ) );
+		}
+
+		if ( ! $id ) {
+			wp_die( esc_html__( 'Invalid document ID.', 'ihumbak-invoices' ) );
+		}
+
+		// Verify nonce.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$nonce = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'pdf_document_' . $id ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'ihumbak-invoices' ) );
+		}
+
+		// Get document.
+		$repository = new DocumentRepository();
+		$document   = $repository->find( $id );
+
+		if ( ! $document ) {
+			wp_die( esc_html__( 'Document not found.', 'ihumbak-invoices' ) );
+		}
+
+		// Check if document is issued.
+		if ( $document->isDraft() ) {
+			wp_die( esc_html__( 'Cannot generate PDF for draft documents.', 'ihumbak-invoices' ) );
+		}
+
+		try {
+			// Get PDF generator from container and download document.
+			$generator = $this->container->get( 'pdf.generator' );
+			$generator->download( $document );
+			exit;
+		} catch ( \Exception $e ) {
+			wp_die(
+				esc_html(
+					sprintf(
+						/* translators: %s: Error message */
+						__( 'Failed to generate PDF: %s', 'ihumbak-invoices' ),
+						$e->getMessage()
+					)
+				)
+			);
+		}
 	}
 
 	/**

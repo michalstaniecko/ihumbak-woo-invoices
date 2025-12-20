@@ -6,9 +6,13 @@
 define('WC_VERSION', '9.0.0');
 
 /**
+ * Check if current page is my account page.
+ *
  * @return bool
  */
-function is_account_page(): bool {}
+function is_account_page(): bool {
+    return false;
+}
 
 class WC_Order {
     public function get_id(): int {}
@@ -23,6 +27,7 @@ class WC_Order {
     public function get_billing_country(): string {}
     public function get_billing_email(): string {}
     public function get_billing_phone(): string {}
+    /** @return array<int, WC_Order_Item_Product> */
     public function get_items(): array {}
     public function get_total(): string {}
     public function get_subtotal(): string {}
@@ -53,10 +58,4 @@ class WC_Product {
     public function get_name(): string {}
     public function get_price(): string {}
     public function get_sku(): string {}
-}
-
-namespace Automattic\WooCommerce\Utilities;
-
-class FeaturesUtil {
-    public static function declare_compatibility(string $feature, string $plugin, bool $positive = true): void {}
 }

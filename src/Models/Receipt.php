@@ -43,7 +43,7 @@ class Receipt extends Document {
 	 * @param string $date_string Date string to parse.
 	 * @return \DateTimeImmutable|null Parsed date or null on failure.
 	 */
-	private static function parseDate( string $date_string ): ?\DateTimeImmutable {
+	protected static function parseDate( string $date_string ): ?\DateTimeImmutable {
 		try {
 			return new \DateTimeImmutable( $date_string );
 		} catch ( \Exception $e ) {

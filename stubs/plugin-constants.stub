@@ -1,0 +1,9 @@
+<?php
+/**
+ * Plugin constants stubs for PHPStan.
+ */
+
+define('IHUMBAK_INVOICES_PATH', '/path/to/plugin/');
+define('IHUMBAK_INVOICES_URL', 'https://example.com/wp-content/plugins/ihumbak-woo-invoices/');
+define('IHUMBAK_INVOICES_BASENAME', 'ihumbak-woo-invoices/ihumbak-invoices.php');
+define('IHUMBAK_INVOICES_VERSION', '0.1.0');

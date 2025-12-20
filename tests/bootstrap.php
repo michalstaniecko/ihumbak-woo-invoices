@@ -118,3 +118,96 @@ if ( ! function_exists( 'wp_json_encode' ) ) {
         return json_encode( $data, $options, $depth );
     }
 }
+
+// WordPress time constants.
+if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
+    define( 'HOUR_IN_SECONDS', 3600 );
+}
+
+if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+    define( 'DAY_IN_SECONDS', 86400 );
+}
+
+// Mock WordPress theme/filesystem functions.
+if ( ! function_exists( 'is_child_theme' ) ) {
+    function is_child_theme(): bool {
+        return false;
+    }
+}
+
+if ( ! function_exists( 'get_stylesheet_directory' ) ) {
+    function get_stylesheet_directory(): string {
+        return '/tmp/wordpress/wp-content/themes/theme';
+    }
+}
+
+if ( ! function_exists( 'get_template_directory' ) ) {
+    function get_template_directory(): string {
+        return '/tmp/wordpress/wp-content/themes/theme';
+    }
+}
+
+if ( ! function_exists( 'trailingslashit' ) ) {
+    function trailingslashit( string $value ): string {
+        return rtrim( $value, '/\\' ) . '/';
+    }
+}
+
+if ( ! function_exists( 'wp_upload_dir' ) ) {
+    function wp_upload_dir(): array {
+        return array(
+            'basedir' => '/tmp/wordpress/wp-content/uploads',
+            'baseurl' => 'http://localhost/wp-content/uploads',
+            'path'    => '/tmp/wordpress/wp-content/uploads/' . date( 'Y/m' ),
+            'url'     => 'http://localhost/wp-content/uploads/' . date( 'Y/m' ),
+        );
+    }
+}
+
+if ( ! function_exists( 'wp_mkdir_p' ) ) {
+    function wp_mkdir_p( string $target ): bool {
+        if ( is_dir( $target ) ) {
+            return true;
+        }
+        return @mkdir( $target, 0755, true );
+    }
+}
+
+if ( ! function_exists( 'wp_delete_file' ) ) {
+    function wp_delete_file( string $file ): bool {
+        if ( file_exists( $file ) ) {
+            return @unlink( $file );
+        }
+        return false;
+    }
+}
+
+if ( ! function_exists( 'apply_filters' ) ) {
+    function apply_filters( string $tag, $value, ...$args ) {
+        return $value;
+    }
+}
+
+if ( ! function_exists( 'do_action' ) ) {
+    function do_action( string $tag, ...$args ): void {
+        // Do nothing in tests.
+    }
+}
+
+if ( ! function_exists( 'get_transient' ) ) {
+    function get_transient( string $transient ) {
+        return false;
+    }
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+    function set_transient( string $transient, $value, int $expiration = 0 ): bool {
+        return true;
+    }
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+    function delete_transient( string $transient ): bool {
+        return true;
+    }
+}
