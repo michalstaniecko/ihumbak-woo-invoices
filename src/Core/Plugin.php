@@ -16,6 +16,7 @@ use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Modules\PDF\TemplateLoader;
 use IHumbak\Invoices\Modules\PDF\TemplateRegistry;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
+use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 
 /**
  * Plugin singleton class.
@@ -423,6 +424,11 @@ final class Plugin {
 		if ( $document->isDraft() ) {
 			wp_die( esc_html__( 'Cannot generate PDF for draft documents.', 'ihumbak-invoices' ) );
 		}
+
+		// Load document items from database.
+		$item_repository = new DocumentItemRepository();
+		$items           = $item_repository->findByDocumentId( $id );
+		$document->setItems( $items );
 
 		try {
 			// Get PDF generator from container and download document.
