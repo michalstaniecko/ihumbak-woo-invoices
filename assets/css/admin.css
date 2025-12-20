@@ -274,3 +274,41 @@
     vertical-align: middle;
     margin-right: 5px;
 }
+
+/* ==========================================================================
+   Stacked form fields (Seller/Buyer cards)
+   ========================================================================== */
+
+.ihumbak-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ihumbak-form-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.ihumbak-form-field input[type="text"],
+.ihumbak-form-field input[type="email"],
+.ihumbak-form-field input[type="number"],
+.ihumbak-form-field textarea,
+.ihumbak-form-field select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.ihumbak-form-field textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+.ihumbak-form-field .description {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #646970;
+}
