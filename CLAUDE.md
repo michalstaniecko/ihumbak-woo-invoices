@@ -407,7 +407,7 @@ composer check            # Wszystkie sprawdzenia
 - Szablony: invoice.php, receipt.php, styles.css
 
 **Testy:**
-- 107 testów jednostkowych, wszystkie przechodzą
+- 153 testy jednostkowe, wszystkie przechodzą
 
 ### Do implementacji
 

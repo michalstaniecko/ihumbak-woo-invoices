@@ -164,7 +164,7 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
 | `TemplateRegistryTest.php` | Testy rejestru szablonow | [x] |
 | `PdfCacheManagerTest.php` | Testy cache PDF | [x] |
 
-**Podsumowanie testow:** 107 testow, 343 asercji - wszystkie przechodza
+**Podsumowanie testow:** 149 testow, 419 asercji - wszystkie przechodza
 
 ---
 
@@ -179,7 +179,7 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Endpoint AJAX fetch_order_data
   - [x] Modyfikacja formularzy (przycisk + spinner)
   - [x] JavaScript (fetch, confirm replace/append, populate)
-  - [ ] Testy jednostkowe dla OrderDataExtractor
+  - [x] Testy jednostkowe dla OrderDataExtractor
 - [ ] Metoda 2: Przyciski na stronie zamowienia WC
   - [ ] OrderMetaBox (Utworz fakture / Utworz paragon)
   - [ ] Pre-fill formularza z GET parameter order_id

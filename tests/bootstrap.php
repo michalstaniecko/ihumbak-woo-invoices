@@ -211,3 +211,345 @@ if ( ! function_exists( 'delete_transient' ) ) {
         return true;
     }
 }
+
+// =============================================================================
+// Mock WooCommerce classes for unit tests.
+// These mocks simulate WooCommerce order-related classes to enable unit testing
+// of OrderDataExtractor without requiring the full WooCommerce installation.
+// =============================================================================
+
+if ( ! class_exists( 'WC_Order' ) ) {
+    /**
+     * Mock WC_Order class for unit tests.
+     */
+    class WC_Order {
+        /**
+         * Order data.
+         *
+         * @var array<string, mixed>
+         */
+        private array $data = array();
+
+        /**
+         * Order meta data.
+         *
+         * @var array<string, mixed>
+         */
+        private array $meta = array();
+
+        /**
+         * Order items.
+         *
+         * @var array<int, object>
+         */
+        private array $items = array();
+
+        /**
+         * Set order data.
+         *
+         * @param array<string, mixed> $data Order data.
+         */
+        public function set_data( array $data ): void {
+            $this->data = $data;
+        }
+
+        /**
+         * Set meta value.
+         *
+         * @param string $key   Meta key.
+         * @param mixed  $value Meta value.
+         */
+        public function set_meta( string $key, $value ): void {
+            $this->meta[ $key ] = $value;
+        }
+
+        /**
+         * Add item to order.
+         *
+         * @param object $item Order item.
+         */
+        public function add_item( $item ): void {
+            $this->items[] = $item;
+        }
+
+        /**
+         * Get order items.
+         *
+         * @return array<int, object>
+         */
+        public function get_items(): array {
+            return $this->items;
+        }
+
+        /**
+         * Get currency.
+         *
+         * @return string
+         */
+        public function get_currency(): string {
+            return $this->data['currency'] ?? 'PLN';
+        }
+
+        /**
+         * Get shipping total.
+         *
+         * @return string
+         */
+        public function get_shipping_total(): string {
+            return (string) ( $this->data['shipping_total'] ?? '0' );
+        }
+
+        /**
+         * Get shipping tax.
+         *
+         * @return string
+         */
+        public function get_shipping_tax(): string {
+            return (string) ( $this->data['shipping_tax'] ?? '0' );
+        }
+
+        /**
+         * Get shipping method.
+         *
+         * @return string|null
+         */
+        public function get_shipping_method(): ?string {
+            return $this->data['shipping_method'] ?? null;
+        }
+
+        /**
+         * Get payment method.
+         *
+         * @return string
+         */
+        public function get_payment_method(): string {
+            return $this->data['payment_method'] ?? '';
+        }
+
+        /**
+         * Get billing company.
+         *
+         * @return string
+         */
+        public function get_billing_company(): string {
+            return $this->data['billing_company'] ?? '';
+        }
+
+        /**
+         * Get billing first name.
+         *
+         * @return string
+         */
+        public function get_billing_first_name(): string {
+            return $this->data['billing_first_name'] ?? '';
+        }
+
+        /**
+         * Get billing last name.
+         *
+         * @return string
+         */
+        public function get_billing_last_name(): string {
+            return $this->data['billing_last_name'] ?? '';
+        }
+
+        /**
+         * Get billing address line 1.
+         *
+         * @return string
+         */
+        public function get_billing_address_1(): string {
+            return $this->data['billing_address_1'] ?? '';
+        }
+
+        /**
+         * Get billing address line 2.
+         *
+         * @return string
+         */
+        public function get_billing_address_2(): string {
+            return $this->data['billing_address_2'] ?? '';
+        }
+
+        /**
+         * Get billing postcode.
+         *
+         * @return string
+         */
+        public function get_billing_postcode(): string {
+            return $this->data['billing_postcode'] ?? '';
+        }
+
+        /**
+         * Get billing city.
+         *
+         * @return string
+         */
+        public function get_billing_city(): string {
+            return $this->data['billing_city'] ?? '';
+        }
+
+        /**
+         * Get billing country.
+         *
+         * @return string
+         */
+        public function get_billing_country(): string {
+            return $this->data['billing_country'] ?? '';
+        }
+
+        /**
+         * Get billing email.
+         *
+         * @return string
+         */
+        public function get_billing_email(): string {
+            return $this->data['billing_email'] ?? '';
+        }
+
+        /**
+         * Get billing phone.
+         *
+         * @return string
+         */
+        public function get_billing_phone(): string {
+            return $this->data['billing_phone'] ?? '';
+        }
+
+        /**
+         * Get meta value.
+         *
+         * @param string $key    Meta key.
+         * @param bool   $single Return single value.
+         * @return mixed
+         */
+        public function get_meta( string $key, bool $single = true ) {
+            return $this->meta[ $key ] ?? '';
+        }
+    }
+}
+
+if ( ! class_exists( 'WC_Order_Item_Product' ) ) {
+    /**
+     * Mock WC_Order_Item_Product class for unit tests.
+     */
+    class WC_Order_Item_Product {
+        /**
+         * Item data.
+         *
+         * @var array<string, mixed>
+         */
+        private array $data = array();
+
+        /**
+         * Associated product.
+         *
+         * @var WC_Product|null
+         */
+        private ?WC_Product $product = null;
+
+        /**
+         * Set item data.
+         *
+         * @param array<string, mixed> $data Item data.
+         */
+        public function set_data( array $data ): void {
+            $this->data = $data;
+        }
+
+        /**
+         * Set associated product.
+         *
+         * @param WC_Product|null $product Product object.
+         */
+        public function set_product( ?WC_Product $product ): void {
+            $this->product = $product;
+        }
+
+        /**
+         * Get quantity.
+         *
+         * @return float|int|string
+         */
+        public function get_quantity() {
+            return $this->data['quantity'] ?? 1;
+        }
+
+        /**
+         * Get subtotal (net).
+         *
+         * @return string
+         */
+        public function get_subtotal(): string {
+            return (string) ( $this->data['subtotal'] ?? '0' );
+        }
+
+        /**
+         * Get subtotal tax.
+         *
+         * @return string
+         */
+        public function get_subtotal_tax(): string {
+            return (string) ( $this->data['subtotal_tax'] ?? '0' );
+        }
+
+        /**
+         * Get product ID.
+         *
+         * @return int
+         */
+        public function get_product_id(): int {
+            return $this->data['product_id'] ?? 0;
+        }
+
+        /**
+         * Get item name.
+         *
+         * @return string
+         */
+        public function get_name(): string {
+            return $this->data['name'] ?? '';
+        }
+
+        /**
+         * Get associated product.
+         *
+         * @return WC_Product|false
+         */
+        public function get_product() {
+            return $this->product ?? false;
+        }
+    }
+}
+
+if ( ! class_exists( 'WC_Product' ) ) {
+    /**
+     * Mock WC_Product class for unit tests.
+     */
+    class WC_Product {
+        /**
+         * Product SKU.
+         *
+         * @var string
+         */
+        private string $sku = '';
+
+        /**
+         * Constructor.
+         *
+         * @param string $sku Product SKU.
+         */
+        public function __construct( string $sku = '' ) {
+            $this->sku = $sku;
+        }
+
+        /**
+         * Get SKU.
+         *
+         * @return string
+         */
+        public function get_sku(): string {
+            return $this->sku;
+        }
+    }
+}
