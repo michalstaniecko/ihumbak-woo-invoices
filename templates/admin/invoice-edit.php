@@ -198,11 +198,15 @@ $page_title = $is_new
                         </p>
                     <?php endif; ?>
 
-                    <?php if ( $document && $document->getPdfPath() ) : ?>
+                    <?php if ( $document && ! $document->isDraft() ) : ?>
                         <p>
-                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices&action=download_pdf&id=' . $document->getId() . '&nonce=' . wp_create_nonce( 'download_pdf_' . $document->getId() ) ) ); ?>"
-                               class="button button-large">
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices&action=pdf&id=' . $document->getId() . '&nonce=' . wp_create_nonce( 'pdf_document_' . $document->getId() ) ) ); ?>"
+                               class="button button-large" target="_blank">
                                 <?php esc_html_e( 'Download PDF', 'ihumbak-invoices' ); ?>
+                            </a>
+                            <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices&action=pdf&id=' . $document->getId() . '&force=1&nonce=' . wp_create_nonce( 'pdf_document_' . $document->getId() ) ) ); ?>"
+                               class="button button-large" target="_blank">
+                                <?php esc_html_e( 'Regenerate PDF', 'ihumbak-invoices' ); ?>
                             </a>
                         </p>
                     <?php endif; ?>

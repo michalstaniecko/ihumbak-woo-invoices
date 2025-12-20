@@ -24,66 +24,101 @@ body {
 
 /* Page Layout */
 .document-container {
-    width: 100%;
-    max-width: 210mm;
-    padding: 15mm;
+    padding: 10mm;
 }
 
-/* Header */
-.document-header {
-    margin-bottom: 20pt;
-    padding-bottom: 15pt;
-    border-bottom: 2pt solid #2c3e50;
-}
-
-.header-top {
+/* Header Section - Row 1: Logo/Company + Seller Data */
+.header-section {
     width: 100%;
     margin-bottom: 15pt;
 }
 
-.header-top td {
+.header-section td {
     vertical-align: top;
+    width: 50%;
+}
+
+.header-left {
+    padding-right: 10pt;
+}
+
+.header-right {
+    padding-left: 10pt;
+    text-align: right;
 }
 
 .logo {
-    max-width: 150pt;
-    max-height: 60pt;
+    max-width: 120pt;
+    max-height: 50pt;
+}
+
+.company-name {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.seller-info {
+    font-size: 9pt;
+    color: #495057;
+    line-height: 1.4;
+}
+
+.seller-info .tax-id {
+    margin-top: 5pt;
+    font-weight: bold;
+}
+
+/* Document Title Section - Row 2: Centered Title */
+.document-title-section {
+    text-align: center;
+    margin: 15pt 0;
+    padding: 10pt 0;
+    border-top: 2pt solid #2c3e50;
+    border-bottom: 2pt solid #2c3e50;
 }
 
 .document-title {
-    font-size: 24pt;
+    font-size: 20pt;
     font-weight: bold;
     color: #2c3e50;
-    text-align: right;
+    text-transform: uppercase;
 }
 
 .document-number {
-    font-size: 12pt;
+    font-size: 11pt;
     color: #7f8c8d;
-    text-align: right;
-    margin-top: 5pt;
+    margin-top: 3pt;
 }
 
-/* Parties Section */
-.parties-section {
+/* Details Section - Row 3: Invoice Details + Buyer */
+.details-section {
     width: 100%;
-    margin-bottom: 20pt;
+    margin-bottom: 15pt;
+    table-layout: fixed;
 }
 
-.parties-section td {
+.details-section td {
     width: 50%;
     vertical-align: top;
-    padding: 10pt;
 }
 
-.party-box {
+.details-left {
+    padding-right: 10pt;
+}
+
+.details-right {
+    padding-left: 10pt;
+}
+
+.detail-box {
     background-color: #f8f9fa;
     border: 1pt solid #e9ecef;
     border-radius: 3pt;
-    padding: 12pt;
+    padding: 10pt;
 }
 
-.party-label {
+.detail-box-title {
     font-size: 8pt;
     font-weight: bold;
     text-transform: uppercase;
@@ -92,8 +127,22 @@ body {
     letter-spacing: 0.5pt;
 }
 
+.detail-row {
+    font-size: 9pt;
+    margin-bottom: 4pt;
+}
+
+.detail-row .label {
+    color: #7f8c8d;
+}
+
+.detail-row .value {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
 .party-name {
-    font-size: 12pt;
+    font-size: 11pt;
     font-weight: bold;
     color: #2c3e50;
     margin-bottom: 5pt;
@@ -102,40 +151,15 @@ body {
 .party-address {
     font-size: 9pt;
     color: #495057;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 .party-tax-id {
     font-size: 9pt;
     color: #495057;
-    margin-top: 8pt;
-    padding-top: 8pt;
-    border-top: 1pt solid #e9ecef;
+    margin-top: 5pt;
 }
 
-/* Document Details */
-.document-details {
-    width: 100%;
-    margin-bottom: 20pt;
-    background-color: #f8f9fa;
-    border: 1pt solid #e9ecef;
-    border-radius: 3pt;
-}
-
-.document-details td {
-    padding: 8pt 12pt;
-    font-size: 9pt;
-}
-
-.document-details .label {
-    color: #7f8c8d;
-    font-weight: bold;
-    width: 25%;
-}
-
-.document-details .value {
-    color: #2c3e50;
-}
 
 /* Items Table */
 .items-section {
@@ -145,6 +169,7 @@ body {
 .items-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     font-size: 9pt;
 }
 
@@ -152,7 +177,7 @@ body {
     background-color: #2c3e50;
     color: #ffffff;
     font-weight: bold;
-    padding: 10pt 8pt;
+    padding: 6pt 4pt;
     text-align: left;
     font-size: 8pt;
     text-transform: uppercase;
@@ -170,9 +195,11 @@ body {
 }
 
 .items-table td {
-    padding: 10pt 8pt;
+    padding: 6pt 4pt;
     border-bottom: 1pt solid #e9ecef;
     vertical-align: top;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .items-table tbody tr:nth-child(even) {
@@ -185,41 +212,42 @@ body {
 }
 
 .items-table .col-no {
-    width: 5%;
+    width: 20pt;
 }
 
 .items-table .col-name {
-    width: 35%;
+    width: auto; /* takes remaining space */
 }
 
 .items-table .col-qty {
-    width: 8%;
+    width: 40pt;
 }
 
 .items-table .col-unit {
-    width: 7%;
+    width: 30pt;
 }
 
 .items-table .col-price {
-    width: 12%;
+    width: 55pt;
 }
 
 .items-table .col-tax-rate {
-    width: 8%;
+    width: 35pt;
 }
 
 .items-table .col-tax {
-    width: 12%;
+    width: 55pt;
 }
 
 .items-table .col-total {
-    width: 13%;
+    width: 65pt;
 }
 
 /* VAT Summary */
 .vat-summary {
     width: 100%;
     margin-bottom: 20pt;
+    table-layout: fixed;
 }
 
 .vat-summary td {
@@ -237,6 +265,7 @@ body {
 .vat-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
     font-size: 9pt;
 }
 
@@ -285,7 +314,7 @@ body {
 .totals-table .value {
     text-align: right;
     color: #2c3e50;
-    width: 120pt;
+    width: 90pt;
 }
 
 .totals-table .total-row {
@@ -327,7 +356,7 @@ body {
 .payment-details .label {
     color: #7f8c8d;
     display: inline-block;
-    width: 120pt;
+    width: 100pt;
 }
 
 .payment-details .value {
@@ -408,7 +437,7 @@ body {
 /* Print Styles */
 @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 15mm;
 }
 
 @media print {

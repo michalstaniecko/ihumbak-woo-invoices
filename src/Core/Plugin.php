@@ -372,7 +372,9 @@ final class Plugin {
 			return;
 		}
 
-		if ( ! isset( $_GET['action'] ) || 'pdf' !== $_GET['action'] ) {
+		// Support both 'pdf' and legacy 'download_pdf' action for backward compatibility.
+		$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
+		if ( ! in_array( $action, array( 'pdf', 'download_pdf' ), true ) ) {
 			return;
 		}
 
@@ -398,12 +400,16 @@ final class Plugin {
 			wp_die( esc_html__( 'Invalid document ID.', 'ihumbak-invoices' ) );
 		}
 
-		// Verify nonce.
+		// Verify nonce - support both new 'pdf_document_' and legacy 'download_pdf_' prefix.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$nonce = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce, 'pdf_document_' . $id ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'pdf_document_' . $id ) && ! wp_verify_nonce( $nonce, 'download_pdf_' . $id ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'ihumbak-invoices' ) );
 		}
+
+		// Check if force regeneration is requested.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$force = isset( $_GET['force'] ) && '1' === sanitize_text_field( wp_unslash( $_GET['force'] ) );
 
 		// Get document.
 		$repository = new DocumentRepository();
@@ -421,7 +427,7 @@ final class Plugin {
 		try {
 			// Get PDF generator from container and download document.
 			$generator = $this->container->get( 'pdf.generator' );
-			$generator->download( $document );
+			$generator->download( $document, $force );
 			exit;
 		} catch ( \Exception $e ) {
 			wp_die(

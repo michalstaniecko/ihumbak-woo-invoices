@@ -202,6 +202,24 @@ class DocumentListTable extends \WP_List_Table {
 				esc_url( $pdf_url ),
 				esc_html__( 'Download PDF', 'ihumbak-invoices' )
 			);
+
+			// Add regenerate PDF action (force regeneration, ignores cache).
+			$regenerate_url = add_query_arg(
+				array(
+					'page'   => 'ihumbak-invoices',
+					'action' => 'pdf',
+					'id'     => $item->getId(),
+					'force'  => '1',
+					'nonce'  => wp_create_nonce( 'pdf_document_' . $item->getId() ),
+				),
+				admin_url( 'admin.php' )
+			);
+
+			$actions['regenerate'] = sprintf(
+				'<a href="%s" target="_blank">%s</a>',
+				esc_url( $regenerate_url ),
+				esc_html__( 'Regenerate PDF', 'ihumbak-invoices' )
+			);
 		}
 
 		if ( $item->isDraft() ) {
