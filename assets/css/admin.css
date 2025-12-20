@@ -343,3 +343,93 @@
     font-size: 12px;
     color: #646970;
 }
+
+/* ==========================================================================
+   Order Metabox (WooCommerce order edit page)
+   ========================================================================== */
+
+.ihumbak-order-metabox {
+    margin: -6px -12px -12px;
+}
+
+.ihumbak-no-documents {
+    padding: 12px;
+    margin: 0;
+    color: #646970;
+    font-style: italic;
+}
+
+.ihumbak-documents-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.ihumbak-document-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.ihumbak-document-item:last-child {
+    border-bottom: none;
+}
+
+.ihumbak-doc-type {
+    font-size: 11px;
+    color: #646970;
+    min-width: 55px;
+}
+
+.ihumbak-doc-number {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ihumbak-doc-number a {
+    text-decoration: none;
+}
+
+.ihumbak-doc-number a:hover {
+    text-decoration: underline;
+}
+
+.ihumbak-document-item .ihumbak-status {
+    font-size: 10px;
+    padding: 1px 6px;
+}
+
+.ihumbak-pdf-link {
+    color: #2271b1;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.ihumbak-pdf-link:hover {
+    color: #135e96;
+}
+
+.ihumbak-pdf-link .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.ihumbak-metabox-actions {
+    padding: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ihumbak-metabox-actions .button {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+}

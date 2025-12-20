@@ -11,6 +11,7 @@ namespace IHumbak\Invoices\Core;
 
 use IHumbak\Invoices\Modules\Admin\DocumentController;
 use IHumbak\Invoices\Modules\Admin\AjaxController;
+use IHumbak\Invoices\Modules\Admin\OrderMetaBox;
 use IHumbak\Invoices\Modules\PDF\PdfGenerator;
 use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Modules\PDF\TemplateLoader;
@@ -36,6 +37,13 @@ final class Plugin {
 	 * @var AjaxController|null
 	 */
 	private ?AjaxController $ajax_controller = null;
+
+	/**
+	 * Order metabox.
+	 *
+	 * @var OrderMetaBox|null
+	 */
+	private ?OrderMetaBox $order_metabox = null;
 
 	/**
 	 * Plugin instance.
@@ -155,6 +163,10 @@ final class Plugin {
 
 			$this->ajax_controller = new AjaxController();
 			$this->ajax_controller->init();
+
+			// Initialize order metabox.
+			$this->order_metabox = new OrderMetaBox( new DocumentRepository() );
+			$this->order_metabox->init();
 		}
 	}
 
@@ -228,6 +240,18 @@ final class Plugin {
 	 * @return void
 	 */
 	public function enqueue_admin_assets( string $hook ): void {
+		// Check if we're on WooCommerce order edit page (for metabox styles).
+		if ( $this->is_order_edit_page( $hook ) ) {
+			wp_enqueue_style( 'dashicons' );
+			wp_enqueue_style(
+				'ihumbak-invoices-admin',
+				IHUMBAK_INVOICES_URL . 'assets/css/admin.css',
+				array(),
+				IHUMBAK_INVOICES_VERSION
+			);
+			return;
+		}
+
 		if ( ! str_contains( $hook, 'ihumbak-invoices' ) ) {
 			return;
 		}
@@ -593,5 +617,29 @@ final class Plugin {
 	 */
 	public function container(): Container {
 		return $this->container;
+	}
+
+	/**
+	 * Check if current page is WooCommerce order edit page.
+	 *
+	 * @param string $hook Current admin page hook.
+	 * @return bool
+	 */
+	private function is_order_edit_page( string $hook ): bool {
+		// HPOS: woocommerce_page_wc-orders.
+		if ( 'woocommerce_page_wc-orders' === $hook ) {
+			return true;
+		}
+
+		// Legacy: post.php with shop_order post type.
+		if ( 'post.php' === $hook ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+			if ( $post_id && 'shop_order' === get_post_type( $post_id ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

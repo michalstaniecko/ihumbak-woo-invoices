@@ -4,11 +4,12 @@
  *
  * @package IHumbak\Invoices
  *
- * @var \IHumbak\Invoices\Models\Receipt|null $document    Document being edited (null for new).
- * @var array<string, string>                 $seller      Seller data.
- * @var array<string, string>                 $buyer       Buyer data.
- * @var array<int, array<string, mixed>>      $items       Document items.
- * @var string                                $next_number Preview of next document number.
+ * @var \IHumbak\Invoices\Models\Receipt|null $document            Document being edited (null for new).
+ * @var array<string, string>                 $seller              Seller data.
+ * @var array<string, string>                 $buyer               Buyer data.
+ * @var array<int, array<string, mixed>>      $items               Document items.
+ * @var string                                $next_number         Preview of next document number.
+ * @var int|null                              $pre_filled_order_id Order ID to pre-fill (from WC order metabox).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -120,8 +121,16 @@ $page_title = $is_new
                             <th><label for="order_id"><?php esc_html_e( 'WooCommerce Order', 'ihumbak-invoices' ); ?></label></th>
                             <td>
                                 <div class="ihumbak-order-field-wrapper">
+                                    <?php
+                                    $order_id_value = '';
+                                    if ( $document && $document->getOrderId() ) {
+                                        $order_id_value = $document->getOrderId();
+                                    } elseif ( ! empty( $pre_filled_order_id ) ) {
+                                        $order_id_value = $pre_filled_order_id;
+                                    }
+                                    ?>
                                     <input type="number" id="order_id" name="order_id"
-                                           value="<?php echo esc_attr( $document ? $document->getOrderId() : '' ); ?>"
+                                           value="<?php echo esc_attr( $order_id_value ); ?>"
                                            class="small-text" min="1" <?php disabled( ! $can_edit ); ?>>
                                     <?php if ( $can_edit ) : ?>
                                     <button type="button" id="ihumbak-fetch-order" class="button" disabled>
@@ -203,4 +212,10 @@ $page_title = $is_new
             </div>
         </div>
     </form>
+
+    <?php if ( ! empty( $pre_filled_order_id ) ) : ?>
+    <script type="text/javascript">
+        window.ihumbakPreFilledOrderId = <?php echo (int) $pre_filled_order_id; ?>;
+    </script>
+    <?php endif; ?>
 </div>

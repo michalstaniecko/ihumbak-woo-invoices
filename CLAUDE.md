@@ -400,7 +400,7 @@ composer check            # Wszystkie sprawdzenia
 - NumberingService, CalculationService, OrderDataExtractor
 
 **Admin:**
-- DocumentListTable, DocumentController, AjaxController
+- DocumentListTable, DocumentController, AjaxController, OrderMetaBox
 
 **PDF:**
 - PdfGenerator, PdfCacheManager, TemplateLoader, TemplateRegistry

@@ -10,6 +10,14 @@
 (function($) {
     'use strict';
 
+    /**
+     * Delay before auto-fetching order data (ms).
+     * Allows DOM to fully render before triggering AJAX.
+     *
+     * @type {number}
+     */
+    var AUTO_FETCH_DELAY = 100;
+
     var DocumentEdit = {
         /**
          * Current item index for new rows.
@@ -25,10 +33,21 @@
          * Initialize the module.
          */
         init: function() {
+            var self = this;
+
             this.itemIndex = this.getMaxItemIndex() + 1;
             this.bindEvents();
             this.initFetchOrder();
-            this.recalculateDocument();
+
+            // Check for pre-filled order ID (from WC order metabox).
+            if (window.ihumbakPreFilledOrderId) {
+                // Auto-fetch order data when coming from WC order page.
+                setTimeout(function() {
+                    self.fetchOrderDataAutomatic(window.ihumbakPreFilledOrderId);
+                }, AUTO_FETCH_DELAY);
+            } else {
+                this.recalculateDocument();
+            }
         },
 
         /**
@@ -255,11 +274,37 @@
         },
 
         /**
-         * Fetch order data via AJAX.
+         * Fetch order data via AJAX (manual trigger with confirmation).
          *
          * @param {number} orderId Order ID.
          */
         fetchOrderData: function(orderId) {
+            this._doFetchOrderData(orderId, this.confirmAndPopulate.bind(this), false);
+        },
+
+        /**
+         * Fetch order data automatically (from WC order metabox).
+         * Does not ask for confirmation, always replaces.
+         *
+         * @param {number} orderId Order ID.
+         */
+        fetchOrderDataAutomatic: function(orderId) {
+            var self = this;
+            this._doFetchOrderData(orderId, function(data) {
+                self.populateFromOrderData(data, 'replace');
+                self.showNotice('success', ihumbakInvoices.i18n.orderDataLoaded || 'Order data loaded successfully.');
+            }, true);
+        },
+
+        /**
+         * Internal method to fetch order data via AJAX.
+         *
+         * @param {number}   orderId            Order ID.
+         * @param {Function} onSuccess          Callback on successful fetch.
+         * @param {boolean}  recalculateOnError Whether to recalculate on error.
+         * @private
+         */
+        _doFetchOrderData: function(orderId, onSuccess, recalculateOnError) {
             var self = this;
             var $button = $('#ihumbak-fetch-order');
             var $spinner = $('#ihumbak-fetch-status');
@@ -278,14 +323,20 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        self.confirmAndPopulate(response.data);
+                        onSuccess(response.data);
                     } else {
                         self.showNotice('error', response.data.message || ihumbakInvoices.i18n.error);
+                        if (recalculateOnError) {
+                            self.recalculateDocument();
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('AJAX error:', error);
                     self.showNotice('error', ihumbakInvoices.i18n.error);
+                    if (recalculateOnError) {
+                        self.recalculateDocument();
+                    }
                 },
                 complete: function() {
                     $button.prop('disabled', false);

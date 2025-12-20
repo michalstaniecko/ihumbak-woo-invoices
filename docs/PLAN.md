@@ -180,9 +180,10 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Modyfikacja formularzy (przycisk + spinner)
   - [x] JavaScript (fetch, confirm replace/append, populate)
   - [x] Testy jednostkowe dla OrderDataExtractor
-- [ ] Metoda 2: Przyciski na stronie zamowienia WC
-  - [ ] OrderMetaBox (Utworz fakture / Utworz paragon)
-  - [ ] Pre-fill formularza z GET parameter order_id
+- [x] Metoda 2: Przyciski na stronie zamowienia WC
+  - [x] OrderMetaBox (Utworz fakture / Utworz paragon)
+  - [x] Pre-fill formularza z GET parameter order_id
+  - [x] Auto-fetch danych zamowienia przy otwarciu formularza
 
 ### Pozostale rozszerzenia
 - [ ] Faktury korygujace (correction.php)

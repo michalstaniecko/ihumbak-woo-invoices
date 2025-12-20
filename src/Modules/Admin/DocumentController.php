@@ -84,14 +84,19 @@ class DocumentController {
 	 * @return void
 	 */
 	public function render_invoice_edit( ?int $id = null ): void {
-		$document = null;
-		$items    = array();
+		$document            = null;
+		$items               = array();
+		$pre_filled_order_id = null;
 
 		if ( $id ) {
 			$document = $this->document_repository->find( $id );
 			if ( $document ) {
 				$items = $this->item_repository->findByDocumentId( $id );
 			}
+		} else {
+			// Check for order_id parameter for pre-filling from WC order metabox.
+			// Auto-fetch is only enabled if nonce is valid (link from order metabox).
+			$pre_filled_order_id = $this->get_verified_order_id_from_request();
 		}
 
 		$settings    = Plugin::get_instance()->get_settings();
@@ -114,14 +119,19 @@ class DocumentController {
 	 * @return void
 	 */
 	public function render_receipt_edit( ?int $id = null ): void {
-		$document = null;
-		$items    = array();
+		$document            = null;
+		$items               = array();
+		$pre_filled_order_id = null;
 
 		if ( $id ) {
 			$document = $this->document_repository->find( $id );
 			if ( $document ) {
 				$items = $this->item_repository->findByDocumentId( $id );
 			}
+		} else {
+			// Check for order_id parameter for pre-filling from WC order metabox.
+			// Auto-fetch is only enabled if nonce is valid (link from order metabox).
+			$pre_filled_order_id = $this->get_verified_order_id_from_request();
 		}
 
 		$settings    = Plugin::get_instance()->get_settings();
@@ -410,5 +420,33 @@ class DocumentController {
 			)
 		);
 		exit;
+	}
+
+	/**
+	 * Get verified order ID from request.
+	 *
+	 * Returns order_id only if valid nonce is present (link from order metabox).
+	 * This prevents auto-fetch for manually typed URLs without proper authorization.
+	 *
+	 * @return int|null Order ID or null if not present or nonce invalid.
+	 */
+	private function get_verified_order_id_from_request(): ?int {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
+		$order_id = isset( $_GET['order_id'] ) ? absint( $_GET['order_id'] ) : 0;
+
+		if ( $order_id < 1 ) {
+			return null;
+		}
+
+		// Verify nonce - auto-fetch only if link came from order metabox.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This IS the nonce verification.
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+
+		if ( ! wp_verify_nonce( $nonce, 'ihumbak_create_from_order_' . $order_id ) ) {
+			// Nonce invalid or missing - no auto-fetch, user can still manually fetch.
+			return null;
+		}
+
+		return $order_id;
 	}
 }
