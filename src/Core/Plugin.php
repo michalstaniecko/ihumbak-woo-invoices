@@ -346,6 +346,8 @@ final class Plugin {
 			case 'edit':
 				if ( 'receipt' === $type ) {
 					$this->document_controller->render_receipt_edit( $id );
+				} elseif ( 'credit_note' === $type ) {
+					$this->document_controller->render_credit_note_edit( $id );
 				} else {
 					$this->document_controller->render_invoice_edit( $id );
 				}
@@ -534,10 +536,11 @@ final class Plugin {
 				'phone'        => '',
 			),
 			'numbering'  => array(
-				'invoice_pattern'    => 'FV/{YYYY}/{MM}/{NNNN}',
-				'receipt_pattern'    => 'PAR/{YYYY}/{MM}/{NNNN}',
-				'correction_pattern' => 'FK/{YYYY}/{MM}/{NNNN}',
-				'reset_monthly'      => true,
+				'invoice_pattern'     => 'FV/{YYYY}/{MM}/{NNNN}',
+				'receipt_pattern'     => 'PAR/{YYYY}/{MM}/{NNNN}',
+				'credit_note_pattern' => 'CN/{YYYY}/{MM}/{NNNN}',
+				'correction_pattern'  => 'FK/{YYYY}/{MM}/{NNNN}', // Legacy - kept for backward compatibility.
+				'reset_monthly'       => true,
 			),
 			'pdf'        => array(
 				'template'    => 'default',
@@ -581,10 +584,11 @@ final class Plugin {
 		// Sanitize numbering settings.
 		if ( isset( $input['numbering'] ) && is_array( $input['numbering'] ) ) {
 			$sanitized['numbering'] = array(
-				'invoice_pattern'    => sanitize_text_field( $input['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' ),
-				'receipt_pattern'    => sanitize_text_field( $input['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' ),
-				'correction_pattern' => sanitize_text_field( $input['numbering']['correction_pattern'] ?? 'FK/{YYYY}/{MM}/{NNNN}' ),
-				'reset_monthly'      => ! empty( $input['numbering']['reset_monthly'] ),
+				'invoice_pattern'     => sanitize_text_field( $input['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' ),
+				'receipt_pattern'     => sanitize_text_field( $input['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' ),
+				'credit_note_pattern' => sanitize_text_field( $input['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}' ),
+				'correction_pattern'  => sanitize_text_field( $input['numbering']['correction_pattern'] ?? 'FK/{YYYY}/{MM}/{NNNN}' ),
+				'reset_monthly'       => ! empty( $input['numbering']['reset_monthly'] ),
 			);
 		}
 

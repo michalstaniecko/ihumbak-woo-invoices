@@ -12,6 +12,7 @@ namespace IHumbak\Invoices\Infrastructure\Database;
 use IHumbak\Invoices\Models\Document;
 use IHumbak\Invoices\Models\Invoice;
 use IHumbak\Invoices\Models\Receipt;
+use IHumbak\Invoices\Models\CreditNote;
 use IHumbak\Invoices\Core\Installer;
 
 /**
@@ -235,6 +236,33 @@ class DocumentRepository {
 	}
 
 	/**
+	 * Find credit notes by corrected document ID.
+	 *
+	 * @param int $corrected_document_id Original document ID.
+	 * @return CreditNote[]
+	 */
+	public function findByCorrectedDocumentId( int $corrected_document_id ): array {
+		$rows = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT * FROM {$this->table} WHERE corrected_document_id = %d AND document_type = %s ORDER BY created_at DESC",
+				$corrected_document_id,
+				'credit_note'
+			),
+			ARRAY_A
+		);
+
+		$documents = array_map( array( $this, 'hydrate' ), $rows ?: array() );
+
+		// Filter to ensure only CreditNote instances are returned.
+		return array_values(
+			array_filter(
+				$documents,
+				static fn( Document $doc ): bool => $doc instanceof CreditNote
+			)
+		);
+	}
+
+	/**
 	 * Hydrate document from database row.
 	 *
 	 * @param array<string, mixed> $row Database row.
@@ -244,8 +272,9 @@ class DocumentRepository {
 		$type = $row['document_type'] ?? 'invoice';
 
 		return match ( $type ) {
-			'receipt' => Receipt::fromArray( $row ),
-			default   => Invoice::fromArray( $row ),
+			'receipt'     => Receipt::fromArray( $row ),
+			'credit_note' => CreditNote::fromArray( $row ),
+			default       => Invoice::fromArray( $row ),
 		};
 	}
 
@@ -257,22 +286,30 @@ class DocumentRepository {
 	 */
 	private function prepareData( Document $document ): array {
 		$data = array(
-			'order_id'        => $document->getOrderId(),
-			'document_type'   => $document->getDocumentType(),
-			'document_number' => $document->getDocumentNumber(),
-			'issue_date'      => $document->getIssueDate()?->format( 'Y-m-d' ),
-			'sale_date'       => $document->getSaleDate()?->format( 'Y-m-d' ),
-			'due_date'        => $document->getDueDate()?->format( 'Y-m-d' ),
-			'buyer_data'      => $document->getBuyer()?->toJson() ?? '{}',
-			'seller_data'     => $document->getSeller()?->toJson() ?? '{}',
-			'subtotal'        => $document->getSubtotal(),
-			'tax_total'       => $document->getTaxTotal(),
-			'total'           => $document->getTotal(),
-			'currency'        => $document->getCurrency(),
-			'status'          => $document->getStatus(),
-			'pdf_path'        => $document->getPdfPath(),
-			'notes'           => $document->getNotes(),
+			'order_id'              => $document->getOrderId(),
+			'document_type'         => $document->getDocumentType(),
+			'document_number'       => $document->getDocumentNumber(),
+			'issue_date'            => $document->getIssueDate()?->format( 'Y-m-d' ),
+			'sale_date'             => $document->getSaleDate()?->format( 'Y-m-d' ),
+			'due_date'              => $document->getDueDate()?->format( 'Y-m-d' ),
+			'corrected_document_id' => $document->getCorrectedDocumentId(),
+			'buyer_data'            => $document->getBuyer()?->toJson() ?? '{}',
+			'seller_data'           => $document->getSeller()?->toJson() ?? '{}',
+			'subtotal'              => $document->getSubtotal(),
+			'tax_total'             => $document->getTaxTotal(),
+			'total'                 => $document->getTotal(),
+			'currency'              => $document->getCurrency(),
+			'status'                => $document->getStatus(),
+			'pdf_path'              => $document->getPdfPath(),
+			'notes'                 => $document->getNotes(),
 		);
+
+		// Add credit note specific fields.
+		if ( $document instanceof CreditNote ) {
+			$data['correction_reason'] = $document->getCorrectionReason();
+			$data['correction_type']   = $document->getCorrectionType();
+			$data['refund_id']         = $document->getRefundId();
+		}
 
 		return $data;
 	}

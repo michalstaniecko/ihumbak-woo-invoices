@@ -183,7 +183,7 @@ System numeracji dokumentów.
 
 - Faktura: `FV/{YYYY}/{MM}/{NNNN}`
 - Paragon: `PAR/{YYYY}/{MM}/{NNNN}`
-- Korekta: `FK/{YYYY}/{MM}/{NNNN}`
+- Faktura korygująca: `CN/{YYYY}/{MM}/{NNNN}`
 
 ## Typy dokumentów
 
@@ -200,11 +200,13 @@ System numeracji dokumentów.
 - Bez NIP nabywcy (opcjonalnie)
 - Dla klientów indywidualnych
 
-### Faktura korygująca (correction)
+### Faktura korygująca (credit_note)
 
-- Odniesienie do faktury źródłowej
-- Powód korekty
-- Różnica wartości
+- Odniesienie do faktury źródłowej (corrected_document_id)
+- Typ korekty: pełna (full) lub częściowa (partial)
+- Powód korekty (correction_reason)
+- Opcjonalne powiązanie z WC refund (refund_id)
+- Ujemne wartości pozycji
 
 ## Hooki i filtry
 
@@ -391,27 +393,26 @@ composer check            # Wszystkie sprawdzenia
 - Plugin.php, Container.php, Activator.php, Deactivator.php, Installer.php
 
 **Modele:**
-- Document (abstrakcyjna), Invoice, Receipt, DocumentItem, Buyer, Seller
+- Document (abstrakcyjna), Invoice, Receipt, CreditNote, DocumentItem, Buyer, Seller
 
 **Repozytoria:**
 - DocumentRepository, DocumentItemRepository
 
 **Serwisy:**
-- NumberingService, CalculationService, OrderDataExtractor
+- NumberingService, CalculationService, OrderDataExtractor, RefundDataExtractor
 
 **Admin:**
 - DocumentListTable, DocumentController, AjaxController, OrderMetaBox
 
 **PDF:**
 - PdfGenerator, PdfCacheManager, TemplateLoader, TemplateRegistry
-- Szablony: invoice.php, receipt.php, styles.css
+- Szablony: invoice.php, receipt.php, credit-note.php, styles.css
 
 **Testy:**
-- 153 testy jednostkowe, wszystkie przechodzą
+- 190 testów jednostkowych, wszystkie przechodzą
 
 ### Do implementacji
 
-- Faktury korygujące
 - Portal klienta (My Account)
 - Wysyłka email z fakturą
 

@@ -14,6 +14,9 @@ namespace IHumbak\Invoices\Modules\PDF;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use IHumbak\Invoices\Models\Document;
+use IHumbak\Invoices\Models\CreditNote;
+use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
+use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 use IHumbak\Invoices\Core\Plugin;
 
 /**
@@ -43,20 +46,40 @@ class PdfGenerator {
 	private TemplateRegistry $template_registry;
 
 	/**
+	 * Document repository.
+	 *
+	 * @var DocumentRepository
+	 */
+	private DocumentRepository $document_repository;
+
+	/**
+	 * Document item repository.
+	 *
+	 * @var DocumentItemRepository
+	 */
+	private DocumentItemRepository $item_repository;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param TemplateLoader|null   $template_loader   Template loader instance.
-	 * @param PdfCacheManager|null  $cache_manager     Cache manager instance.
-	 * @param TemplateRegistry|null $template_registry Template registry instance.
+	 * @param TemplateLoader|null         $template_loader      Template loader instance.
+	 * @param PdfCacheManager|null        $cache_manager        Cache manager instance.
+	 * @param TemplateRegistry|null       $template_registry    Template registry instance.
+	 * @param DocumentRepository|null     $document_repository  Document repository instance.
+	 * @param DocumentItemRepository|null $item_repository      Document item repository instance.
 	 */
 	public function __construct(
 		?TemplateLoader $template_loader = null,
 		?PdfCacheManager $cache_manager = null,
-		?TemplateRegistry $template_registry = null
+		?TemplateRegistry $template_registry = null,
+		?DocumentRepository $document_repository = null,
+		?DocumentItemRepository $item_repository = null
 	) {
-		$this->template_loader   = $template_loader ?? new TemplateLoader();
-		$this->cache_manager     = $cache_manager ?? new PdfCacheManager();
-		$this->template_registry = $template_registry ?? new TemplateRegistry( $this->template_loader );
+		$this->template_loader     = $template_loader ?? new TemplateLoader();
+		$this->cache_manager       = $cache_manager ?? new PdfCacheManager();
+		$this->template_registry   = $template_registry ?? new TemplateRegistry( $this->template_loader );
+		$this->document_repository = $document_repository ?? new DocumentRepository();
+		$this->item_repository     = $item_repository ?? new DocumentItemRepository();
 	}
 
 	/**
@@ -228,6 +251,15 @@ class PdfGenerator {
 			'tax_total' => $this->formatMoney( $document->getTaxTotal(), $document->getCurrency() ),
 			'total'     => $this->formatMoney( $document->getTotal(), $document->getCurrency() ),
 		);
+
+		// Add original document data for credit notes.
+		if ( $document instanceof CreditNote && $document->getCorrectedDocumentId() ) {
+			$original_document = $this->document_repository->find( $document->getCorrectedDocumentId() );
+			$original_items    = $this->item_repository->findByDocumentId( $document->getCorrectedDocumentId() );
+
+			$data['original_document'] = $original_document;
+			$data['original_items']    = $original_items;
+		}
 
 		return $data;
 	}

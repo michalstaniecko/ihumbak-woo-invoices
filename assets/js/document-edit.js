@@ -38,12 +38,18 @@
             this.itemIndex = this.getMaxItemIndex() + 1;
             this.bindEvents();
             this.initFetchOrder();
+            this.initCreditNote();
 
             // Check for pre-filled order ID (from WC order metabox).
             if (window.ihumbakPreFilledOrderId) {
                 // Auto-fetch order data when coming from WC order page.
                 setTimeout(function() {
                     self.fetchOrderDataAutomatic(window.ihumbakPreFilledOrderId);
+                }, AUTO_FETCH_DELAY);
+            } else if (window.ihumbakPreSelectedInvoiceId) {
+                // Auto-fetch invoice data when coming with pre-selected invoice.
+                setTimeout(function() {
+                    self.fetchInvoiceDataAutomatic(window.ihumbakPreSelectedInvoiceId);
                 }, AUTO_FETCH_DELAY);
             } else {
                 this.recalculateDocument();
@@ -486,6 +492,368 @@
                     $(this).remove();
                 });
             }, 5000);
+        },
+
+        /**
+         * Initialize credit note functionality.
+         */
+        initCreditNote: function() {
+            var self = this;
+            var $loadInvoiceButton = $('#ihumbak-load-invoice');
+            var $loadRefundButton = $('#ihumbak-load-refund');
+            var $invoiceSelect = $('#corrected_document_id');
+
+            if (!$loadInvoiceButton.length) {
+                return; // Not on credit note page.
+            }
+
+            // Load invoice data button click.
+            $loadInvoiceButton.on('click', function(e) {
+                e.preventDefault();
+                var invoiceId = parseInt($invoiceSelect.val(), 10);
+                if (invoiceId > 0) {
+                    self.fetchInvoiceData(invoiceId);
+                } else {
+                    self.showNotice('error', ihumbakInvoices.i18n.selectInvoice || 'Please select an invoice first.');
+                }
+            });
+
+            // Load refund data button click.
+            if ($loadRefundButton.length) {
+                $loadRefundButton.on('click', function(e) {
+                    e.preventDefault();
+                    var refundId = parseInt($('#refund_id').val(), 10);
+                    if (refundId > 0) {
+                        self.fetchRefundData(refundId);
+                    } else {
+                        self.showNotice('error', ihumbakInvoices.i18n.selectRefund || 'Please select a refund first.');
+                    }
+                });
+            }
+
+            // Enable/disable load button and show warning based on selection.
+            $invoiceSelect.on('change', function() {
+                var invoiceId = parseInt($(this).val(), 10);
+                $loadInvoiceButton.prop('disabled', !invoiceId || invoiceId < 1);
+
+                // Show/hide correction warning.
+                var $selected = $(this).find('option:selected');
+                var hasCorrections = $selected.data('has-corrections') === 1 || $selected.data('has-corrections') === '1';
+                var $warning = $('#correction-warning');
+
+                if (hasCorrections) {
+                    $warning.show();
+                } else {
+                    $warning.hide();
+                }
+            });
+
+            // Trigger on load.
+            $invoiceSelect.trigger('change');
+        },
+
+        /**
+         * Fetch invoice data via AJAX (manual trigger).
+         *
+         * @param {number} invoiceId Invoice ID.
+         */
+        fetchInvoiceData: function(invoiceId) {
+            var self = this;
+            var hasItems = $('#ihumbak-items-body .ihumbak-item-row').length > 0;
+            var mode = 'replace';
+
+            if (hasItems) {
+                var confirmMsg = ihumbakInvoices.i18n.replaceItemsConfirm ||
+                    'The form already contains items. Do you want to replace them with invoice data?';
+
+                if (!confirm(confirmMsg)) {
+                    mode = 'append';
+                }
+            }
+
+            this._doFetchInvoiceData(invoiceId, function(data) {
+                self.populateFromInvoiceData(data, mode);
+                self.showNotice('success', ihumbakInvoices.i18n.invoiceDataLoaded || 'Invoice data loaded successfully.');
+            });
+        },
+
+        /**
+         * Fetch invoice data automatically (from pre-selected invoice).
+         *
+         * @param {number} invoiceId Invoice ID.
+         */
+        fetchInvoiceDataAutomatic: function(invoiceId) {
+            var self = this;
+            this._doFetchInvoiceData(invoiceId, function(data) {
+                self.populateFromInvoiceData(data, 'replace');
+                self.showNotice('success', ihumbakInvoices.i18n.invoiceDataLoaded || 'Invoice data loaded successfully.');
+            });
+        },
+
+        /**
+         * Internal method to fetch invoice data via AJAX.
+         *
+         * @param {number}   invoiceId  Invoice ID.
+         * @param {Function} onSuccess  Callback on successful fetch.
+         * @private
+         */
+        _doFetchInvoiceData: function(invoiceId, onSuccess) {
+            var self = this;
+            var $button = $('#ihumbak-load-invoice');
+            var $spinner = $('#ihumbak-load-status');
+
+            // Show loading state.
+            $button.prop('disabled', true);
+            $spinner.addClass('is-active');
+
+            $.ajax({
+                url: ihumbakInvoices.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'ihumbak_fetch_invoice_data',
+                    nonce: ihumbakInvoices.nonce,
+                    invoice_id: invoiceId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        onSuccess(response.data);
+                    } else {
+                        self.showNotice('error', response.data.message || ihumbakInvoices.i18n.error);
+                        self.recalculateDocument();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    self.showNotice('error', ihumbakInvoices.i18n.error);
+                    self.recalculateDocument();
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                    $spinner.removeClass('is-active');
+                }
+            });
+        },
+
+        /**
+         * Populate credit note form from invoice data.
+         *
+         * @param {Object} data Invoice data.
+         * @param {string} mode 'replace' or 'append'.
+         */
+        populateFromInvoiceData: function(data, mode) {
+            var self = this;
+
+            if (mode === 'replace') {
+                // Clear existing items.
+                $('#ihumbak-items-body').empty();
+                this.itemIndex = 0;
+            }
+
+            // Add items (with negative quantities for credit note).
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(function(item) {
+                    // Negate quantity for credit note.
+                    item.quantity = -Math.abs(item.quantity || 1);
+                    self.addItemRowWithData(item);
+                });
+            }
+
+            // Populate buyer fields.
+            if (data.buyer) {
+                this.populateBuyerFields(data.buyer);
+            }
+
+            // Populate seller fields.
+            if (data.seller) {
+                this.populateSellerFields(data.seller);
+            }
+
+            // Update original invoice info display.
+            if (data.invoice) {
+                this.updateOriginalInvoiceInfo(data.invoice);
+            }
+
+            // Update refunds dropdown if available.
+            if (data.refunds && data.refunds.length > 0) {
+                this.updateRefundsDropdown(data.refunds);
+            }
+
+            // Recalculate document totals.
+            this.recalculateDocument();
+        },
+
+        /**
+         * Populate seller fields.
+         *
+         * @param {Object} sellerData Seller data.
+         */
+        populateSellerFields: function(sellerData) {
+            $('#seller_name').val(sellerData.name || '');
+            $('#seller_nip').val(sellerData.nip || '');
+            $('#seller_address').val(sellerData.address || '');
+            $('#seller_postcode').val(sellerData.postcode || '');
+            $('#seller_city').val(sellerData.city || '');
+            $('#seller_country').val(sellerData.country || 'PL');
+            $('#seller_email').val(sellerData.email || '');
+            $('#seller_phone').val(sellerData.phone || '');
+            $('#seller_bank_name').val(sellerData.bank_name || '');
+            $('#seller_bank_account').val(sellerData.bank_account || '');
+        },
+
+        /**
+         * Update original invoice info display.
+         *
+         * @param {Object} invoiceData Invoice data.
+         */
+        updateOriginalInvoiceInfo: function(invoiceData) {
+            var $infoRow = $('#original-invoice-info');
+            var $details = $('#original-invoice-details');
+
+            if (!$infoRow.length) {
+                // Create info row if it doesn't exist.
+                var html = '<tr id="original-invoice-info">' +
+                    '<th>' + (ihumbakInvoices.i18n.originalInvoice || 'Original Invoice') + '</th>' +
+                    '<td><div id="original-invoice-details"></div></td>' +
+                    '</tr>';
+                $('#corrected_document_id').closest('tr').after(html);
+                $details = $('#original-invoice-details');
+            }
+
+            $details.html(
+                '<strong>' + this.escapeHtml(invoiceData.document_number) + '</strong><br>' +
+                (ihumbakInvoices.i18n.date || 'Date') + ': ' + this.escapeHtml(invoiceData.issue_date)
+            );
+        },
+
+        /**
+         * Update refunds dropdown with available refunds.
+         *
+         * @param {Array} refunds Array of refund data.
+         */
+        updateRefundsDropdown: function(refunds) {
+            var $row = $('#refund-selection-row');
+            var $select = $('#refund_id');
+
+            if (!$row.length && refunds.length > 0) {
+                // Create refund row if it doesn't exist.
+                var html = '<tr id="refund-selection-row">' +
+                    '<th><label for="refund_id">' + (ihumbakInvoices.i18n.linkToRefund || 'Link to WC Refund (Optional)') + '</label></th>' +
+                    '<td>' +
+                    '<select id="refund_id" name="refund_id"></select> ' +
+                    '<button type="button" id="ihumbak-load-refund" class="button">' +
+                    (ihumbakInvoices.i18n.applyRefundData || 'Apply Refund Data') +
+                    '</button>' +
+                    '</td>' +
+                    '</tr>';
+                $('#correction_reason').closest('tr').after(html);
+                $select = $('#refund_id');
+
+                // Bind click handler for new button.
+                var self = this;
+                $('#ihumbak-load-refund').on('click', function(e) {
+                    e.preventDefault();
+                    var refundId = parseInt($select.val(), 10);
+                    if (refundId > 0) {
+                        self.fetchRefundData(refundId);
+                    }
+                });
+            }
+
+            // Populate options.
+            $select.empty();
+            $select.append('<option value="">' + (ihumbakInvoices.i18n.noRefund || '-- No Refund --') + '</option>');
+
+            refunds.forEach(function(refund) {
+                var label = '#' + refund.id + ' - ' + parseFloat(refund.amount).toFixed(2) + ' - ' + refund.date;
+                if (refund.reason) {
+                    label += ' (' + refund.reason.substring(0, 30) + ')';
+                }
+                $select.append('<option value="' + refund.id + '">' + label + '</option>');
+            });
+        },
+
+        /**
+         * Fetch refund data via AJAX.
+         *
+         * @param {number} refundId Refund ID.
+         */
+        fetchRefundData: function(refundId) {
+            var self = this;
+            var $button = $('#ihumbak-load-refund');
+
+            $button.prop('disabled', true);
+
+            $.ajax({
+                url: ihumbakInvoices.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'ihumbak_fetch_refund_data',
+                    nonce: ihumbakInvoices.nonce,
+                    refund_id: refundId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.populateFromRefundData(response.data);
+                        self.showNotice('success', ihumbakInvoices.i18n.refundDataLoaded || 'Refund data applied successfully.');
+                    } else {
+                        self.showNotice('error', response.data.message || ihumbakInvoices.i18n.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    self.showNotice('error', ihumbakInvoices.i18n.error);
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
+            });
+        },
+
+        /**
+         * Populate credit note from refund data.
+         *
+         * @param {Object} data Refund data.
+         */
+        populateFromRefundData: function(data) {
+            var self = this;
+
+            // Set correction reason from refund reason.
+            if (data.reason) {
+                $('#correction_reason').val(data.reason);
+            }
+
+            // Replace items with refund items.
+            if (data.items && data.items.length > 0) {
+                $('#ihumbak-items-body').empty();
+                this.itemIndex = 0;
+
+                data.items.forEach(function(item) {
+                    self.addItemRowWithData({
+                        name: item.name,
+                        quantity: -Math.abs(item.quantity || 1),
+                        unit_price_net: item.unit_price_net || 0,
+                        tax_rate: 23 // Default, will be recalculated.
+                    });
+                });
+            }
+
+            // Recalculate.
+            this.recalculateDocument();
+        },
+
+        /**
+         * Escape HTML to prevent XSS.
+         *
+         * @param {string} text Text to escape.
+         * @return {string} Escaped text.
+         */
+        escapeHtml: function(text) {
+            if (!text) {
+                return '';
+            }
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     };
 

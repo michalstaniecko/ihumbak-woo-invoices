@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.1.0';
+	private const DB_VERSION = '1.2.0';
 
 	/**
 	 * Option name for storing database version.
@@ -90,6 +90,55 @@ class Installer {
 			if ( ! $column_exists ) {
 				$wpdb->query( "ALTER TABLE {$items_table} ADD COLUMN sku varchar(100) DEFAULT '' AFTER name" );
 			}
+			// phpcs:enable
+		}
+
+		// Migration to 1.2.0: Add Credit Note columns.
+		if ( version_compare( $from_version, '1.2.0', '<' ) ) {
+			$table = self::get_documents_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			// Add correction_reason column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'correction_reason'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN correction_reason TEXT DEFAULT NULL AFTER notes" );
+			}
+
+			// Add correction_type column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'correction_type'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN correction_type varchar(20) DEFAULT 'partial' AFTER correction_reason" );
+			}
+
+			// Add refund_id column with index.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'refund_id'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN refund_id bigint(20) unsigned DEFAULT NULL AFTER correction_type" );
+				$wpdb->query( "ALTER TABLE {$table} ADD INDEX refund_id (refund_id)" );
+			}
+
 			// phpcs:enable
 		}
 	}

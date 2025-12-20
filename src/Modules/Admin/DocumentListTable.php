@@ -379,6 +379,7 @@ class DocumentListTable extends \WP_List_Table {
 				<option value=""><?php esc_html_e( 'All types', 'ihumbak-invoices' ); ?></option>
 				<option value="invoice" <?php selected( $current_type, 'invoice' ); ?>><?php esc_html_e( 'Invoices', 'ihumbak-invoices' ); ?></option>
 				<option value="receipt" <?php selected( $current_type, 'receipt' ); ?>><?php esc_html_e( 'Receipts', 'ihumbak-invoices' ); ?></option>
+				<option value="credit_note" <?php selected( $current_type, 'credit_note' ); ?>><?php esc_html_e( 'Credit Notes', 'ihumbak-invoices' ); ?></option>
 			</select>
 
 			<select name="status">

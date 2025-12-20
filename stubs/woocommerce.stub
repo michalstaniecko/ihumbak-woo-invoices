@@ -36,6 +36,7 @@ function wc_get_product( int $product_id ): WC_Product|false {
 
 class WC_Order {
     public function get_id(): int {}
+    public function get_type(): string {}
     public function get_status(): string {}
     public function get_billing_first_name(): string {}
     public function get_billing_last_name(): string {}
@@ -47,8 +48,11 @@ class WC_Order {
     public function get_billing_country(): string {}
     public function get_billing_email(): string {}
     public function get_billing_phone(): string {}
-    /** @return array<int, WC_Order_Item_Product> */
-    public function get_items(): array {}
+    /**
+     * @param string|string[] $types Item types to get.
+     * @return array<int, WC_Order_Item_Product>
+     */
+    public function get_items( $types = 'line_item' ): array {}
     public function get_total(): string {}
     public function get_subtotal(): string {}
     public function get_total_tax(): string {}
@@ -63,6 +67,8 @@ class WC_Order {
     public function get_shipping_total(): string {}
     public function get_shipping_tax(): string {}
     public function get_shipping_method(): string {}
+    /** @return WC_Order_Refund[] */
+    public function get_refunds(): array {}
 }
 
 class WC_Order_Item_Product {
@@ -76,6 +82,22 @@ class WC_Order_Item_Product {
     public function get_subtotal_tax(): string {}
     public function get_product(): ?WC_Product {}
     public function get_variation_id(): int {}
+    public function get_meta( string $key, bool $single = true ): mixed {}
+}
+
+/**
+ * WooCommerce Order Refund.
+ */
+class WC_Order_Refund extends WC_Order {
+    public function get_id(): int {}
+    public function get_reason(): string {}
+    public function get_amount(): string {}
+    public function get_date_created(): ?\WC_DateTime {}
+    /**
+     * @param string|string[] $types Item types to get.
+     * @return array<int, WC_Order_Item_Product>
+     */
+    public function get_items( $types = 'line_item' ): array {}
 }
 
 class WC_DateTime extends \DateTime {}

@@ -231,10 +231,11 @@ class NumberingService {
 	 */
 	public static function getDefaultPattern( string $document_type ): string {
 		return match ( $document_type ) {
-			'invoice'    => 'FV/{YYYY}/{MM}/{NNNN}',
-			'receipt'    => 'PAR/{YYYY}/{MM}/{NNNN}',
-			'correction' => 'FK/{YYYY}/{MM}/{NNNN}',
-			default      => 'DOC/{YYYY}/{MM}/{NNNN}',
+			'invoice'     => 'FV/{YYYY}/{MM}/{NNNN}',
+			'receipt'     => 'PAR/{YYYY}/{MM}/{NNNN}',
+			'credit_note' => 'CN/{YYYY}/{MM}/{NNNN}',
+			'correction'  => 'FK/{YYYY}/{MM}/{NNNN}', // Legacy - kept for backward compatibility.
+			default       => 'DOC/{YYYY}/{MM}/{NNNN}',
 		};
 	}
 }

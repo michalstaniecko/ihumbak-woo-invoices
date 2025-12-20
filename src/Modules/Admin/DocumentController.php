@@ -14,10 +14,12 @@ use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 use IHumbak\Invoices\Models\Document;
 use IHumbak\Invoices\Models\Invoice;
 use IHumbak\Invoices\Models\Receipt;
+use IHumbak\Invoices\Models\CreditNote;
 use IHumbak\Invoices\Models\DocumentItem;
 use IHumbak\Invoices\Models\Buyer;
 use IHumbak\Invoices\Models\Seller;
 use IHumbak\Invoices\Modules\Invoice\NumberingService;
+use IHumbak\Invoices\Modules\Invoice\RefundDataExtractor;
 use IHumbak\Invoices\Core\Plugin;
 
 /**
@@ -47,12 +49,20 @@ class DocumentController {
 	private NumberingService $numbering_service;
 
 	/**
+	 * Refund data extractor.
+	 *
+	 * @var RefundDataExtractor
+	 */
+	private RefundDataExtractor $refund_extractor;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->document_repository = new DocumentRepository();
 		$this->item_repository     = new DocumentItemRepository();
 		$this->numbering_service   = new NumberingService();
+		$this->refund_extractor    = new RefundDataExtractor();
 	}
 
 	/**
@@ -63,6 +73,7 @@ class DocumentController {
 	public function init(): void {
 		add_action( 'admin_post_ihumbak_save_invoice', array( $this, 'handle_save_invoice' ) );
 		add_action( 'admin_post_ihumbak_save_receipt', array( $this, 'handle_save_receipt' ) );
+		add_action( 'admin_post_ihumbak_save_credit_note', array( $this, 'handle_save_credit_note' ) );
 	}
 
 	/**
@@ -166,6 +177,106 @@ class DocumentController {
 	}
 
 	/**
+	 * Handle save credit note action.
+	 *
+	 * @return void
+	 */
+	public function handle_save_credit_note(): void {
+		$this->handle_save( 'credit_note' );
+	}
+
+	/**
+	 * Render credit note edit page.
+	 *
+	 * @param int|null $id Document ID (null for new).
+	 * @return void
+	 */
+	public function render_credit_note_edit( ?int $id = null ): void {
+		$document          = null;
+		$items             = array();
+		$original_document = null;
+		$original_items    = array();
+		$available_refunds = array();
+
+		if ( $id ) {
+			$document = $this->document_repository->find( $id );
+			if ( $document ) {
+				$items = $this->item_repository->findByDocumentId( $id );
+
+				// Load original document if set.
+				if ( $document->getCorrectedDocumentId() ) {
+					$original_document = $this->document_repository->find( $document->getCorrectedDocumentId() );
+					$original_items    = $this->item_repository->findByDocumentId( $document->getCorrectedDocumentId() );
+
+					// Load refunds if order is linked.
+					if ( $original_document && $original_document->getOrderId() ) {
+						$available_refunds = $this->refund_extractor->extractRefundsFromOrderId( $original_document->getOrderId() );
+					}
+				}
+			}
+		}
+
+		// Check for pre-selected invoice ID.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$pre_selected_invoice_id = isset( $_GET['corrected_document_id'] ) ? absint( $_GET['corrected_document_id'] ) : null;
+
+		$settings = Plugin::get_instance()->get_settings();
+		$seller   = $document ? $document->getSeller()?->toArray() : ( $settings['seller'] ?? array() );
+		$buyer    = $document ? $document->getBuyer()?->toArray() : array();
+		$items    = array_map( fn( $item ) => $item->toArray(), $items );
+
+		// Get available invoices for dropdown with existing corrections info.
+		$available_invoices   = $this->get_correctable_invoices();
+		$existing_corrections = $this->get_existing_corrections_map( $available_invoices );
+
+		$next_number = $this->numbering_service->previewNextNumber(
+			'credit_note',
+			$settings['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}',
+			$settings['numbering']['reset_monthly'] ?? true
+		);
+
+		include IHUMBAK_INVOICES_PATH . 'templates/admin/credit-note-edit.php';
+	}
+
+	/**
+	 * Get invoices that can be corrected.
+	 *
+	 * @return Document[]
+	 */
+	private function get_correctable_invoices(): array {
+		return $this->document_repository->findAll(
+			array(
+				'document_type' => 'invoice',
+				'status'        => Document::STATUS_ISSUED,
+			),
+			1000,
+			0
+		);
+	}
+
+	/**
+	 * Get map of existing corrections for invoices.
+	 *
+	 * @param Document[] $invoices Array of invoices.
+	 * @return array<int, CreditNote[]> Map of invoice ID to array of credit notes.
+	 */
+	private function get_existing_corrections_map( array $invoices ): array {
+		$corrections = array();
+
+		foreach ( $invoices as $invoice ) {
+			$invoice_id = $invoice->getId();
+			if ( $invoice_id ) {
+				$credit_notes = $this->document_repository->findByCorrectedDocumentId( $invoice_id );
+				if ( ! empty( $credit_notes ) ) {
+					$corrections[ $invoice_id ] = $credit_notes;
+				}
+			}
+		}
+
+		return $corrections;
+	}
+
+	/**
 	 * Handle document save.
 	 *
 	 * @param string $type Document type.
@@ -196,7 +307,11 @@ class DocumentController {
 				wp_die( esc_html__( 'This document cannot be edited.', 'ihumbak-invoices' ) );
 			}
 		} else {
-			$document = 'invoice' === $type ? new Invoice() : new Receipt();
+			$document = match ( $type ) {
+				'receipt'     => new Receipt(),
+				'credit_note' => new CreditNote(),
+				default       => new Invoice(),
+			};
 		}
 
 		try {
@@ -210,9 +325,11 @@ class DocumentController {
 				// Generate document number on issue.
 				if ( ! $document->getDocumentNumber() ) {
 					$settings = Plugin::get_instance()->get_settings();
-					$pattern  = 'invoice' === $type
-						? ( $settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' )
-						: ( $settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' );
+					$pattern  = match ( $type ) {
+						'receipt'     => $settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}',
+						'credit_note' => $settings['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}',
+						default       => $settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}',
+					};
 
 					$document->setDocumentNumber(
 						$this->numbering_service->generateNumber(
@@ -288,6 +405,7 @@ class DocumentController {
 	 *
 	 * @param Document $document Document to populate.
 	 * @return void
+	 * @throws \InvalidArgumentException If corrected document ID is invalid.
 	 */
 	private function populate_document_from_request( Document $document ): void {
         // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in calling method.
@@ -317,6 +435,54 @@ class DocumentController {
 		// Payment method (invoice only).
 		if ( $document instanceof Invoice && ! empty( $_POST['payment_method'] ) ) {
 			$document->setPaymentMethod( sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) );
+		}
+
+		// Credit note specific fields.
+		if ( $document instanceof CreditNote ) {
+			// Corrected document ID (required).
+			if ( ! empty( $_POST['corrected_document_id'] ) ) {
+				$corrected_id = absint( $_POST['corrected_document_id'] );
+
+				// Validate that the corrected document exists and is an invoice.
+				$original_document = $this->document_repository->find( $corrected_id );
+				if ( ! $original_document ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
+					);
+				}
+				if ( 'invoice' !== $original_document->getDocumentType() ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
+					);
+				}
+
+				$document->setCorrectedDocumentId( $corrected_id );
+
+				// Propagate order_id from original invoice to credit note.
+				if ( $original_document->getOrderId() ) {
+					$document->setOrderId( $original_document->getOrderId() );
+				}
+			}
+
+			// Correction reason.
+			if ( ! empty( $_POST['correction_reason'] ) ) {
+				$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
+			}
+
+			// Correction type (full or partial).
+			if ( ! empty( $_POST['correction_type'] ) ) {
+				try {
+					$document->setCorrectionType( sanitize_text_field( wp_unslash( $_POST['correction_type'] ) ) );
+				} catch ( \InvalidArgumentException $e ) {
+					// Use default type (partial) if invalid value provided.
+					unset( $e );
+				}
+			}
+
+			// Refund ID (optional).
+			if ( ! empty( $_POST['refund_id'] ) ) {
+				$document->setRefundId( absint( $_POST['refund_id'] ) );
+			}
 		}
 
 		// Seller.

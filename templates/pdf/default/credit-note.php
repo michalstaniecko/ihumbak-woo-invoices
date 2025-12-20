@@ -1,0 +1,273 @@
+<?php
+/**
+ * Default Credit Note PDF Template
+ *
+ * EU Standard Credit Note Template - English
+ *
+ * Available variables:
+ *
+ * @var IHumbak\Invoices\Models\CreditNote $document
+ * @var IHumbak\Invoices\Models\Document|null $original_document Original invoice being corrected.
+ * @var IHumbak\Invoices\Models\DocumentItem[] $original_items Original invoice items.
+ * @var IHumbak\Invoices\Models\Seller|null $seller
+ * @var IHumbak\Invoices\Models\Buyer|null $buyer
+ * @var IHumbak\Invoices\Models\DocumentItem[] $items Corrected items (new values).
+ * @var array $settings
+ * @var string|null $logo_url
+ * @var string $styles
+ * @var array $vat_breakdown
+ * @var array $formatted
+ *
+ * @package IHumbak\Invoices
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+$currency = $document->getCurrency();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Credit Note <?php echo esc_html( $document->getDocumentNumber() ); ?></title>
+	<style>
+		<?php echo $styles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+
+		/* Credit Note specific styles */
+		.correction-reference {
+			background: #fff3cd;
+			border: 2pt solid #ffc107;
+			border-radius: 4pt;
+			padding: 12pt;
+			margin-bottom: 20pt;
+		}
+
+		.correction-reference-title {
+			font-size: 10pt;
+			font-weight: bold;
+			color: #856404;
+			text-transform: uppercase;
+			margin-bottom: 8pt;
+		}
+
+		.correction-reference-row {
+			font-size: 9pt;
+			color: #856404;
+			margin-bottom: 4pt;
+		}
+
+		.correction-reference-row .label {
+			font-weight: bold;
+		}
+
+		.correction-reason-section {
+			background: #f8d7da;
+			border: 1pt solid #f5c6cb;
+			border-radius: 4pt;
+			padding: 12pt;
+			margin: 20pt 0;
+		}
+
+		.correction-reason-title {
+			font-size: 10pt;
+			font-weight: bold;
+			color: #721c24;
+			text-transform: uppercase;
+			margin-bottom: 8pt;
+		}
+
+		.correction-reason-content {
+			font-size: 9pt;
+			color: #721c24;
+			line-height: 1.6;
+		}
+
+		.credit-note-total-bar {
+			background: #dc3545;
+		}
+
+		.document-title-section .document-title {
+			color: #dc3545;
+		}
+	</style>
+</head>
+<body>
+	<div class="document-container">
+		<!-- Row 1: Logo/Company Name + Seller Data -->
+		<table class="header-section" cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="header-left">
+					<?php if ( $logo_url ) : ?>
+						<img src="<?php echo esc_attr( $logo_url ); ?>" alt="Logo" class="logo">
+					<?php elseif ( $seller ) : ?>
+						<div class="company-name"><?php echo esc_html( $seller->getName() ); ?></div>
+					<?php endif; ?>
+				</td>
+				<td class="header-right">
+					<?php if ( $seller ) : ?>
+						<div class="seller-info">
+							<strong><?php echo esc_html( $seller->getName() ); ?></strong><br>
+							<?php echo esc_html( $seller->getAddress() ); ?><br>
+							<?php echo esc_html( $seller->getPostcode() . ' ' . $seller->getCity() ); ?><br>
+							<?php echo esc_html( $seller->getCountry() ); ?>
+							<?php if ( $seller->getNip() ) : ?>
+								<div class="tax-id">VAT ID: <?php echo esc_html( $seller->getNip() ); ?></div>
+							<?php endif; ?>
+						</div>
+					<?php endif; ?>
+				</td>
+			</tr>
+		</table>
+
+		<!-- Row 2: Centered Document Title -->
+		<div class="document-title-section">
+			<div class="document-title">CREDIT NOTE</div>
+			<div class="document-number"><?php echo esc_html( $document->getDocumentNumber() ); ?></div>
+		</div>
+
+		<!-- Correction Reference Box -->
+		<?php if ( $original_document ) : ?>
+		<div class="correction-reference">
+			<div class="correction-reference-title">Corrects Invoice</div>
+			<div class="correction-reference-row">
+				<span class="label">Original Invoice No:</span>
+				<span class="value"><?php echo esc_html( $original_document->getDocumentNumber() ); ?></span>
+			</div>
+			<div class="correction-reference-row">
+				<span class="label">Original Issue Date:</span>
+				<span class="value"><?php echo $original_document->getIssueDate() ? esc_html( $original_document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
+			</div>
+			<div class="correction-reference-row">
+				<span class="label">Original Total:</span>
+				<span class="value"><?php echo esc_html( number_format( $original_document->getTotal(), 2, '.', ' ' ) . ' ' . $original_document->getCurrency() ); ?></span>
+			</div>
+		</div>
+		<?php endif; ?>
+
+		<!-- Row 3: Credit Note Details + Buyer Data -->
+		<table class="details-section" cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="details-left">
+					<div class="detail-box">
+						<div class="detail-box-title">Credit Note Details</div>
+						<div class="detail-row">
+							<span class="label">Credit Note No:</span>
+							<span class="value"><?php echo esc_html( $document->getDocumentNumber() ); ?></span>
+						</div>
+						<div class="detail-row">
+							<span class="label">Issue Date:</span>
+							<span class="value"><?php echo $document->getIssueDate() ? esc_html( $document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
+						</div>
+						<div class="detail-row">
+							<span class="label">Sale Date:</span>
+							<span class="value"><?php echo $document->getSaleDate() ? esc_html( $document->getSaleDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
+						</div>
+						<div class="detail-row">
+							<span class="label">Correction Type:</span>
+							<span class="value">
+								<?php echo $document->isFullCorrection() ? esc_html__( 'Full', 'ihumbak-invoices' ) : esc_html__( 'Partial', 'ihumbak-invoices' ); ?>
+							</span>
+						</div>
+					</div>
+				</td>
+				<td class="details-right">
+					<div class="detail-box">
+						<div class="detail-box-title">Buyer</div>
+						<?php if ( $buyer ) : ?>
+							<div class="party-name"><?php echo esc_html( $buyer->getName() ); ?></div>
+							<div class="party-address">
+								<?php echo esc_html( $buyer->getAddress() ); ?><br>
+								<?php echo esc_html( $buyer->getPostcode() . ' ' . $buyer->getCity() ); ?><br>
+								<?php echo esc_html( $buyer->getCountry() ); ?>
+							</div>
+							<?php if ( $buyer->getNip() ) : ?>
+								<div class="party-tax-id">VAT ID: <?php echo esc_html( $buyer->getNip() ); ?></div>
+							<?php endif; ?>
+						<?php endif; ?>
+					</div>
+				</td>
+			</tr>
+		</table>
+
+		<!-- Correction Reason -->
+		<?php if ( $document->getCorrectionReason() ) : ?>
+		<div class="correction-reason-section">
+			<div class="correction-reason-title">Reason for Correction</div>
+			<div class="correction-reason-content"><?php echo nl2br( esc_html( $document->getCorrectionReason() ) ); ?></div>
+		</div>
+		<?php endif; ?>
+
+		<!-- Items Table -->
+		<div class="items-section">
+			<table class="items-table" cellpadding="0" cellspacing="0">
+				<thead>
+					<tr>
+						<th class="col-name"><?php esc_html_e( 'Description', 'ihumbak-invoices' ); ?></th>
+						<th class="col-qty text-right"><?php esc_html_e( 'Qty', 'ihumbak-invoices' ); ?></th>
+						<th class="col-net text-right"><?php printf( esc_html__( 'Net (%s)', 'ihumbak-invoices' ), esc_html( $currency ) ); ?></th>
+						<th class="col-tax-rate text-center"><?php esc_html_e( 'VAT %', 'ihumbak-invoices' ); ?></th>
+						<th class="col-tax text-right"><?php printf( esc_html__( 'VAT (%s)', 'ihumbak-invoices' ), esc_html( $currency ) ); ?></th>
+						<th class="col-gross text-right"><?php printf( esc_html__( 'Gross (%s)', 'ihumbak-invoices' ), esc_html( $currency ) ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ( $items as $item ) : ?>
+						<tr>
+							<td class="item-name"><?php echo esc_html( $item->getName() ); ?></td>
+							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
+							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalNet(), 2, '.', ' ' ) ); ?></td>
+							<td class="text-center"><?php echo esc_html( number_format( $item->getTaxRate(), 0 ) ); ?>%</td>
+							<td class="text-right"><?php echo esc_html( number_format( $item->getTaxAmount(), 2, '.', ' ' ) ); ?></td>
+							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalGross(), 2, '.', ' ' ) ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+				<?php if ( ! empty( $vat_breakdown ) ) : ?>
+				<tfoot>
+					<?php foreach ( $vat_breakdown as $values ) : ?>
+						<tr class="vat-subtotal">
+							<td colspan="2"></td>
+							<td class="text-right"><?php echo esc_html( number_format( $values['net'], 2, '.', ' ' ) ); ?></td>
+							<td class="text-center"><?php echo esc_html( number_format( $values['rate'], 0 ) ); ?>%</td>
+							<td class="text-right"><?php echo esc_html( number_format( $values['tax'], 2, '.', ' ' ) ); ?></td>
+							<td class="text-right"><?php echo esc_html( number_format( $values['gross'], 2, '.', ' ' ) ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					<tr class="grand-total">
+						<td colspan="2"></td>
+						<td class="text-right"><?php echo esc_html( number_format( $document->getSubtotal(), 2, '.', ' ' ) ); ?></td>
+						<td></td>
+						<td class="text-right"><?php echo esc_html( number_format( $document->getTaxTotal(), 2, '.', ' ' ) ); ?></td>
+						<td class="text-right"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) ); ?></td>
+					</tr>
+				</tfoot>
+				<?php endif; ?>
+			</table>
+		</div>
+
+		<!-- Credit Note Total Bar -->
+		<div class="document-total-bar credit-note-total-bar">
+			<span class="total-label"><?php esc_html_e( 'CREDIT AMOUNT:', 'ihumbak-invoices' ); ?></span>
+			<span class="total-value"><?php echo esc_html( number_format( abs( $document->getTotal() ), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
+		</div>
+
+		<!-- Notes -->
+		<?php if ( $document->getNotes() ) : ?>
+			<div class="notes-section">
+				<div class="notes-title">Notes</div>
+				<div class="notes-content"><?php echo nl2br( esc_html( $document->getNotes() ) ); ?></div>
+			</div>
+		<?php endif; ?>
+
+		<!-- Footer -->
+		<div class="document-footer">
+			<?php if ( ! empty( $settings['pdf']['footer_text'] ) ) : ?>
+				<?php echo esc_html( $settings['pdf']['footer_text'] ); ?>
+			<?php else : ?>
+				<?php esc_html_e( 'This credit note was generated electronically and is valid without a signature.', 'ihumbak-invoices' ); ?>
+			<?php endif; ?>
+		</div>
+	</div>
+</body>
+</html>
