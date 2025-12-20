@@ -138,80 +138,54 @@ $currency = $document->getCurrency();
 			<table class="items-table" cellpadding="0" cellspacing="0">
 				<thead>
 					<tr>
-						<th class="col-no text-center">#</th>
-						<th class="col-name">Description</th>
-						<th class="col-qty text-right">Qty</th>
-						<th class="col-unit text-center">Unit</th>
-						<th class="col-price text-right">Unit Price</th>
-						<th class="col-tax-rate text-center">VAT %</th>
-						<th class="col-tax text-right">VAT Amount</th>
-						<th class="col-total text-right">Total Gross</th>
+						<th class="col-name"><?php esc_html_e( 'Description', 'ihumbak-invoices' ); ?></th>
+						<th class="col-qty text-right"><?php esc_html_e( 'Qty', 'ihumbak-invoices' ); ?></th>
+						<th class="col-net text-right"><?php printf( esc_html__( 'Net (%s)', 'ihumbak-invoices' ), esc_html( $currency ) ); ?></th>
+						<th class="col-tax-rate text-center"><?php esc_html_e( 'VAT %', 'ihumbak-invoices' ); ?></th>
+						<th class="col-tax text-right"><?php printf( esc_html__( 'VAT (%s)', 'ihumbak-invoices' ), esc_html( $currency ) ); ?></th>
+						<th class="col-gross text-right"><?php printf( esc_html__( 'Gross (%s)', 'ihumbak-invoices' ), esc_html( $currency ) ); ?></th>
 					</tr>
 				</thead>
 				<tbody>
-					<?php foreach ( $items as $index => $item ) : ?>
+					<?php foreach ( $items as $item ) : ?>
 						<tr>
-							<td class="text-center"><?php echo esc_html( $index + 1 ); ?></td>
 							<td class="item-name"><?php echo esc_html( $item->getName() ); ?></td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
-							<td class="text-center"><?php echo esc_html( $item->getUnit() ); ?></td>
-							<td class="text-right"><?php echo esc_html( number_format( $item->getUnitPriceNet(), 2, '.', ' ' ) ); ?></td>
+							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalNet(), 2, '.', ' ' ) ); ?></td>
 							<td class="text-center"><?php echo esc_html( number_format( $item->getTaxRate(), 0 ) ); ?>%</td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getTaxAmount(), 2, '.', ' ' ) ); ?></td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalGross(), 2, '.', ' ' ) ); ?></td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
+				<?php if ( ! empty( $vat_breakdown ) ) : ?>
+				<tfoot>
+					<?php foreach ( $vat_breakdown as $values ) : ?>
+						<tr class="vat-subtotal">
+							<td colspan="2"></td>
+							<td class="text-right"><?php echo esc_html( number_format( $values['net'], 2, '.', ' ' ) ); ?></td>
+							<td class="text-center"><?php echo esc_html( number_format( $values['rate'], 0 ) ); ?>%</td>
+							<td class="text-right"><?php echo esc_html( number_format( $values['tax'], 2, '.', ' ' ) ); ?></td>
+							<td class="text-right"><?php echo esc_html( number_format( $values['gross'], 2, '.', ' ' ) ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+					<tr class="grand-total">
+						<td colspan="2"></td>
+						<td class="text-right"><?php echo esc_html( number_format( $document->getSubtotal(), 2, '.', ' ' ) ); ?></td>
+						<td></td>
+						<td class="text-right"><?php echo esc_html( number_format( $document->getTaxTotal(), 2, '.', ' ' ) ); ?></td>
+						<td class="text-right"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) ); ?></td>
+					</tr>
+				</tfoot>
+				<?php endif; ?>
 			</table>
 		</div>
 
-		<!-- VAT Summary and Totals -->
-		<table class="vat-summary" cellpadding="0" cellspacing="0">
-			<tr>
-				<td class="vat-summary-left">
-					<?php if ( ! empty( $vat_breakdown ) ) : ?>
-						<table class="vat-table" cellpadding="0" cellspacing="0">
-							<thead>
-								<tr>
-									<th>VAT Rate</th>
-									<th class="text-right">Net Amount</th>
-									<th class="text-right">VAT Amount</th>
-									<th class="text-right">Gross Amount</th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php foreach ( $vat_breakdown as $rate => $values ) : ?>
-									<tr>
-										<td><?php echo esc_html( number_format( $values['rate'], 0 ) ); ?>%</td>
-										<td class="text-right"><?php echo esc_html( number_format( $values['net'], 2, '.', ' ' ) ); ?></td>
-										<td class="text-right"><?php echo esc_html( number_format( $values['tax'], 2, '.', ' ' ) ); ?></td>
-										<td class="text-right"><?php echo esc_html( number_format( $values['gross'], 2, '.', ' ' ) ); ?></td>
-									</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					<?php endif; ?>
-				</td>
-				<td class="vat-summary-right">
-					<div class="totals-section">
-						<table class="totals-table" cellpadding="0" cellspacing="0">
-							<tr>
-								<td class="label">Subtotal (Net):</td>
-								<td class="value"><?php echo esc_html( number_format( $document->getSubtotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></td>
-							</tr>
-							<tr>
-								<td class="label">VAT Total:</td>
-								<td class="value"><?php echo esc_html( number_format( $document->getTaxTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></td>
-							</tr>
-							<tr class="total-row">
-								<td class="label">TOTAL (Gross):</td>
-								<td class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></td>
-							</tr>
-						</table>
-					</div>
-				</td>
-			</tr>
-		</table>
+		<!-- Invoice Total Bar -->
+		<div class="document-total-bar">
+			<span class="total-label"><?php esc_html_e( 'INVOICE TOTAL:', 'ihumbak-invoices' ); ?></span>
+			<span class="total-value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
+		</div>
 
 		<!-- Payment Information -->
 		<?php if ( $seller && ( $seller->getBankName() || $seller->getBankAccount() ) ) : ?>
