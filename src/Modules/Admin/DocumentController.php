@@ -176,72 +176,101 @@ class DocumentController {
 		// Get document ID if editing.
 		$document_id = isset( $_POST['document_id'] ) ? absint( $_POST['document_id'] ) : null;
 
-		// Create document model.
-		$document = 'invoice' === $type ? new Invoice() : new Receipt();
-
+		// Create or load document model.
 		if ( $document_id ) {
-			$existing = $this->document_repository->find( $document_id );
-			if ( $existing && ! $existing->canBeEdited() ) {
+			$document = $this->document_repository->find( $document_id );
+			if ( ! $document ) {
+				wp_die( esc_html__( 'Document not found.', 'ihumbak-invoices' ) );
+			}
+			if ( ! $document->canBeEdited() ) {
 				wp_die( esc_html__( 'This document cannot be edited.', 'ihumbak-invoices' ) );
 			}
-			$document->setId( $document_id );
-		}
-
-		// Set document data.
-		$this->populate_document_from_request( $document );
-
-		// Determine status based on action.
-		$save_action = isset( $_POST['save_action'] ) ? sanitize_text_field( wp_unslash( $_POST['save_action'] ) ) : 'draft';
-
-		if ( 'issue' === $save_action ) {
-			// Generate document number on issue.
-			if ( ! $document->getDocumentNumber() ) {
-				$settings = Plugin::get_instance()->get_settings();
-				$pattern  = 'invoice' === $type
-					? ( $settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' )
-					: ( $settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' );
-
-				$document->setDocumentNumber(
-					$this->numbering_service->generateNumber(
-						$type,
-						$pattern,
-						$settings['numbering']['reset_monthly'] ?? true
-					)
-				);
-			}
-			$document->setStatus( Document::STATUS_ISSUED );
 		} else {
-			$document->setStatus( Document::STATUS_DRAFT );
+			$document = 'invoice' === $type ? new Invoice() : new Receipt();
 		}
 
-		// Save document.
-		$document_id = $this->document_repository->save( $document );
+		try {
+			// Set document data.
+			$this->populate_document_from_request( $document );
 
-		// Save items.
-		$items = $this->get_items_from_request();
-		$this->item_repository->saveItems( $document_id, $items );
+			// Determine status based on action.
+			$save_action = isset( $_POST['save_action'] ) ? sanitize_text_field( wp_unslash( $_POST['save_action'] ) ) : 'draft';
 
-		// Fire action.
-		do_action( 'ihumbak_document_saved', $document );
+			if ( 'issue' === $save_action ) {
+				// Generate document number on issue.
+				if ( ! $document->getDocumentNumber() ) {
+					$settings = Plugin::get_instance()->get_settings();
+					$pattern  = 'invoice' === $type
+						? ( $settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' )
+						: ( $settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' );
 
-		if ( 'issue' === $save_action ) {
-			do_action( 'ihumbak_document_issued', $document );
+					$document->setDocumentNumber(
+						$this->numbering_service->generateNumber(
+							$type,
+							$pattern,
+							$settings['numbering']['reset_monthly'] ?? true
+						)
+					);
+				}
+				$document->setStatus( Document::STATUS_ISSUED );
+			} else {
+				$document->setStatus( Document::STATUS_DRAFT );
+			}
+
+			// Save document.
+			$document_id = $this->document_repository->save( $document );
+
+			// Save items.
+			$items = $this->get_items_from_request();
+			$this->item_repository->saveItems( $document_id, $items );
+
+			// Fire action.
+			do_action( 'ihumbak_document_saved', $document );
+
+			if ( 'issue' === $save_action ) {
+				do_action( 'ihumbak_document_issued', $document );
+			}
+
+			// Redirect back with success message.
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'    => 'ihumbak-invoices',
+						'action'  => 'edit',
+						'type'    => $type,
+						'id'      => $document_id,
+						'message' => 'saved',
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+			exit;
+
+		} catch ( \Exception $e ) {
+			// Store error in transient for display.
+			set_transient(
+				'ihumbak_save_error_' . get_current_user_id(),
+				$e->getMessage(),
+				60
+			);
+
+			// Redirect back to form with error.
+			$redirect_args = array(
+				'page'    => 'ihumbak-invoices',
+				'action'  => $document_id ? 'edit' : 'new',
+				'type'    => $type,
+				'message' => 'error',
+			);
+
+			if ( $document_id ) {
+				$redirect_args['id'] = $document_id;
+			}
+
+			wp_safe_redirect(
+				add_query_arg( $redirect_args, admin_url( 'admin.php' ) )
+			);
+			exit;
 		}
-
-		// Redirect back.
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'    => 'ihumbak-invoices',
-					'action'  => 'edit',
-					'type'    => $type,
-					'id'      => $document_id,
-					'message' => 'saved',
-				),
-				admin_url( 'admin.php' )
-			)
-		);
-		exit;
 	}
 
 	/**
@@ -264,10 +293,11 @@ class DocumentController {
 			$document->setDueDate( new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['due_date'] ) ) ) );
 		}
 
-		// Order ID.
-		if ( ! empty( $_POST['order_id'] ) ) {
-			$document->setOrderId( absint( $_POST['order_id'] ) );
-		}
+		// Order ID (can be empty).
+		$order_id = isset( $_POST['order_id'] ) && '' !== $_POST['order_id']
+			? absint( $_POST['order_id'] )
+			: null;
+		$document->setOrderId( $order_id );
 
 		// Notes.
 		if ( isset( $_POST['notes'] ) ) {

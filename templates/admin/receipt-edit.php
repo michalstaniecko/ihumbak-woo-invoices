@@ -34,6 +34,33 @@ $page_title = $is_new
 
     <hr class="wp-header-end">
 
+    <?php
+    // Display messages.
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    $message = isset( $_GET['message'] ) ? sanitize_text_field( wp_unslash( $_GET['message'] ) ) : '';
+
+    if ( 'saved' === $message ) :
+        ?>
+        <div class="notice notice-success is-dismissible">
+            <p><?php esc_html_e( 'Document saved successfully.', 'ihumbak-invoices' ); ?></p>
+        </div>
+        <?php
+    elseif ( 'error' === $message ) :
+        $error_message = get_transient( 'ihumbak_save_error_' . get_current_user_id() );
+        delete_transient( 'ihumbak_save_error_' . get_current_user_id() );
+        ?>
+        <div class="notice notice-error is-dismissible">
+            <p>
+                <?php esc_html_e( 'Error saving document.', 'ihumbak-invoices' ); ?>
+                <?php if ( $error_message ) : ?>
+                    <br><small><?php echo esc_html( $error_message ); ?></small>
+                <?php endif; ?>
+            </p>
+        </div>
+        <?php
+    endif;
+    ?>
+
     <?php if ( ! $can_edit ) : ?>
         <div class="notice notice-warning">
             <p><?php esc_html_e( 'This document has been issued and cannot be edited.', 'ihumbak-invoices' ); ?></p>

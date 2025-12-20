@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.0.0';
+	private const DB_VERSION = '1.0.1';
 
 	/**
 	 * Option name for storing database version.
@@ -36,9 +36,41 @@ class Installer {
 	public function install(): void {
 		$installed_version = get_option( self::DB_VERSION_OPTION, '0' );
 
+		// Force migration if schema fix marker not set.
+		$schema_fixed = get_option( 'ihumbak_schema_fix_101', false );
+		if ( ! $schema_fixed ) {
+			$this->run_migrations( '1.0.0' );
+			update_option( 'ihumbak_schema_fix_101', true );
+		}
+
 		if ( version_compare( $installed_version, self::DB_VERSION, '<' ) ) {
 			$this->create_tables();
+			$this->run_migrations( $installed_version );
 			update_option( self::DB_VERSION_OPTION, self::DB_VERSION );
+		}
+	}
+
+	/**
+	 * Run database migrations.
+	 *
+	 * @param string $from_version Version to migrate from.
+	 * @return void
+	 */
+	private function run_migrations( string $from_version ): void {
+		global $wpdb;
+
+		// Migration to 1.0.1: Make columns nullable.
+		if ( version_compare( $from_version, '1.0.1', '<' ) ) {
+			$table = self::get_documents_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN order_id bigint(20) unsigned DEFAULT NULL" );
+			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN document_number varchar(50) DEFAULT NULL" );
+			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN issue_date date DEFAULT NULL" );
+			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN sale_date date DEFAULT NULL" );
+			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN buyer_data longtext DEFAULT NULL" );
+			$wpdb->query( "ALTER TABLE {$table} MODIFY COLUMN seller_data longtext DEFAULT NULL" );
+			// phpcs:enable
 		}
 	}
 
@@ -73,15 +105,15 @@ class Installer {
 
 		return "CREATE TABLE {$table_name} (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-            order_id bigint(20) unsigned NOT NULL,
+            order_id bigint(20) unsigned DEFAULT NULL,
             document_type varchar(20) NOT NULL DEFAULT 'invoice',
-            document_number varchar(50) NOT NULL,
-            issue_date date NOT NULL,
-            sale_date date NOT NULL,
+            document_number varchar(50) DEFAULT NULL,
+            issue_date date DEFAULT NULL,
+            sale_date date DEFAULT NULL,
             due_date date DEFAULT NULL,
             corrected_document_id bigint(20) unsigned DEFAULT NULL,
-            buyer_data longtext NOT NULL,
-            seller_data longtext NOT NULL,
+            buyer_data longtext DEFAULT NULL,
+            seller_data longtext DEFAULT NULL,
             subtotal decimal(10,2) NOT NULL DEFAULT 0.00,
             tax_total decimal(10,2) NOT NULL DEFAULT 0.00,
             total decimal(10,2) NOT NULL DEFAULT 0.00,

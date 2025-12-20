@@ -112,8 +112,13 @@ final class Plugin {
 		// Register core services.
 		$this->container->register( 'installer', fn() => new Installer() );
 
-		// Initialize controllers.
+		// Initialize admin-only features.
 		if ( is_admin() ) {
+			// Check for database updates.
+			$installer = new Installer();
+			$installer->install();
+
+			// Initialize controllers.
 			$this->document_controller = new DocumentController();
 			$this->document_controller->init();
 

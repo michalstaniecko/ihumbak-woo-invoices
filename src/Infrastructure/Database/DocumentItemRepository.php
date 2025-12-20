@@ -88,6 +88,7 @@ class DocumentItemRepository {
 	 *
 	 * @param DocumentItem $item Item to save.
 	 * @return int Item ID.
+	 * @throws \RuntimeException When save operation fails.
 	 */
 	public function save( DocumentItem $item ): int {
 		$data = array(
@@ -108,20 +109,47 @@ class DocumentItemRepository {
 
 		if ( $item->getId() ) {
 			// Update existing.
-			$this->wpdb->update(
+			$result = $this->wpdb->update(
 				$this->table,
 				$data,
 				array( 'id' => $item->getId() ),
 				$formats,
 				array( '%d' )
 			);
+
+			if ( false === $result ) {
+				throw new \RuntimeException(
+					sprintf(
+						/* translators: 1: Item ID, 2: Database error message */
+						esc_html__( 'Failed to update item ID %1$d: %2$s', 'ihumbak-invoices' ),
+						absint( $item->getId() ),
+						esc_html( $this->wpdb->last_error )
+					)
+				);
+			}
+
 			return $item->getId();
 		}
 
 		// Insert new.
-		$this->wpdb->insert( $this->table, $data, $formats );
+		$result = $this->wpdb->insert( $this->table, $data, $formats );
+
+		if ( false === $result ) {
+			throw new \RuntimeException(
+				sprintf(
+					/* translators: %s: Database error message */
+					esc_html__( 'Failed to insert document item: %s', 'ihumbak-invoices' ),
+					esc_html( $this->wpdb->last_error )
+				)
+			);
+		}
 
 		$id = (int) $this->wpdb->insert_id;
+
+		if ( 0 === $id ) {
+			throw new \RuntimeException( esc_html__( 'Failed to get inserted item ID.', 'ihumbak-invoices' ) );
+		}
+
 		$item->setId( $id );
 
 		return $id;

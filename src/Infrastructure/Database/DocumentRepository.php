@@ -142,30 +142,58 @@ class DocumentRepository {
 	 *
 	 * @param Document $document Document to save.
 	 * @return int Document ID.
+	 * @throws \RuntimeException When save operation fails.
 	 */
 	public function save( Document $document ): int {
 		$data = $this->prepareData( $document );
 
 		if ( $document->getId() ) {
 			// Update existing.
-			$this->wpdb->update(
+			$result = $this->wpdb->update(
 				$this->table,
 				$data,
 				array( 'id' => $document->getId() ),
 				$this->getDataFormats( $data ),
 				array( '%d' )
 			);
+
+			if ( false === $result ) {
+				throw new \RuntimeException(
+					sprintf(
+						/* translators: 1: Document ID, 2: Database error message */
+						esc_html__( 'Failed to update document ID %1$d: %2$s', 'ihumbak-invoices' ),
+						absint( $document->getId() ),
+						esc_html( $this->wpdb->last_error )
+					)
+				);
+			}
+
 			return $document->getId();
 		}
 
 		// Insert new.
-		$this->wpdb->insert(
+		$result = $this->wpdb->insert(
 			$this->table,
 			$data,
 			$this->getDataFormats( $data )
 		);
 
+		if ( false === $result ) {
+			throw new \RuntimeException(
+				sprintf(
+					/* translators: %s: Database error message */
+					esc_html__( 'Failed to insert document: %s', 'ihumbak-invoices' ),
+					esc_html( $this->wpdb->last_error )
+				)
+			);
+		}
+
 		$id = (int) $this->wpdb->insert_id;
+
+		if ( 0 === $id ) {
+			throw new \RuntimeException( esc_html__( 'Failed to get inserted document ID.', 'ihumbak-invoices' ) );
+		}
+
 		$document->setId( $id );
 
 		return $id;
