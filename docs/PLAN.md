@@ -43,92 +43,83 @@
 ---
 
 ## Faza 2: Panel administracyjny faktur
-**Status: W TRAKCIE**
+**Status: UKONCZONA**
 
 ### 2.1 Modele domenowe
 **Katalog:** `src/Models/`
 
 | Plik | Opis | Status |
 |------|------|--------|
-| `Document.php` | Abstrakcyjna klasa bazowa dokumentu | [ ] |
-| `Invoice.php` | Faktura VAT (extends Document) | [ ] |
-| `Receipt.php` | Paragon (extends Document) | [ ] |
-| `DocumentItem.php` | Pozycja na dokumencie | [ ] |
-| `Buyer.php` | Value Object - dane nabywcy | [ ] |
-| `Seller.php` | Value Object - dane sprzedawcy | [ ] |
+| `Document.php` | Abstrakcyjna klasa bazowa dokumentu | [x] |
+| `Invoice.php` | Faktura VAT (extends Document) | [x] |
+| `Receipt.php` | Paragon (extends Document) | [x] |
+| `DocumentItem.php` | Pozycja na dokumencie | [x] |
+| `Buyer.php` | Value Object - dane nabywcy | [x] |
+| `Seller.php` | Value Object - dane sprzedawcy | [x] |
 
 ### 2.2 Warstwa danych
 **Katalog:** `src/Infrastructure/Database/`
 
 | Plik | Opis | Status |
 |------|------|--------|
-| `DocumentRepository.php` | CRUD dokumentow (save, find, delete) | [ ] |
-| `DocumentItemRepository.php` | CRUD pozycji dokumentu | [ ] |
+| `DocumentRepository.php` | CRUD dokumentow (save, find, delete) | [x] |
+| `DocumentItemRepository.php` | CRUD pozycji dokumentu z transakcjami | [x] |
 
 ### 2.3 Serwisy
 **Katalog:** `src/Modules/Invoice/`
 
 | Plik | Opis | Status |
 |------|------|--------|
-| `NumberingService.php` | Generowanie numerow wg wzorca | [ ] |
-| `DocumentService.php` | Tworzenie, edycja, usuwanie dokumentow | [ ] |
-| `CalculationService.php` | Obliczenia: netto/brutto, VAT, sumy (AJAX) | [ ] |
+| `NumberingService.php` | Generowanie numerow wg wzorca z zabezpieczeniem przed race conditions | [x] |
+| `CalculationService.php` | Obliczenia: netto/brutto, VAT, sumy (AJAX) | [x] |
 
 ### 2.4 Admin UI
 **Katalog:** `src/Modules/Admin/`
 
 | Plik | Opis | Status |
 |------|------|--------|
-| `DocumentListTable.php` | WP_List_Table - lista dokumentow | [ ] |
-| `InvoiceController.php` | Obsluga formularza faktury | [ ] |
-| `ReceiptController.php` | Obsluga formularza paragonu | [ ] |
+| `DocumentListTable.php` | WP_List_Table - lista dokumentow z filtrami | [x] |
+| `DocumentController.php` | Obsluga formularzy faktury i paragonu | [x] |
+| `AjaxController.php` | Endpointy AJAX dla obliczen | [x] |
 
 ### 2.5 Szablony
 **Katalog:** `templates/admin/`
 
 | Plik | Opis | Status |
 |------|------|--------|
-| `documents-list.php` | Lista dokumentow z przyciskami | [ ] |
-| `invoice-edit.php` | Formularz faktury VAT | [ ] |
-| `receipt-edit.php` | Formularz paragonu | [ ] |
-| `partials/items-table.php` | Tabela pozycji (wspolna) | [ ] |
-| `partials/buyer-fields.php` | Pola danych nabywcy | [ ] |
-| `partials/seller-fields.php` | Pola danych sprzedawcy | [ ] |
+| `documents-list.php` | Lista dokumentow z przyciskami | [x] |
+| `invoice-edit.php` | Formularz faktury VAT | [x] |
+| `receipt-edit.php` | Formularz paragonu | [x] |
+| `partials/items-table.php` | Tabela pozycji (wspolna) z template JS | [x] |
+| `partials/buyer-fields.php` | Pola danych nabywcy | [x] |
+| `partials/seller-fields.php` | Pola danych sprzedawcy | [x] |
 
 ### 2.6 JavaScript
 **Katalog:** `assets/js/`
 
 | Plik | Opis | Status |
 |------|------|--------|
-| `document-edit.js` | Dynamiczne wiersze, AJAX do przeliczen | [ ] |
+| `document-edit.js` | Dynamiczne wiersze, AJAX do przeliczen z debounce | [x] |
 
 **Przeplyw obliczen:**
 ```
 [Uzytkownik zmienia wartosc]
-    -> JS wysyla AJAX do CalculationService
+    -> JS wysyla AJAX do CalculationService (z debounce 300ms)
     -> PHP oblicza netto/brutto/VAT/sumy
     -> JS aktualizuje pola w formularzu
 ```
 
-### Kolejnosc implementacji
+### 2.7 Testy jednostkowe
+**Katalog:** `tests/Unit/`
 
-```
-1. Modele (Document, Invoice, Receipt, DocumentItem, Buyer, Seller)
-      |
-2. DocumentRepository + DocumentItemRepository
-      |
-3. NumberingService + CalculationService
-      |
-4. DocumentListTable + documents-list.php
-      |
-5. Szablony formularzy (invoice-edit.php, receipt-edit.php)
-      |
-6. InvoiceController + ReceiptController + AJAX endpoints
-      |
-7. document-edit.js (dynamiczne pozycje + AJAX)
-      |
-8. Testy jednostkowe
-```
+| Plik | Opis | Status |
+|------|------|--------|
+| `Modules/Invoice/CalculationServiceTest.php` | Testy obliczen VAT | [x] |
+| `Models/DocumentItemTest.php` | Testy modelu pozycji | [x] |
+| `Models/BuyerTest.php` | Testy value object Buyer | [x] |
+| `Models/InvoiceTest.php` | Testy modelu Invoice | [x] |
+
+**Podsumowanie testow:** 56 testow, 240 asercji - wszystkie przechodza
 
 ---
 

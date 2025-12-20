@@ -112,3 +112,9 @@ if ( ! function_exists( 'absint' ) ) {
         return abs( (int) $maybeint );
     }
 }
+
+if ( ! function_exists( 'wp_json_encode' ) ) {
+    function wp_json_encode( $data, int $options = 0, int $depth = 512 ) {
+        return json_encode( $data, $options, $depth );
+    }
+}
