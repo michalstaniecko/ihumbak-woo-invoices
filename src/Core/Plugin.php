@@ -167,6 +167,7 @@ final class Plugin {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'register_admin_menu' ) );
 			add_action( 'admin_init', array( $this, 'register_settings' ) );
+			add_action( 'admin_init', array( $this, 'handle_early_pdf_download' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		}
 
@@ -323,8 +324,10 @@ final class Plugin {
 				break;
 
 			case 'pdf':
-				$this->handle_pdf_download( $id );
-				break;
+				// PDF download is handled early in admin_init to avoid output buffering issues.
+				// This case should not be reached, but redirect to list if it is.
+				wp_safe_redirect( admin_url( 'admin.php?page=ihumbak-invoices' ) );
+				exit;
 
 			case 'delete':
 				// Verify nonce for delete action.
@@ -354,6 +357,29 @@ final class Plugin {
 		}
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/settings.php';
+	}
+
+	/**
+	 * Handle PDF download early in admin_init before any output.
+	 *
+	 * This must be called before any HTML is output to avoid corrupting the PDF.
+	 *
+	 * @return void
+	 */
+	public function handle_early_pdf_download(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
+		if ( ! isset( $_GET['page'] ) || 'ihumbak-invoices' !== $_GET['page'] ) {
+			return;
+		}
+
+		if ( ! isset( $_GET['action'] ) || 'pdf' !== $_GET['action'] ) {
+			return;
+		}
+
+		$id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : null;
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		$this->handle_pdf_download( $id );
 	}
 
 	/**
