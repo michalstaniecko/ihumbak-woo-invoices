@@ -216,9 +216,29 @@ class DocumentController {
 			}
 		}
 
-		// Check for pre-selected invoice ID.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$pre_selected_invoice_id = isset( $_GET['corrected_document_id'] ) ? absint( $_GET['corrected_document_id'] ) : null;
+		// Check for pre-selected invoice ID and order_id from credit note creation links.
+		$pre_selected_invoice_id = null;
+		$pre_filled_order_id     = null;
+
+		if ( isset( $_GET['corrected_document_id'] ) ) {
+			$corrected_id = absint( $_GET['corrected_document_id'] );
+
+			// Verify nonce for credit note creation (from invoice-edit.php or OrderMetaBox).
+			$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+			if ( wp_verify_nonce( $nonce, 'ihumbak_create_credit_note_' . $corrected_id ) ) {
+				$pre_selected_invoice_id = $corrected_id;
+
+				// Also get order_id if provided (from OrderMetaBox).
+				if ( isset( $_GET['order_id'] ) ) {
+					$pre_filled_order_id = absint( $_GET['order_id'] );
+				}
+			}
+		}
+
+		// If order_id is provided and verified, load refunds for that order.
+		if ( $pre_filled_order_id && empty( $available_refunds ) ) {
+			$available_refunds = $this->refund_extractor->extractRefundsFromOrderId( $pre_filled_order_id );
+		}
 
 		$settings = Plugin::get_instance()->get_settings();
 		$seller   = $document ? $document->getSeller()?->toArray() : ( $settings['seller'] ?? array() );
@@ -281,6 +301,7 @@ class DocumentController {
 	 *
 	 * @param string $type Document type.
 	 * @return void
+	 * @throws \InvalidArgumentException When validation fails (caught internally).
 	 */
 	private function handle_save( string $type ): void {
 		// Verify nonce.
@@ -344,11 +365,18 @@ class DocumentController {
 				$document->setStatus( Document::STATUS_DRAFT );
 			}
 
+			// Get and validate items.
+			$items = $this->get_items_from_request();
+			if ( empty( $items ) ) {
+				throw new \InvalidArgumentException(
+					esc_html__( 'Please add at least one item to the document.', 'ihumbak-invoices' )
+				);
+			}
+
 			// Save document.
 			$document_id = $this->document_repository->save( $document );
 
 			// Save items.
-			$items = $this->get_items_from_request();
 			$this->item_repository->saveItems( $document_id, $items );
 
 			// Fire action.
@@ -440,34 +468,41 @@ class DocumentController {
 		// Credit note specific fields.
 		if ( $document instanceof CreditNote ) {
 			// Corrected document ID (required).
-			if ( ! empty( $_POST['corrected_document_id'] ) ) {
-				$corrected_id = absint( $_POST['corrected_document_id'] );
-
-				// Validate that the corrected document exists and is an invoice.
-				$original_document = $this->document_repository->find( $corrected_id );
-				if ( ! $original_document ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
-					);
-				}
-				if ( 'invoice' !== $original_document->getDocumentType() ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
-					);
-				}
-
-				$document->setCorrectedDocumentId( $corrected_id );
-
-				// Propagate order_id from original invoice to credit note.
-				if ( $original_document->getOrderId() ) {
-					$document->setOrderId( $original_document->getOrderId() );
-				}
+			if ( empty( $_POST['corrected_document_id'] ) ) {
+				throw new \InvalidArgumentException(
+					esc_html__( 'Please select a source invoice for the credit note.', 'ihumbak-invoices' )
+				);
 			}
 
-			// Correction reason.
-			if ( ! empty( $_POST['correction_reason'] ) ) {
-				$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
+			$corrected_id = absint( $_POST['corrected_document_id'] );
+
+			// Validate that the corrected document exists and is an invoice.
+			$original_document = $this->document_repository->find( $corrected_id );
+			if ( ! $original_document ) {
+				throw new \InvalidArgumentException(
+					esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
+				);
 			}
+			if ( 'invoice' !== $original_document->getDocumentType() ) {
+				throw new \InvalidArgumentException(
+					esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
+				);
+			}
+
+			$document->setCorrectedDocumentId( $corrected_id );
+
+			// Propagate order_id from original invoice to credit note.
+			if ( $original_document->getOrderId() ) {
+				$document->setOrderId( $original_document->getOrderId() );
+			}
+
+			// Correction reason (required).
+			if ( empty( $_POST['correction_reason'] ) ) {
+				throw new \InvalidArgumentException(
+					esc_html__( 'Please provide a correction reason.', 'ihumbak-invoices' )
+				);
+			}
+			$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
 
 			// Correction type (full or partial).
 			if ( ! empty( $_POST['correction_type'] ) ) {

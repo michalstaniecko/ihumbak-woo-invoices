@@ -272,7 +272,8 @@ $page_title = $is_new
 
 				<!-- Items -->
 				<?php
-				$require_nip = true;
+				$require_nip             = true;
+				$allow_negative_quantity = true;
 				include IHUMBAK_INVOICES_PATH . 'templates/admin/partials/items-table.php';
 				?>
 

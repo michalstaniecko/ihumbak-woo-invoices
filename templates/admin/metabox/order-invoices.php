@@ -4,12 +4,13 @@
  *
  * @package IHumbak\Invoices
  *
- * @var int                                   $order_id           Order ID.
- * @var \IHumbak\Invoices\Models\Document[]  $documents          Documents for this order.
- * @var string                                $create_invoice_url URL to create invoice.
- * @var string                                $create_receipt_url URL to create receipt.
- * @var array<int, string>                    $edit_urls          Edit URLs keyed by document ID.
- * @var array<int, string>                    $pdf_urls           PDF URLs keyed by document ID.
+ * @var int                                   $order_id            Order ID.
+ * @var \IHumbak\Invoices\Models\Document[]  $documents           Documents for this order.
+ * @var string                                $create_invoice_url  URL to create invoice.
+ * @var string                                $create_receipt_url  URL to create receipt.
+ * @var array<int, string>                    $edit_urls           Edit URLs keyed by document ID.
+ * @var array<int, string>                    $pdf_urls            PDF URLs keyed by document ID.
+ * @var array<int, string>                    $credit_note_urls    Credit note URLs keyed by invoice ID.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -45,6 +46,13 @@ defined( 'ABSPATH' ) || exit;
 						   title="<?php esc_attr_e( 'Download PDF', 'ihumbak-invoices' ); ?>">
 							<span class="dashicons dashicons-pdf"></span>
 						</a>
+						<?php if ( isset( $credit_note_urls[ $doc_id ] ) ) : ?>
+							<a href="<?php echo esc_url( $credit_note_urls[ $doc_id ] ); ?>"
+							   class="ihumbak-credit-note-link"
+							   title="<?php esc_attr_e( 'Create Credit Note', 'ihumbak-invoices' ); ?>">
+								<span class="dashicons dashicons-undo"></span>
+							</a>
+						<?php endif; ?>
 					<?php endif; ?>
 				</li>
 			<?php endforeach; ?>

@@ -4,12 +4,15 @@
  *
  * @package IHumbak\Invoices
  *
- * @var array<int, array<string, mixed>> $items Document items.
+ * @var array<int, array<string, mixed>> $items                   Document items.
+ * @var bool                             $allow_negative_quantity Allow negative quantities (for credit notes).
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$items = $items ?? [];
+$items                   = $items ?? [];
+$allow_negative_quantity = $allow_negative_quantity ?? false;
+$quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
 ?>
 
 <div class="ihumbak-card ihumbak-items-card">
@@ -48,7 +51,7 @@ $items = $items ?? [];
                         <td class="column-quantity">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][quantity]"
                                    value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>"
-                                   class="item-quantity" step="0.001" min="0.001" required>
+                                   class="item-quantity" step="0.001"<?php echo esc_attr( $quantity_min_attr ); ?> required>
                         </td>
                         <td class="column-unit">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][unit]"
@@ -135,7 +138,7 @@ $items = $items ?? [];
             <input type="text" name="items[{{index}}][sku]" value="" class="item-sku">
         </td>
         <td class="column-quantity">
-            <input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001" min="0.001" required>
+            <input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001"<?php echo esc_attr( $quantity_min_attr ); ?> required>
         </td>
         <td class="column-unit">
             <input type="text" name="items[{{index}}][unit]" value="szt." class="item-unit">

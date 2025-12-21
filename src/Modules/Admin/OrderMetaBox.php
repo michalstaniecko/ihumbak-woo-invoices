@@ -92,13 +92,19 @@ class OrderMetaBox {
 		$create_invoice_url = $this->build_create_url( $order_id, 'invoice' );
 		$create_receipt_url = $this->build_create_url( $order_id, 'receipt' );
 
-		$edit_urls = array();
-		$pdf_urls  = array();
+		$edit_urls        = array();
+		$pdf_urls         = array();
+		$credit_note_urls = array();
 
 		foreach ( $documents as $document ) {
 			$doc_id               = $document->getId();
 			$edit_urls[ $doc_id ] = $this->build_edit_url( $document );
 			$pdf_urls[ $doc_id ]  = $this->build_pdf_url( $document );
+
+			// Build credit note URL for issued invoices only.
+			if ( 'invoice' === $document->getDocumentType() && ! $document->isDraft() ) {
+				$credit_note_urls[ $doc_id ] = $this->build_create_credit_note_url( $order_id, $doc_id );
+			}
 		}
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/metabox/order-invoices.php';
@@ -208,6 +214,30 @@ class OrderMetaBox {
 				'action' => 'pdf',
 				'id'     => $document->getId(),
 				'nonce'  => wp_create_nonce( 'pdf_document_' . $document->getId() ),
+			),
+			admin_url( 'admin.php' )
+		);
+	}
+
+	/**
+	 * Build URL for creating a credit note from an invoice.
+	 *
+	 * Uses nonce pattern: ihumbak_create_credit_note_{invoice_id}
+	 * This pattern is consistent with invoice-edit.php template.
+	 *
+	 * @param int $order_id   Order ID (passed for refunds loading).
+	 * @param int $invoice_id Invoice ID to correct.
+	 * @return string
+	 */
+	private function build_create_credit_note_url( int $order_id, int $invoice_id ): string {
+		return add_query_arg(
+			array(
+				'page'                  => 'ihumbak-invoices',
+				'action'                => 'new',
+				'type'                  => 'credit_note',
+				'corrected_document_id' => $invoice_id,
+				'order_id'              => $order_id,
+				'_wpnonce'              => wp_create_nonce( 'ihumbak_create_credit_note_' . $invoice_id ),
 			),
 			admin_url( 'admin.php' )
 		);

@@ -29,6 +29,24 @@ class Installer {
 	private const DB_VERSION_OPTION = 'ihumbak_invoices_db_version';
 
 	/**
+	 * Option name for storing completed migrations.
+	 *
+	 * @var string
+	 */
+	private const MIGRATIONS_OPTION = 'ihumbak_completed_migrations';
+
+	/**
+	 * List of migrations with their required version.
+	 *
+	 * @var array<string, string>
+	 */
+	private const MIGRATIONS = array(
+		'schema_fix_101'  => '1.0.0',
+		'sku_column_110'  => '1.1.0',
+		'credit_note_120' => '1.2.0',
+	);
+
+	/**
 	 * Install database tables.
 	 *
 	 * @return void
@@ -36,18 +54,71 @@ class Installer {
 	public function install(): void {
 		$installed_version = get_option( self::DB_VERSION_OPTION, '0' );
 
-		// Force migration if schema fix marker not set.
-		$schema_fixed = get_option( 'ihumbak_schema_fix_101', false );
-		if ( ! $schema_fixed ) {
-			$this->run_migrations( '1.0.0' );
-			update_option( 'ihumbak_schema_fix_101', true );
-		}
+		// Run any pending force migrations.
+		$this->run_force_migrations();
 
 		if ( version_compare( $installed_version, self::DB_VERSION, '<' ) ) {
 			$this->create_tables();
 			$this->run_migrations( $installed_version );
 			update_option( self::DB_VERSION_OPTION, self::DB_VERSION );
 		}
+	}
+
+	/**
+	 * Run force migrations that need to be applied regardless of version.
+	 *
+	 * This handles cases where migrations were added but the version wasn't properly tracked.
+	 *
+	 * @return void
+	 */
+	private function run_force_migrations(): void {
+		$completed = get_option( self::MIGRATIONS_OPTION, array() );
+
+		// Migrate old markers to new system.
+		$completed = $this->migrate_old_markers( $completed );
+
+		$updated = false;
+
+		foreach ( self::MIGRATIONS as $migration_key => $from_version ) {
+			if ( ! in_array( $migration_key, $completed, true ) ) {
+				$this->run_migrations( $from_version );
+				$completed[] = $migration_key;
+				$updated     = true;
+			}
+		}
+
+		if ( $updated ) {
+			update_option( self::MIGRATIONS_OPTION, $completed );
+		}
+	}
+
+	/**
+	 * Migrate old individual option markers to new array-based system.
+	 *
+	 * @param array<string> $completed Already completed migrations.
+	 * @return array<string> Updated completed migrations.
+	 */
+	private function migrate_old_markers( array $completed ): array {
+		$old_markers = array(
+			'ihumbak_schema_fix_101'       => 'schema_fix_101',
+			'ihumbak_credit_note_migrated' => 'sku_column_110',
+		);
+
+		$updated = false;
+
+		foreach ( $old_markers as $old_option => $new_key ) {
+			if ( get_option( $old_option, false ) && ! in_array( $new_key, $completed, true ) ) {
+				$completed[] = $new_key;
+				delete_option( $old_option );
+				$updated = true;
+			}
+		}
+
+		if ( $updated ) {
+			update_option( self::MIGRATIONS_OPTION, $completed );
+		}
+
+		return $completed;
 	}
 
 	/**
@@ -276,6 +347,7 @@ class Installer {
 		}
 
 		delete_option( self::DB_VERSION_OPTION );
+		delete_option( self::MIGRATIONS_OPTION );
 		delete_option( 'ihumbak_invoices_settings' );
 		delete_option( 'ihumbak_invoices_version' );
 	}

@@ -227,6 +227,26 @@ $page_title = $is_new
                                 <?php esc_html_e( 'Regenerate PDF', 'ihumbak-invoices' ); ?>
                             </a>
                         </p>
+                        <hr style="margin: 15px 0;">
+                        <p>
+                            <a href="<?php
+							echo esc_url(
+								add_query_arg(
+									array(
+										'page'                  => 'ihumbak-invoices',
+										'action'                => 'new',
+										'type'                  => 'credit_note',
+										'corrected_document_id' => $document->getId(),
+										'_wpnonce'              => wp_create_nonce( 'ihumbak_create_credit_note_' . $document->getId() ),
+									),
+									admin_url( 'admin.php' )
+								)
+							);
+							?>"
+                               class="button button-large">
+                                <?php esc_html_e( 'Create Credit Note', 'ihumbak-invoices' ); ?>
+                            </a>
+                        </p>
                     <?php endif; ?>
                 </div>
 

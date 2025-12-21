@@ -101,7 +101,32 @@ final class Plugin {
 	private function init(): void {
 		$this->load_textdomain();
 		$this->register_services();
+		$this->check_database_updates();
 		$this->init_hooks();
+	}
+
+	/**
+	 * Check and run database updates if needed.
+	 *
+	 * Uses admin_init hook for non-AJAX requests to avoid running on every request.
+	 * For AJAX requests, skip entirely as migrations should not run during AJAX.
+	 *
+	 * @return void
+	 */
+	private function check_database_updates(): void {
+		// Skip database checks during AJAX requests.
+		if ( wp_doing_ajax() ) {
+			return;
+		}
+
+		// Only run database checks in admin context.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// Run installer to check for updates.
+		$installer = new Installer();
+		$installer->install();
 	}
 
 	/**
