@@ -1,0 +1,292 @@
+{
+  "name": "Minimalist JetBrains Style",
+  "version": "1.0",
+  "description": "Minimalistyczny design system inspirowany fakturą JetBrains - czytelny, profesjonalny, z ciemnymi nagłówkami tabel i czerwonym akcentem dla statusów.",
+  "typography": {
+    "fontFamily": {
+      "primary": "Open Sans, DejaVu Sans, sans-serif",
+      "monospace": "DejaVu Sans Mono, monospace"
+    },
+    "fontFiles": {
+      "comment": "Pobierz z https://fonts.google.com/specimen/Open+Sans",
+      "regular": "OpenSans-Regular.ttf",
+      "bold": "OpenSans-Bold.ttf",
+      "italic": "OpenSans-Italic.ttf",
+      "boldItalic": "OpenSans-BoldItalic.ttf"
+    },
+    "alternatives": [
+      {
+        "name": "Roboto",
+        "url": "https://fonts.google.com/specimen/Roboto",
+        "description": "Nowoczesny, czytelny font od Google"
+      },
+      {
+        "name": "Lato",
+        "url": "https://fonts.google.com/specimen/Lato",
+        "description": "Elegancki font polskiego projektanta"
+      },
+      {
+        "name": "Source Sans Pro",
+        "url": "https://fonts.google.com/specimen/Source+Sans+Pro",
+        "description": "Font Adobe, zaprojektowany dla czytelności"
+      }
+    ],
+    "fontSize": {
+      "xs": "8px",
+      "sm": "9px",
+      "base": "10px",
+      "md": "11px",
+      "lg": "14px",
+      "xl": "18px",
+      "xxl": "22px"
+    },
+    "fontWeight": {
+      "normal": "400",
+      "bold": "700"
+    },
+    "lineHeight": {
+      "tight": "1.2",
+      "normal": "1.4",
+      "relaxed": "1.6"
+    }
+  },
+  "colors": {
+    "primary": "#333333",
+    "secondary": "#4A4A4A",
+    "accent": "#E91E63",
+    "success": "#4CAF50",
+    "warning": "#FF9800",
+    "text": {
+      "heading": "#333333",
+      "body": "#333333",
+      "muted": "#666666",
+      "light": "#999999",
+      "inverse": "#FFFFFF"
+    },
+    "background": {
+      "page": "#FFFFFF",
+      "tableHeader": "#4A4A4A",
+      "tableAlt": "#F9F9F9",
+      "highlight": "#FFF3E0"
+    },
+    "border": {
+      "light": "#E0E0E0",
+      "medium": "#CCCCCC",
+      "dark": "#4A4A4A"
+    },
+    "status": {
+      "paid": "#E91E63",
+      "draft": "#9E9E9E",
+      "issued": "#2196F3",
+      "sent": "#FF9800",
+      "cancelled": "#F44336",
+      "corrected": "#9C27B0"
+    }
+  },
+  "spacing": {
+    "page": {
+      "marginTop": "12mm",
+      "marginBottom": "12mm",
+      "marginLeft": "15mm",
+      "marginRight": "15mm"
+    },
+    "section": {
+      "marginBottom": "15px",
+      "padding": "0"
+    },
+    "element": {
+      "xs": "4px",
+      "sm": "6px",
+      "md": "10px",
+      "lg": "15px",
+      "xl": "20px",
+      "xxl": "30px"
+    }
+  },
+  "layout": {
+    "header": {
+      "type": "two-column",
+      "logoPosition": "left",
+      "logoMaxWidth": "180px",
+      "logoMaxHeight": "60px",
+      "companyInfoPosition": "right",
+      "companyInfoAlign": "right"
+    },
+    "documentTitle": {
+      "position": "center",
+      "marginTop": "25px",
+      "marginBottom": "25px"
+    },
+    "details": {
+      "type": "two-column",
+      "leftColumnWidth": "55%",
+      "rightColumnWidth": "45%",
+      "gap": "20px"
+    },
+    "parties": {
+      "type": "two-column",
+      "sellerPosition": "left",
+      "buyerPosition": "right",
+      "columnWidth": "50%"
+    },
+    "table": {
+      "headerBackground": true,
+      "headerColor": "inverse",
+      "alternateRows": false,
+      "borderStyle": "full",
+      "cellPadding": "8px 10px"
+    },
+    "summary": {
+      "position": "right",
+      "width": "45%",
+      "marginTop": "15px"
+    },
+    "statusBadge": {
+      "position": "right",
+      "showUnderline": true
+    },
+    "footer": {
+      "type": "full-width",
+      "showPageNumbers": true,
+      "borderTop": true,
+      "fontSize": "xs"
+    }
+  },
+  "borders": {
+    "radius": "0",
+    "width": {
+      "thin": "1px",
+      "medium": "2px",
+      "thick": "3px"
+    },
+    "style": "solid"
+  },
+  "components": {
+    "documentTitle": {
+      "fontSize": "xxl",
+      "fontWeight": "bold",
+      "color": "heading",
+      "textAlign": "center",
+      "marginTop": "xxl",
+      "marginBottom": "xl"
+    },
+    "sectionTitle": {
+      "fontSize": "md",
+      "fontWeight": "bold",
+      "color": "heading",
+      "marginBottom": "sm"
+    },
+    "label": {
+      "fontSize": "base",
+      "fontWeight": "normal",
+      "color": "body"
+    },
+    "value": {
+      "fontSize": "base",
+      "fontWeight": "normal",
+      "color": "body"
+    },
+    "tableHeader": {
+      "fontSize": "sm",
+      "fontWeight": "bold",
+      "color": "inverse",
+      "background": "tableHeader",
+      "padding": "sm md",
+      "textAlign": "left"
+    },
+    "tableCell": {
+      "fontSize": "sm",
+      "fontWeight": "normal",
+      "color": "body",
+      "padding": "sm md",
+      "borderBottom": true,
+      "borderColor": "light"
+    },
+    "tableCellNumeric": {
+      "fontSize": "sm",
+      "fontWeight": "normal",
+      "color": "body",
+      "padding": "sm md",
+      "textAlign": "right"
+    },
+    "summaryRow": {
+      "fontSize": "base",
+      "fontWeight": "normal",
+      "color": "body",
+      "padding": "xs 0"
+    },
+    "totalRow": {
+      "fontSize": "md",
+      "fontWeight": "bold",
+      "color": "heading"
+    },
+    "statusBadge": {
+      "fontSize": "xl",
+      "fontWeight": "bold",
+      "textAlign": "center",
+      "underlineWidth": "medium",
+      "underlineColor": "accent"
+    },
+    "companyInfo": {
+      "fontSize": "sm",
+      "fontWeight": "normal",
+      "color": "body",
+      "lineHeight": "relaxed",
+      "textAlign": "right"
+    },
+    "partyTitle": {
+      "fontSize": "md",
+      "fontWeight": "bold",
+      "color": "heading",
+      "marginBottom": "sm"
+    },
+    "partyData": {
+      "fontSize": "base",
+      "fontWeight": "normal",
+      "color": "body",
+      "lineHeight": "relaxed"
+    },
+    "footerText": {
+      "fontSize": "xs",
+      "fontWeight": "normal",
+      "color": "muted",
+      "lineHeight": "normal"
+    },
+    "correctionInfo": {
+      "fontSize": "base",
+      "fontWeight": "normal",
+      "color": "body",
+      "background": "highlight",
+      "padding": "md",
+      "borderLeft": "thick",
+      "borderLeftColor": "warning"
+    }
+  },
+  "documentTypes": {
+    "invoice": {
+      "titlePL": "Faktura VAT",
+      "titleEN": "Invoice",
+      "accentColor": "primary",
+      "statusColors": {
+        "draft": "#9E9E9E",
+        "issued": "#4A4A4A",
+        "sent": "#FF9800",
+        "paid": "#E91E63"
+      }
+    },
+    "receipt": {
+      "titlePL": "Paragon",
+      "titleEN": "Receipt",
+      "accentColor": "primary",
+      "simplified": true
+    },
+    "creditNote": {
+      "titlePL": "Faktura korygująca",
+      "titleEN": "Credit Note",
+      "accentColor": "warning",
+      "showOriginalReference": true,
+      "showCorrectionReason": true,
+      "negativeValuesColor": "#F44336"
+    }
+  }
+}

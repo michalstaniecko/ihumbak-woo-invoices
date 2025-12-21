@@ -33,66 +33,9 @@ $currency = $document->getCurrency();
 	<title>Credit Note <?php echo esc_html( $document->getDocumentNumber() ); ?></title>
 	<style>
 		<?php echo $styles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-
-		/* Credit Note specific styles */
-		.correction-reference {
-			background: #fff3cd;
-			border: 2pt solid #ffc107;
-			border-radius: 4pt;
-			padding: 12pt;
-			margin-bottom: 20pt;
-		}
-
-		.correction-reference-title {
-			font-size: 10pt;
-			font-weight: bold;
-			color: #856404;
-			text-transform: uppercase;
-			margin-bottom: 8pt;
-		}
-
-		.correction-reference-row {
-			font-size: 9pt;
-			color: #856404;
-			margin-bottom: 4pt;
-		}
-
-		.correction-reference-row .label {
-			font-weight: bold;
-		}
-
-		.correction-reason-section {
-			background: #f8d7da;
-			border: 1pt solid #f5c6cb;
-			border-radius: 4pt;
-			padding: 12pt;
-			margin: 20pt 0;
-		}
-
-		.correction-reason-title {
-			font-size: 10pt;
-			font-weight: bold;
-			color: #721c24;
-			text-transform: uppercase;
-			margin-bottom: 8pt;
-		}
-
-		.correction-reason-content {
-			font-size: 9pt;
-			color: #721c24;
-			line-height: 1.6;
-		}
-
-		.credit-note-total-bar {
-			background: #dc3545;
-		}
-
-		.document-title-section .document-title {
-			color: #dc3545;
-		}
 	</style>
 </head>
-<body>
+<body class="document-type-credit-note">
 	<div class="document-container">
 		<!-- Row 1: Logo/Company Name + Seller Data -->
 		<table class="header-section" cellpadding="0" cellspacing="0">
