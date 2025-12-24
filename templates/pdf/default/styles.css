@@ -353,62 +353,14 @@ body {
    11. Credit Note Specific Styles
    ========================================================================== */
 
-/* Credit Note Title Color */
-.document-type-credit-note .document-title {
-    color: #dc3545;
-}
-
-/* Correction Reference Box */
-.correction-reference {
-    background: #fff3cd;
-    border: 2pt solid #ffc107;
-    padding: 12pt;
-    margin-bottom: 20pt;
-}
-
-.correction-reference-title {
-    font-size: 10pt;
-    font-weight: bold;
-    color: #856404;
-    text-transform: uppercase;
-    margin-bottom: 8pt;
-}
-
-.correction-reference-row {
-    font-size: 9pt;
-    color: #856404;
-    margin-bottom: 4pt;
-}
-
-.correction-reference-row .label {
-    font-weight: bold;
+/* Correction Details Box (Corrects Invoice section) */
+.correction-details {
+    margin-bottom: 15pt;
 }
 
 /* Correction Reason Box */
-.correction-reason-section {
-    background: #f8d7da;
-    border: 1pt solid #f5c6cb;
-    padding: 12pt;
-    margin: 20pt 0;
-}
-
-.correction-reason-title {
-    font-size: 10pt;
-    font-weight: bold;
-    color: #721c24;
-    text-transform: uppercase;
-    margin-bottom: 8pt;
-}
-
-.correction-reason-content {
-    font-size: 9pt;
-    color: #721c24;
-    line-height: 1.6;
-}
-
-/* Credit Note Total Bar */
-.credit-note-total-bar {
-    background-color: #dc3545;
+.correction-reason {
+    margin: 15pt 0;
 }
 
 /* Negative Values */

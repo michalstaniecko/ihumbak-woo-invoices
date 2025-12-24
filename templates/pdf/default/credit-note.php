@@ -71,17 +71,17 @@ $currency = $document->getCurrency();
 
 		<!-- Correction Reference Box -->
 		<?php if ( $original_document ) : ?>
-		<div class="correction-reference">
-			<div class="correction-reference-title">Corrects Invoice</div>
-			<div class="correction-reference-row">
+		<div class="detail-box correction-details">
+			<div class="detail-box-title">Corrects Invoice</div>
+			<div class="detail-row">
 				<span class="label">Original Invoice No:</span>
 				<span class="value"><?php echo esc_html( $original_document->getDocumentNumber() ); ?></span>
 			</div>
-			<div class="correction-reference-row">
+			<div class="detail-row">
 				<span class="label">Original Issue Date:</span>
 				<span class="value"><?php echo $original_document->getIssueDate() ? esc_html( $original_document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 			</div>
-			<div class="correction-reference-row">
+			<div class="detail-row">
 				<span class="label">Original Total:</span>
 				<span class="value"><?php echo esc_html( number_format( $original_document->getTotal(), 2, '.', ' ' ) . ' ' . $original_document->getCurrency() ); ?></span>
 			</div>
@@ -151,9 +151,11 @@ $currency = $document->getCurrency();
 
 		<!-- Correction Reason -->
 		<?php if ( $document->getCorrectionReason() ) : ?>
-		<div class="correction-reason-section">
-			<div class="correction-reason-title">Reason for Correction</div>
-			<div class="correction-reason-content"><?php echo nl2br( esc_html( $document->getCorrectionReason() ) ); ?></div>
+		<div class="detail-box correction-reason">
+			<div class="detail-box-title">Reason for Correction</div>
+			<div class="detail-row">
+				<span class="value"><?php echo nl2br( esc_html( $document->getCorrectionReason() ) ); ?></span>
+			</div>
 		</div>
 		<?php endif; ?>
 
@@ -211,7 +213,7 @@ $currency = $document->getCurrency();
 		</div>
 
 		<!-- Credit Note Total Bar -->
-		<div class="document-total-bar credit-note-total-bar">
+		<div class="document-total-bar">
 			<span class="total-label"><?php esc_html_e( 'CREDIT AMOUNT:', 'ihumbak-invoices' ); ?></span>
 			<span class="total-value"><?php echo esc_html( number_format( abs( $document->getTotal() ), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
 		</div>
