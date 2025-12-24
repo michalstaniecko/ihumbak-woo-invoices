@@ -97,13 +97,13 @@ $currency = $document->getCurrency();
 								<span class="value">#<?php echo esc_html( $document->getOrderId() ); ?></span>
 							</div>
 						<?php endif; ?>
-						<?php if ( $seller->getBankName() ) : ?>
+						<?php if ( $seller && $seller->getBankName() ) : ?>
 							<div class="detail-row">
 								<span class="label">Bank:</span>
 								<span class="value"><?php echo esc_html( $seller->getBankName() ); ?></span>
 							</div>
 						<?php endif; ?>
-						<?php if ( $seller->getBankAccount() ) : ?>
+						<?php if ( $seller && $seller->getBankAccount() ) : ?>
 							<div class="detail-row">
 								<span class="label">Account Number:</span>
 								<span class="value"><?php echo esc_html( $seller->getBankAccount() ); ?></span>
