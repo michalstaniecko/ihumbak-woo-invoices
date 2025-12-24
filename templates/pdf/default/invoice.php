@@ -97,6 +97,22 @@ $currency = $document->getCurrency();
 								<span class="value">#<?php echo esc_html( $document->getOrderId() ); ?></span>
 							</div>
 						<?php endif; ?>
+						<?php if ( $seller->getBankName() ) : ?>
+							<div class="detail-row">
+								<span class="label">Bank:</span>
+								<span class="value"><?php echo esc_html( $seller->getBankName() ); ?></span>
+							</div>
+						<?php endif; ?>
+						<?php if ( $seller->getBankAccount() ) : ?>
+							<div class="detail-row">
+								<span class="label">Account Number:</span>
+								<span class="value"><?php echo esc_html( $seller->getBankAccount() ); ?></span>
+							</div>
+						<?php endif; ?>
+						<div class="detail-row">
+							<span class="label">Amount Due:</span>
+							<span class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
+						</div>
 						<?php
 						$payment_methods = array(
 							'transfer' => 'Bank Transfer',
@@ -149,7 +165,12 @@ $currency = $document->getCurrency();
 				<tbody>
 					<?php foreach ( $items as $item ) : ?>
 						<tr>
-							<td class="item-name"><?php echo esc_html( $item->getName() ); ?></td>
+							<td class="item-name">
+								<?php echo esc_html( $item->getName() ); ?>
+								<?php if ( $item->getSku() ) : ?>
+									<div class="item-sku">SKU: <?php echo esc_html( $item->getSku() ); ?></div>
+								<?php endif; ?>
+							</td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalNet(), 2, '.', ' ' ) ); ?></td>
 							<td class="text-center"><?php echo esc_html( number_format( $item->getTaxRate(), 0 ) ); ?>%</td>
@@ -186,31 +207,6 @@ $currency = $document->getCurrency();
 			<span class="total-label"><?php esc_html_e( 'INVOICE TOTAL:', 'ihumbak-invoices' ); ?></span>
 			<span class="total-value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
 		</div>
-
-		<!-- Payment Information -->
-		<?php if ( $seller && ( $seller->getBankName() || $seller->getBankAccount() ) ) : ?>
-			<div class="payment-section">
-				<div class="payment-title">Payment Information</div>
-				<div class="payment-details">
-					<?php if ( $seller->getBankName() ) : ?>
-						<div>
-							<span class="label">Bank:</span>
-							<span class="value"><?php echo esc_html( $seller->getBankName() ); ?></span>
-						</div>
-					<?php endif; ?>
-					<?php if ( $seller->getBankAccount() ) : ?>
-						<div>
-							<span class="label">Account Number:</span>
-							<span class="value"><?php echo esc_html( $seller->getBankAccount() ); ?></span>
-						</div>
-					<?php endif; ?>
-					<div>
-						<span class="label">Amount Due:</span>
-						<span class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
-					</div>
-				</div>
-			</div>
-		<?php endif; ?>
 
 		<!-- Notes -->
 		<?php if ( $document->getNotes() ) : ?>

@@ -83,10 +83,7 @@ body {
     line-height: 1.2;
 }
 
-.seller-info .tax-id {
-    margin-top: 5pt;
-    font-weight: bold;
-}
+/* .seller-info .tax-id - inherits from .seller-info */
 
 /* ==========================================================================
    4. Document Title Section
@@ -94,13 +91,10 @@ body {
 .document-title-section {
     text-align: center;
     margin: 15pt 0;
-    padding: 10pt 0;
-    border-top: 2pt solid #333333;
-    border-bottom: 2pt solid #333333;
 }
 
 .document-title {
-    font-size: 20pt;
+    font-size: 16pt;
     font-weight: bold;
     color: #333333;
     text-transform: uppercase;
@@ -109,7 +103,6 @@ body {
 .document-number {
     font-size: 11pt;
     color: #4A4A4A;
-    margin-top: 3pt;
 }
 
 /* ==========================================================================
@@ -145,7 +138,7 @@ body {
 }
 
 .detail-box {
-    /* No background, border or padding - clean minimal look */
+    font-size: 8pt;
 }
 
 .detail-box-title {
@@ -156,10 +149,7 @@ body {
     margin-bottom: 8pt;
 }
 
-.detail-row {
-    font-size: 9pt;
-    margin-bottom: 2pt;
-}
+/* .detail-row - inherits from .detail-box */
 
 .detail-row .label {
     color: #4A4A4A;
@@ -167,26 +157,6 @@ body {
 
 .detail-row .value {
     color: #333333;
-    font-weight: 500;
-}
-
-.party-name {
-    font-size: 11pt;
-    font-weight: bold;
-    color: #333333;
-    margin-bottom: 5pt;
-}
-
-.party-address {
-    font-size: 9pt;
-    color: #4A4A4A;
-    line-height: 1.2;
-}
-
-.party-tax-id {
-    font-size: 9pt;
-    color: #4A4A4A;
-    margin-top: 5pt;
 }
 
 /* ==========================================================================
@@ -235,9 +205,8 @@ body {
 }
 
 .items-table .item-sku {
-    font-size: 8pt;
+    font-size: 7pt;
     color: #4A4A4A;
-    margin-top: 2pt;
 }
 
 .items-table .col-name {
@@ -245,7 +214,7 @@ body {
 }
 
 .items-table .col-qty {
-    width: 100px;
+    width: auto;
 }
 
 .items-table .col-net {

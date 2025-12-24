@@ -112,6 +112,22 @@ $currency = $document->getCurrency();
 								<?php echo $document->isFullCorrection() ? esc_html__( 'Full', 'ihumbak-invoices' ) : esc_html__( 'Partial', 'ihumbak-invoices' ); ?>
 							</span>
 						</div>
+						<?php if ( $seller->getBankName() ) : ?>
+							<div class="detail-row">
+								<span class="label">Bank:</span>
+								<span class="value"><?php echo esc_html( $seller->getBankName() ); ?></span>
+							</div>
+						<?php endif; ?>
+						<?php if ( $seller->getBankAccount() ) : ?>
+							<div class="detail-row">
+								<span class="label">Account Number:</span>
+								<span class="value"><?php echo esc_html( $seller->getBankAccount() ); ?></span>
+							</div>
+						<?php endif; ?>
+						<div class="detail-row">
+							<span class="label">Credit Amount:</span>
+							<span class="value"><?php echo esc_html( number_format( abs( $document->getTotal() ), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
+						</div>
 					</div>
 				</td>
 				<td class="details-right">
@@ -157,7 +173,12 @@ $currency = $document->getCurrency();
 				<tbody>
 					<?php foreach ( $items as $item ) : ?>
 						<tr>
-							<td class="item-name"><?php echo esc_html( $item->getName() ); ?></td>
+							<td class="item-name">
+								<?php echo esc_html( $item->getName() ); ?>
+								<?php if ( $item->getSku() ) : ?>
+									<div class="item-sku">SKU: <?php echo esc_html( $item->getSku() ); ?></div>
+								<?php endif; ?>
+							</td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalNet(), 2, '.', ' ' ) ); ?></td>
 							<td class="text-center"><?php echo esc_html( number_format( $item->getTaxRate(), 0 ) ); ?>%</td>
