@@ -119,7 +119,7 @@
 | `Models/BuyerTest.php` | Testy value object Buyer | [x] |
 | `Models/InvoiceTest.php` | Testy modelu Invoice | [x] |
 
-**Podsumowanie testow:** 56 testow, 240 asercji - wszystkie przechodza
+**Podsumowanie testow Fazy 2:** 56 testow, 240 asercji
 
 ---
 
@@ -164,7 +164,7 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
 | `TemplateRegistryTest.php` | Testy rejestru szablonow | [x] |
 | `PdfCacheManagerTest.php` | Testy cache PDF | [x] |
 
-**Podsumowanie testow:** 149 testow, 419 asercji - wszystkie przechodza
+**Podsumowanie testow Fazy 3:** 149 testow, 419 asercji
 
 ---
 
@@ -185,7 +185,40 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Pre-fill formularza z GET parameter order_id
   - [x] Auto-fetch danych zamowienia przy otwarciu formularza
 
+### Faktury korygujace (Credit Notes)
+- [x] Model CreditNote (extends Document)
+  - [x] Typ korekty: full/partial
+  - [x] Powiazanie z dokumentem zrodlowym (corrected_document_id)
+  - [x] Powod korekty (correction_reason)
+  - [x] Opcjonalne powiazanie z WC refund (refund_id)
+- [x] Serwis RefundDataExtractor
+  - [x] Ekstrakcja danych z WC_Order_Refund
+  - [x] Automatyczne ustawianie ujemnych wartosci
+- [x] Szablon PDF credit-note.php
+  - [x] Naglowek "CREDIT NOTE / CORRECTION INVOICE"
+  - [x] Sekcja "CORRECTS DOCUMENT"
+  - [x] Sekcja "CORRECTION REASON"
+- [x] Formularz admin credit-note-edit.php
+  - [x] Wybor dokumentu zrodlowego
+  - [x] Pole powodu korekty
+  - [x] Przycisk "Fetch Refund Data"
+- [x] Migracja bazy danych
+  - [x] Kolumny: corrected_document_id, correction_type, correction_reason, refund_id
+  - [x] System wersjonowania migracji
+- [x] Integracja z OrderMetaBox
+  - [x] Przycisk "Create Credit Note" na stronie zamowienia
+
 ### Pozostale rozszerzenia
-- [ ] Faktury korygujace (correction.php)
+- [ ] Kolumna z numerem dokumentu na liscie zamowien WC
+  - [ ] Klasa OrderListColumn (hook: manage_edit-shop_order_columns, manage_shop_order_custom_column)
+  - [ ] Opcja w ustawieniach: wlacz/wylacz kolumne
+  - [ ] Wyswietlanie numeru faktury/paragonu/korekty (z linkiem do dokumentu)
+  - [ ] Obsluga HPOS (High-Performance Order Storage)
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura
+
+---
+
+## Podsumowanie testow
+
+**Lacznie:** 190 testow, 554 asercji - wszystkie przechodza

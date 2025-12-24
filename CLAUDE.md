@@ -385,7 +385,7 @@ composer check            # Wszystkie sprawdzenia
 | 1 | Fundament | UKONCZONA |
 | 2 | Panel administracyjny | UKONCZONA |
 | 3 | Eksport PDF | UKONCZONA |
-| 4 | Rozszerzenia | DO ZROBIENIA |
+| 4 | Rozszerzenia | W TRAKCIE |
 
 ### Zaimplementowane komponenty
 
