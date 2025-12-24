@@ -20,6 +20,7 @@ Thumbs.db
 /coverage/
 .phpunit.cache/
 .phpunit.result.cache
+/tests/output/
 
 # Logs
 *.log
