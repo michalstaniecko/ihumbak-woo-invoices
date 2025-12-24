@@ -52,7 +52,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label for="seller_nip"><?php esc_html_e( 'NIP (Tax ID)', 'ihumbak-invoices' ); ?></label>
+                        <label for="seller_nip"><?php esc_html_e( 'VAT (Tax ID)', 'ihumbak-invoices' ); ?></label>
                     </th>
                     <td>
                         <input type="text"
@@ -84,7 +84,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                                id="seller_postcode"
                                name="ihumbak_invoices_settings[seller][postcode]"
                                value="<?php echo esc_attr( $settings['seller']['postcode'] ?? '' ); ?>"
-                               class="small-text"
+                               class="regular-text"
                                placeholder="00-000">
                     </td>
                 </tr>
@@ -108,8 +108,8 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                         <input type="text"
                                id="seller_country"
                                name="ihumbak_invoices_settings[seller][country]"
-                               value="<?php echo esc_attr( $settings['seller']['country'] ?? 'PL' ); ?>"
-                               class="small-text">
+                               value="<?php echo esc_attr( $settings['seller']['country'] ?? 'Poland' ); ?>"
+                               class="regular-text">
                     </td>
                 </tr>
                 <tr>

@@ -22,7 +22,7 @@ final class Seller {
 	 * @param string $address      Street address.
 	 * @param string $postcode     Postal code.
 	 * @param string $city         City.
-	 * @param string $country      Country code (default: PL).
+	 * @param string $country      Country name (default: Poland).
 	 * @param string $bank_name    Bank name.
 	 * @param string $bank_account Bank account number.
 	 * @param string $email        Email address.
@@ -34,7 +34,7 @@ final class Seller {
 		private readonly string $address = '',
 		private readonly string $postcode = '',
 		private readonly string $city = '',
-		private readonly string $country = 'PL',
+		private readonly string $country = 'Poland',
 		private readonly string $bank_name = '',
 		private readonly string $bank_account = '',
 		private readonly string $email = '',
@@ -161,7 +161,7 @@ final class Seller {
 			address: $data['address'] ?? '',
 			postcode: $data['postcode'] ?? '',
 			city: $data['city'] ?? '',
-			country: $data['country'] ?? 'PL',
+			country: $data['country'] ?? 'Poland',
 			bank_name: $data['bank_name'] ?? '',
 			bank_account: $data['bank_account'] ?? '',
 			email: $data['email'] ?? '',

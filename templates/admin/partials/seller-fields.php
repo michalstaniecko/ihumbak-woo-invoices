@@ -41,7 +41,7 @@ defined( 'ABSPATH' ) || exit;
         <div class="ihumbak-form-field">
             <label for="seller_country"><?php esc_html_e( 'Country', 'ihumbak-invoices' ); ?></label>
             <input type="text" id="seller_country" name="seller[country]"
-                   value="<?php echo esc_attr( $seller['country'] ?? 'PL' ); ?>">
+                   value="<?php echo esc_attr( $seller['country'] ?? 'Poland' ); ?>">
         </div>
         <div class="ihumbak-form-field">
             <label for="seller_bank_name"><?php esc_html_e( 'Bank Name', 'ihumbak-invoices' ); ?></label>

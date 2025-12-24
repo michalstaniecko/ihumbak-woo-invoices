@@ -75,7 +75,7 @@ class Activator {
 					'address'      => '',
 					'city'         => '',
 					'postcode'     => '',
-					'country'      => 'PL',
+					'country'      => 'Poland',
 					'nip'          => '',
 					'bank_name'    => '',
 					'bank_account' => '',
