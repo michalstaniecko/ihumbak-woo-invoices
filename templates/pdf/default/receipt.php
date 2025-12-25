@@ -207,7 +207,7 @@ $currency = $document->getCurrency();
 			<?php if ( ! empty( $settings['pdf']['footer_text'] ) ) : ?>
 				<?php echo esc_html( $settings['pdf']['footer_text'] ); ?>
 			<?php else : ?>
-				This receipt was generated electronically and is valid without a signature.
+				<?php esc_html_e( 'This receipt was generated electronically and is valid without a signature.', 'ihumbak-invoices' ); ?>
 			<?php endif; ?>
 		</div>
 	</div>

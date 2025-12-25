@@ -373,6 +373,10 @@ class MockReceipt {
 	public function getStatus(): string {
 		return $this->data['status'] ?? 'draft';
 	}
+
+	public function getPaymentMethod(): ?string {
+		return $this->data['payment_method'] ?? null;
+	}
 }
 
 /**
