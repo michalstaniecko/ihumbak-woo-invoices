@@ -253,15 +253,7 @@ Zapisywane w `wp_options` pod kluczem `ihumbak_invoices_settings`.
 [
     'seller' => [
         'name' => '',           // Nazwa firmy
-        'address' => '',        // Adres
-        'city' => '',           // Miasto
-        'postcode' => '',       // Kod pocztowy
-        'country' => 'PL',      // Kraj
-        'nip' => '',            // NIP
-        'bank_name' => '',      // Nazwa banku
-        'bank_account' => '',   // Numer konta
-        'email' => '',          // Email
-        'phone' => '',          // Telefon
+        'details' => '',        // Szczegóły firmy (adres, NIP, bank, telefon, email itd.)
     ],
     'numbering' => [
         'invoice_pattern' => 'FV/{YYYY}/{MM}/{NNNN}',

@@ -50,12 +50,7 @@ $currency = $document->getCurrency();
 					<?php if ( $seller ) : ?>
 						<div class="seller-info">
 							<strong><?php echo esc_html( $seller->getName() ); ?></strong><br>
-							<?php echo esc_html( $seller->getAddress() ); ?><br>
-							<?php echo esc_html( $seller->getPostcode() . ' ' . $seller->getCity() ); ?><br>
-							<?php echo esc_html( $seller->getCountry() ); ?>
-							<?php if ( $seller->getNip() ) : ?>
-								<div class="tax-id">VAT ID: <?php echo esc_html( $seller->getNip() ); ?></div>
-							<?php endif; ?>
+							<?php echo nl2br( esc_html( $seller->getDetails() ) ); ?>
 						</div>
 					<?php endif; ?>
 				</td>
@@ -90,18 +85,6 @@ $currency = $document->getCurrency();
 							<div class="detail-row">
 								<span class="label">Order No:</span>
 								<span class="value">#<?php echo esc_html( $document->getOrderId() ); ?></span>
-							</div>
-						<?php endif; ?>
-						<?php if ( $seller && $seller->getBankName() ) : ?>
-							<div class="detail-row">
-								<span class="label">Bank:</span>
-								<span class="value"><?php echo esc_html( $seller->getBankName() ); ?></span>
-							</div>
-						<?php endif; ?>
-						<?php if ( $seller && $seller->getBankAccount() ) : ?>
-							<div class="detail-row">
-								<span class="label">Account Number:</span>
-								<span class="value"><?php echo esc_html( $seller->getBankAccount() ); ?></span>
 							</div>
 						<?php endif; ?>
 						<div class="detail-row">

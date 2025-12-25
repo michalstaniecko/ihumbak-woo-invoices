@@ -20,38 +20,9 @@ defined( 'ABSPATH' ) || exit;
                    value="<?php echo esc_attr( $seller['name'] ?? '' ); ?>" required>
         </div>
         <div class="ihumbak-form-field">
-            <label for="seller_nip"><?php esc_html_e( 'NIP', 'ihumbak-invoices' ); ?> <span class="required">*</span></label>
-            <input type="text" id="seller_nip" name="seller[nip]"
-                   value="<?php echo esc_attr( $seller['nip'] ?? '' ); ?>" required>
-        </div>
-        <div class="ihumbak-form-field">
-            <label for="seller_address"><?php esc_html_e( 'Address', 'ihumbak-invoices' ); ?></label>
-            <textarea id="seller_address" name="seller[address]" rows="2"><?php echo esc_textarea( $seller['address'] ?? '' ); ?></textarea>
-        </div>
-        <div class="ihumbak-form-field">
-            <label for="seller_postcode"><?php esc_html_e( 'Postcode', 'ihumbak-invoices' ); ?></label>
-            <input type="text" id="seller_postcode" name="seller[postcode]"
-                   value="<?php echo esc_attr( $seller['postcode'] ?? '' ); ?>">
-        </div>
-        <div class="ihumbak-form-field">
-            <label for="seller_city"><?php esc_html_e( 'City', 'ihumbak-invoices' ); ?></label>
-            <input type="text" id="seller_city" name="seller[city]"
-                   value="<?php echo esc_attr( $seller['city'] ?? '' ); ?>">
-        </div>
-        <div class="ihumbak-form-field">
-            <label for="seller_country"><?php esc_html_e( 'Country', 'ihumbak-invoices' ); ?></label>
-            <input type="text" id="seller_country" name="seller[country]"
-                   value="<?php echo esc_attr( $seller['country'] ?? 'Poland' ); ?>">
-        </div>
-        <div class="ihumbak-form-field">
-            <label for="seller_bank_name"><?php esc_html_e( 'Bank Name', 'ihumbak-invoices' ); ?></label>
-            <input type="text" id="seller_bank_name" name="seller[bank_name]"
-                   value="<?php echo esc_attr( $seller['bank_name'] ?? '' ); ?>">
-        </div>
-        <div class="ihumbak-form-field">
-            <label for="seller_bank_account"><?php esc_html_e( 'Bank Account', 'ihumbak-invoices' ); ?></label>
-            <input type="text" id="seller_bank_account" name="seller[bank_account]"
-                   value="<?php echo esc_attr( $seller['bank_account'] ?? '' ); ?>">
+            <label for="seller_details"><?php esc_html_e( 'Details', 'ihumbak-invoices' ); ?></label>
+            <textarea id="seller_details" name="seller[details]" rows="6"
+                      placeholder="<?php esc_attr_e( 'Address, VAT ID, bank, phone...', 'ihumbak-invoices' ); ?>"><?php echo esc_textarea( $seller['details'] ?? '' ); ?></textarea>
         </div>
     </div>
 </div>

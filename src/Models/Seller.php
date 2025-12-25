@@ -17,28 +17,12 @@ final class Seller {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $name         Company name.
-	 * @param string $nip          Tax identification number (NIP).
-	 * @param string $address      Street address.
-	 * @param string $postcode     Postal code.
-	 * @param string $city         City.
-	 * @param string $country      Country name (default: Poland).
-	 * @param string $bank_name    Bank name.
-	 * @param string $bank_account Bank account number.
-	 * @param string $email        Email address.
-	 * @param string $phone        Phone number.
+	 * @param string $name    Company name.
+	 * @param string $details Company details (address, VAT ID, bank, phone, etc.).
 	 */
 	public function __construct(
 		private readonly string $name,
-		private readonly string $nip,
-		private readonly string $address = '',
-		private readonly string $postcode = '',
-		private readonly string $city = '',
-		private readonly string $country = 'Poland',
-		private readonly string $bank_name = '',
-		private readonly string $bank_account = '',
-		private readonly string $email = '',
-		private readonly string $phone = '',
+		private readonly string $details = '',
 	) {}
 
 	/**
@@ -51,101 +35,12 @@ final class Seller {
 	}
 
 	/**
-	 * Get NIP (tax ID).
+	 * Get company details.
 	 *
 	 * @return string
 	 */
-	public function getNip(): string {
-		return $this->nip;
-	}
-
-	/**
-	 * Get street address.
-	 *
-	 * @return string
-	 */
-	public function getAddress(): string {
-		return $this->address;
-	}
-
-	/**
-	 * Get postal code.
-	 *
-	 * @return string
-	 */
-	public function getPostcode(): string {
-		return $this->postcode;
-	}
-
-	/**
-	 * Get city.
-	 *
-	 * @return string
-	 */
-	public function getCity(): string {
-		return $this->city;
-	}
-
-	/**
-	 * Get country code.
-	 *
-	 * @return string
-	 */
-	public function getCountry(): string {
-		return $this->country;
-	}
-
-	/**
-	 * Get bank name.
-	 *
-	 * @return string
-	 */
-	public function getBankName(): string {
-		return $this->bank_name;
-	}
-
-	/**
-	 * Get bank account number.
-	 *
-	 * @return string
-	 */
-	public function getBankAccount(): string {
-		return $this->bank_account;
-	}
-
-	/**
-	 * Get email.
-	 *
-	 * @return string
-	 */
-	public function getEmail(): string {
-		return $this->email;
-	}
-
-	/**
-	 * Get phone.
-	 *
-	 * @return string
-	 */
-	public function getPhone(): string {
-		return $this->phone;
-	}
-
-	/**
-	 * Get full address as single string.
-	 *
-	 * @return string
-	 */
-	public function getFullAddress(): string {
-		$parts = array_filter(
-			array(
-				$this->address,
-				trim( $this->postcode . ' ' . $this->city ),
-				$this->country,
-			)
-		);
-
-		return implode( ', ', $parts );
+	public function getDetails(): string {
+		return $this->details;
 	}
 
 	/**
@@ -157,15 +52,7 @@ final class Seller {
 	public static function fromArray( array $data ): self {
 		return new self(
 			name: $data['name'] ?? '',
-			nip: $data['nip'] ?? '',
-			address: $data['address'] ?? '',
-			postcode: $data['postcode'] ?? '',
-			city: $data['city'] ?? '',
-			country: $data['country'] ?? 'Poland',
-			bank_name: $data['bank_name'] ?? '',
-			bank_account: $data['bank_account'] ?? '',
-			email: $data['email'] ?? '',
-			phone: $data['phone'] ?? '',
+			details: $data['details'] ?? '',
 		);
 	}
 
@@ -176,16 +63,8 @@ final class Seller {
 	 */
 	public function toArray(): array {
 		return array(
-			'name'         => $this->name,
-			'nip'          => $this->nip,
-			'address'      => $this->address,
-			'postcode'     => $this->postcode,
-			'city'         => $this->city,
-			'country'      => $this->country,
-			'bank_name'    => $this->bank_name,
-			'bank_account' => $this->bank_account,
-			'email'        => $this->email,
-			'phone'        => $this->phone,
+			'name'    => $this->name,
+			'details' => $this->details,
 		);
 	}
 

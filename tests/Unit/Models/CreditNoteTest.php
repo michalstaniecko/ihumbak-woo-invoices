@@ -160,7 +160,7 @@ class CreditNoteTest extends TestCase {
 		$credit_note = new CreditNote();
 		$date        = new \DateTimeImmutable( '2025-01-15' );
 		$buyer       = new Buyer( name: 'Test Buyer' );
-		$seller      = new Seller( name: 'Test Seller', nip: '1234567890' );
+		$seller      = new Seller( name: 'Test Seller', details: 'NIP: 1234567890' );
 
 		$result = $credit_note
 			->setId( 1 )
@@ -226,7 +226,7 @@ class CreditNoteTest extends TestCase {
 			'correction_type'       => 'partial',
 			'refund_id'             => 42,
 			'buyer_data'            => json_encode( array( 'name' => 'Buyer Co', 'nip' => '1111111111' ) ),
-			'seller_data'           => json_encode( array( 'name' => 'Seller Co', 'nip' => '2222222222' ) ),
+			'seller_data'           => json_encode( array( 'name' => 'Seller Co', 'details' => 'NIP: 2222222222' ) ),
 			'subtotal'              => -100.00,
 			'tax_total'             => -23.00,
 			'total'                 => -123.00,
@@ -277,7 +277,7 @@ class CreditNoteTest extends TestCase {
 	public function test_from_array_with_array_buyer_seller(): void {
 		$data = array(
 			'buyer_data'  => array( 'name' => 'Direct Buyer', 'nip' => '3333333333' ),
-			'seller_data' => array( 'name' => 'Direct Seller', 'nip' => '4444444444' ),
+			'seller_data' => array( 'name' => 'Direct Seller', 'details' => 'NIP: 4444444444' ),
 		);
 
 		$credit_note = CreditNote::fromArray( $data );
@@ -326,7 +326,7 @@ class CreditNoteTest extends TestCase {
 			->setCorrectionType( CreditNote::CORRECTION_TYPE_FULL )
 			->setRefundId( 99 )
 			->setBuyer( new Buyer( name: 'Test Buyer', nip: '1234567890' ) )
-			->setSeller( new Seller( name: 'Test Seller', nip: '0987654321' ) )
+			->setSeller( new Seller( name: 'Test Seller', details: 'NIP: 0987654321' ) )
 			->setSubtotal( -100.00 )
 			->setTaxTotal( -23.00 )
 			->setTotal( -123.00 )

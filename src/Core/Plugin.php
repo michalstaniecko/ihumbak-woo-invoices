@@ -549,16 +549,8 @@ final class Plugin {
 	public function get_default_settings(): array {
 		return array(
 			'seller'     => array(
-				'name'         => '',
-				'address'      => '',
-				'city'         => '',
-				'postcode'     => '',
-				'country'      => 'Poland',
-				'nip'          => '',
-				'bank_name'    => '',
-				'bank_account' => '',
-				'email'        => '',
-				'phone'        => '',
+				'name'    => '',
+				'details' => '',
 			),
 			'numbering'  => array(
 				'invoice_pattern'     => 'FV/{YYYY}/{MM}/{NNNN}',
@@ -593,16 +585,8 @@ final class Plugin {
 		// Sanitize seller data.
 		if ( isset( $input['seller'] ) && is_array( $input['seller'] ) ) {
 			$sanitized['seller'] = array(
-				'name'         => sanitize_text_field( $input['seller']['name'] ?? '' ),
-				'address'      => sanitize_text_field( $input['seller']['address'] ?? '' ),
-				'city'         => sanitize_text_field( $input['seller']['city'] ?? '' ),
-				'postcode'     => sanitize_text_field( $input['seller']['postcode'] ?? '' ),
-				'country'      => sanitize_text_field( $input['seller']['country'] ?? 'Poland' ),
-				'nip'          => sanitize_text_field( $input['seller']['nip'] ?? '' ),
-				'bank_name'    => sanitize_text_field( $input['seller']['bank_name'] ?? '' ),
-				'bank_account' => sanitize_text_field( $input['seller']['bank_account'] ?? '' ),
-				'email'        => sanitize_email( $input['seller']['email'] ?? '' ),
-				'phone'        => sanitize_text_field( $input['seller']['phone'] ?? '' ),
+				'name'    => sanitize_text_field( $input['seller']['name'] ?? '' ),
+				'details' => sanitize_textarea_field( $input['seller']['details'] ?? '' ),
 			);
 		}
 

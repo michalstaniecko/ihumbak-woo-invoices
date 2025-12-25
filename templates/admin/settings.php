@@ -52,113 +52,17 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label for="seller_nip"><?php esc_html_e( 'VAT (Tax ID)', 'ihumbak-invoices' ); ?></label>
+                        <label for="seller_details"><?php esc_html_e( 'Company Details', 'ihumbak-invoices' ); ?></label>
                     </th>
                     <td>
-                        <input type="text"
-                               id="seller_nip"
-                               name="ihumbak_invoices_settings[seller][nip]"
-                               value="<?php echo esc_attr( $settings['seller']['nip'] ?? '' ); ?>"
-                               class="regular-text"
-                               placeholder="1234567890">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_address"><?php esc_html_e( 'Address', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_address"
-                               name="ihumbak_invoices_settings[seller][address]"
-                               value="<?php echo esc_attr( $settings['seller']['address'] ?? '' ); ?>"
-                               class="regular-text">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_postcode"><?php esc_html_e( 'Postcode', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_postcode"
-                               name="ihumbak_invoices_settings[seller][postcode]"
-                               value="<?php echo esc_attr( $settings['seller']['postcode'] ?? '' ); ?>"
-                               class="regular-text"
-                               placeholder="00-000">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_city"><?php esc_html_e( 'City', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_city"
-                               name="ihumbak_invoices_settings[seller][city]"
-                               value="<?php echo esc_attr( $settings['seller']['city'] ?? '' ); ?>"
-                               class="regular-text">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_country"><?php esc_html_e( 'Country', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_country"
-                               name="ihumbak_invoices_settings[seller][country]"
-                               value="<?php echo esc_attr( $settings['seller']['country'] ?? 'Poland' ); ?>"
-                               class="regular-text">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_bank_name"><?php esc_html_e( 'Bank Name', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_bank_name"
-                               name="ihumbak_invoices_settings[seller][bank_name]"
-                               value="<?php echo esc_attr( $settings['seller']['bank_name'] ?? '' ); ?>"
-                               class="regular-text">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_bank_account"><?php esc_html_e( 'Bank Account', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_bank_account"
-                               name="ihumbak_invoices_settings[seller][bank_account]"
-                               value="<?php echo esc_attr( $settings['seller']['bank_account'] ?? '' ); ?>"
-                               class="regular-text"
-                               placeholder="PL00 0000 0000 0000 0000 0000 0000">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_email"><?php esc_html_e( 'Email', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="email"
-                               id="seller_email"
-                               name="ihumbak_invoices_settings[seller][email]"
-                               value="<?php echo esc_attr( $settings['seller']['email'] ?? '' ); ?>"
-                               class="regular-text">
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="seller_phone"><?php esc_html_e( 'Phone', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="seller_phone"
-                               name="ihumbak_invoices_settings[seller][phone]"
-                               value="<?php echo esc_attr( $settings['seller']['phone'] ?? '' ); ?>"
-                               class="regular-text">
+                        <textarea id="seller_details"
+                                  name="ihumbak_invoices_settings[seller][details]"
+                                  rows="8"
+                                  class="large-text"
+                                  placeholder="<?php esc_attr_e( 'Address, VAT ID, bank account, phone, email...', 'ihumbak-invoices' ); ?>"><?php echo esc_textarea( $settings['seller']['details'] ?? '' ); ?></textarea>
+                        <p class="description">
+                            <?php esc_html_e( 'Enter all company details including address, VAT ID (NIP), bank account, phone and email. Each line will be displayed separately in documents.', 'ihumbak-invoices' ); ?>
+                        </p>
                     </td>
                 </tr>
             </table>

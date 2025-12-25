@@ -71,16 +71,8 @@ class Activator {
 		if ( false === $existing ) {
 			$defaults = array(
 				'seller'     => array(
-					'name'         => get_bloginfo( 'name' ),
-					'address'      => '',
-					'city'         => '',
-					'postcode'     => '',
-					'country'      => 'Poland',
-					'nip'          => '',
-					'bank_name'    => '',
-					'bank_account' => '',
-					'email'        => get_option( 'admin_email' ),
-					'phone'        => '',
+					'name'    => get_bloginfo( 'name' ),
+					'details' => '',
 				),
 				'numbering'  => array(
 					'invoice_pattern'    => 'FV/{YYYY}/{MM}/{NNNN}',

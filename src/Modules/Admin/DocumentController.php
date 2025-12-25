@@ -522,7 +522,12 @@ class DocumentController {
 
 		// Seller.
 		if ( isset( $_POST['seller'] ) && is_array( $_POST['seller'] ) ) {
-			$seller_data = array_map( 'sanitize_text_field', wp_unslash( $_POST['seller'] ) );
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized below.
+			$seller_raw  = wp_unslash( $_POST['seller'] );
+			$seller_data = array(
+				'name'    => sanitize_text_field( $seller_raw['name'] ?? '' ),
+				'details' => sanitize_textarea_field( $seller_raw['details'] ?? '' ),
+			);
 			$document->setSeller( Seller::fromArray( $seller_data ) );
 		}
 
