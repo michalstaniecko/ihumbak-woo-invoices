@@ -225,6 +225,23 @@ if ( ! function_exists( 'delete_transient' ) ) {
     }
 }
 
+if ( ! function_exists( 'get_current_user_id' ) ) {
+    /**
+     * Mock get_current_user_id function.
+     *
+     * Returns 0 by default (not logged in).
+     * Tests can define IHUMBAK_TEST_CURRENT_USER_ID to override.
+     *
+     * @return int Current user ID.
+     */
+    function get_current_user_id(): int {
+        if ( defined( 'IHUMBAK_TEST_CURRENT_USER_ID' ) ) {
+            return (int) IHUMBAK_TEST_CURRENT_USER_ID;
+        }
+        return 0;
+    }
+}
+
 // =============================================================================
 // Mock WooCommerce classes for unit tests.
 // These mocks simulate WooCommerce order-related classes to enable unit testing

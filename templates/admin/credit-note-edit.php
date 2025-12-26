@@ -4,17 +4,18 @@
  *
  * @package IHumbak\Invoices
  *
- * @var \IHumbak\Invoices\Models\CreditNote|null $document                  Document being edited (null for new).
- * @var \IHumbak\Invoices\Models\Document|null   $original_document         Original invoice being corrected.
- * @var array<string, string>                    $seller                    Seller data.
- * @var array<string, string>                    $buyer                     Buyer data.
- * @var array<int, array<string, mixed>>         $items                     Document items.
- * @var array<int, \IHumbak\Invoices\Models\DocumentItem> $original_items   Original invoice items.
- * @var \IHumbak\Invoices\Models\Document[]      $available_invoices        Invoices available for correction.
- * @var array<int, \IHumbak\Invoices\Models\CreditNote[]> $existing_corrections Map of invoice ID to credit notes.
- * @var array<int, array<string, mixed>>         $available_refunds         WC refunds for the order.
- * @var string                                   $next_number               Preview of next document number.
- * @var int|null                                 $pre_selected_invoice_id   Pre-selected invoice ID from URL.
+ * @var \IHumbak\Invoices\Models\CreditNote|null            $document                  Document being edited (null for new).
+ * @var \IHumbak\Invoices\Models\Document|null              $original_document         Original invoice being corrected.
+ * @var array<string, string>                               $seller                    Seller data.
+ * @var array<string, string>                               $buyer                     Buyer data.
+ * @var array<int, array<string, mixed>>                    $items                     Document items.
+ * @var array<int, \IHumbak\Invoices\Models\DocumentItem>   $original_items            Original invoice items.
+ * @var \IHumbak\Invoices\Models\Document[]                 $available_invoices        Invoices available for correction.
+ * @var array<int, \IHumbak\Invoices\Models\CreditNote[]>   $existing_corrections      Map of invoice ID to credit notes.
+ * @var array<int, array<string, mixed>>                    $available_refunds         WC refunds for the order.
+ * @var string                                              $next_number               Preview of next document number.
+ * @var int|null                                            $pre_selected_invoice_id   Pre-selected invoice ID from URL.
+ * @var \IHumbak\Invoices\Modules\Invoice\SuperAdminService $super_admin_service       Super admin service.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -51,6 +52,12 @@ $page_title = $is_new
 		?>
 		<div class="notice notice-success is-dismissible">
 			<p><?php esc_html_e( 'Credit Note saved successfully.', 'ihumbak-invoices' ); ?></p>
+		</div>
+		<?php
+	elseif ( 'reverted' === $message ) :
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p><?php esc_html_e( 'Document status reverted to draft. You can now edit the document.', 'ihumbak-invoices' ); ?></p>
 		</div>
 		<?php
 	elseif ( 'error' === $message ) :
@@ -314,6 +321,8 @@ $page_title = $is_new
 							</button>
 						</p>
 					<?php endif; ?>
+
+					<?php include IHUMBAK_INVOICES_PATH . 'templates/admin/partials/revert-button.php'; ?>
 
 					<?php if ( $document && ! $document->isDraft() ) : ?>
 						<p>

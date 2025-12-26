@@ -20,12 +20,18 @@ use IHumbak\Invoices\Models\Buyer;
 use IHumbak\Invoices\Models\Seller;
 use IHumbak\Invoices\Modules\Invoice\NumberingService;
 use IHumbak\Invoices\Modules\Invoice\RefundDataExtractor;
+use IHumbak\Invoices\Modules\Invoice\SuperAdminService;
 use IHumbak\Invoices\Core\Plugin;
 
 /**
  * Handles document admin actions.
  */
 class DocumentController {
+
+	/**
+	 * Nonce action for reverting document to draft.
+	 */
+	public const REVERT_NONCE_ACTION = 'ihumbak_revert_to_draft';
 
 	/**
 	 * Document repository.
@@ -56,13 +62,23 @@ class DocumentController {
 	private RefundDataExtractor $refund_extractor;
 
 	/**
-	 * Constructor.
+	 * Super admin service.
+	 *
+	 * @var SuperAdminService
 	 */
-	public function __construct() {
+	private SuperAdminService $super_admin_service;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param SuperAdminService|null $super_admin_service Optional super admin service for DI.
+	 */
+	public function __construct( ?SuperAdminService $super_admin_service = null ) {
 		$this->document_repository = new DocumentRepository();
 		$this->item_repository     = new DocumentItemRepository();
 		$this->numbering_service   = new NumberingService();
 		$this->refund_extractor    = new RefundDataExtractor();
+		$this->super_admin_service = $super_admin_service ?? new SuperAdminService();
 	}
 
 	/**
@@ -74,6 +90,7 @@ class DocumentController {
 		add_action( 'admin_post_ihumbak_save_invoice', array( $this, 'handle_save_invoice' ) );
 		add_action( 'admin_post_ihumbak_save_receipt', array( $this, 'handle_save_receipt' ) );
 		add_action( 'admin_post_ihumbak_save_credit_note', array( $this, 'handle_save_credit_note' ) );
+		add_action( 'admin_post_ihumbak_revert_to_draft', array( $this, 'handle_revert_to_draft' ) );
 	}
 
 	/**
@@ -120,6 +137,8 @@ class DocumentController {
 			$settings['numbering']['reset_monthly'] ?? true
 		);
 
+		$super_admin_service = $this->super_admin_service;
+
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/invoice-edit.php';
 	}
 
@@ -154,6 +173,8 @@ class DocumentController {
 			$settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}',
 			$settings['numbering']['reset_monthly'] ?? true
 		);
+
+		$super_admin_service = $this->super_admin_service;
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/receipt-edit.php';
 	}
@@ -254,6 +275,8 @@ class DocumentController {
 			$settings['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}',
 			$settings['numbering']['reset_monthly'] ?? true
 		);
+
+		$super_admin_service = $this->super_admin_service;
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/credit-note-edit.php';
 	}
@@ -621,6 +644,87 @@ class DocumentController {
 				array(
 					'page'    => 'ihumbak-invoices',
 					'message' => 'deleted',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Handle revert to draft action.
+	 *
+	 * Only super-admins can revert issued/sent/paid documents to draft status.
+	 *
+	 * @return void
+	 */
+	public function handle_revert_to_draft(): void {
+		// Verify nonce.
+		if ( ! isset( $_POST['ihumbak_revert_nonce'] ) ||
+			! wp_verify_nonce(
+				sanitize_text_field( wp_unslash( $_POST['ihumbak_revert_nonce'] ) ),
+				self::REVERT_NONCE_ACTION
+			)
+		) {
+			wp_die( esc_html__( 'Security check failed.', 'ihumbak-invoices' ) );
+		}
+
+		// Check basic permissions.
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to perform this action.', 'ihumbak-invoices' ) );
+		}
+
+		// Check super-admin permissions.
+		if ( ! $this->super_admin_service->isCurrentUserSuperAdmin() ) {
+			wp_die( esc_html__( 'Only super-admins can revert document status.', 'ihumbak-invoices' ) );
+		}
+
+		// Get document ID.
+		$document_id = isset( $_POST['document_id'] ) ? absint( $_POST['document_id'] ) : 0;
+
+		if ( ! $document_id ) {
+			wp_die( esc_html__( 'Invalid document ID.', 'ihumbak-invoices' ) );
+		}
+
+		// Load document.
+		$document = $this->document_repository->find( $document_id );
+
+		if ( ! $document ) {
+			wp_die( esc_html__( 'Document not found.', 'ihumbak-invoices' ) );
+		}
+
+		// Verify document can be reverted (must be issued, sent, or paid - not draft or cancelled).
+		$revertable_statuses = SuperAdminService::getRevertableStatuses();
+		if ( ! in_array( $document->getStatus(), $revertable_statuses, true ) ) {
+			wp_die(
+				esc_html__( 'Only issued, sent, or paid documents can be reverted to draft.', 'ihumbak-invoices' )
+			);
+		}
+
+		// Revert status to draft.
+		$document->setStatus( Document::STATUS_DRAFT );
+		$this->document_repository->save( $document );
+
+		/**
+		 * Fires after a document status is reverted to draft.
+		 *
+		 * @param Document $document The reverted document.
+		 * @param int      $user_id  ID of the user who performed the action.
+		 */
+		do_action( 'ihumbak_document_reverted_to_draft', $document, get_current_user_id() );
+
+		// Determine document type for redirect.
+		$type = $document->getDocumentType();
+
+		// Redirect back with success message.
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'ihumbak-invoices',
+					'action'  => 'edit',
+					'type'    => $type,
+					'id'      => $document_id,
+					'message' => 'reverted',
 				),
 				admin_url( 'admin.php' )
 			)

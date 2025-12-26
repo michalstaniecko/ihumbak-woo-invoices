@@ -69,6 +69,30 @@
     };
 
     /**
+     * Revert to draft form handler.
+     */
+    var revertFormHandler = {
+        init: function() {
+            var $form = $('#ihumbak-revert-form');
+            if ($form.length) {
+                $form.on('submit', this.handleSubmit.bind(this));
+            }
+        },
+
+        handleSubmit: function(e) {
+            var $form = $(e.currentTarget);
+            var confirmMessage = $form.data('confirm-message');
+
+            if (confirmMessage && !confirm(confirmMessage)) {
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+    };
+
+    /**
      * Initialize on document ready.
      */
     $(document).ready(function() {
@@ -76,6 +100,9 @@
         if ($('#upload_logo_button').length) {
             logoUploader.init();
         }
+
+        // Initialize revert form handler.
+        revertFormHandler.init();
     });
 
 })(jQuery);
