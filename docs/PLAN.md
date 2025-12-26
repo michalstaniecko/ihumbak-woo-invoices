@@ -214,6 +214,13 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [ ] Opcja w ustawieniach: wlacz/wylacz kolumne
   - [ ] Wyswietlanie numeru faktury/paragonu/korekty (z linkiem do dokumentu)
   - [ ] Obsluga HPOS (High-Performance Order Storage)
+- [ ] Cofniecie statusu faktury (issued -> draft) dla super-adminow
+  - [ ] Stala `IHUMBAK_SUPER_ADMIN_IDS` w wp-config.php (string ID oddzielonych przecinkami, np. "1,5,12")
+  - [ ] Serwis `SuperAdminService` - sprawdzanie czy user ma uprawnienia super-admina
+  - [ ] Modyfikacja `DocumentController` - walidacja przy zmianie statusu
+  - [ ] UI: przycisk "Revert to Draft" widoczny tylko dla super-adminow
+  - [ ] Logowanie operacji cofniecia statusu (opcjonalnie)
+  - [ ] Testy jednostkowe dla SuperAdminService
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura
 

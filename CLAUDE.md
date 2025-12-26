@@ -247,6 +247,15 @@ apply_filters('ihumbak_payment_method_map', array $map);
 
 ## Ustawienia pluginu
 
+### Stałe wp-config.php
+
+```php
+// Lista ID użytkowników z uprawnieniami super-admina (cofanie statusu issued -> draft)
+define('IHUMBAK_SUPER_ADMIN_IDS', '1,5,12');
+```
+
+### Opcje w bazie danych
+
 Zapisywane w `wp_options` pod kluczem `ihumbak_invoices_settings`.
 
 ```php
