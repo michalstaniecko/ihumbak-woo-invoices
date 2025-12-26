@@ -214,15 +214,45 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Opcja w ustawieniach: wlacz/wylacz kolumne
   - [x] Wyswietlanie numeru faktury/paragonu/korekty (z linkiem do dokumentu)
   - [x] Obsluga HPOS (High-Performance Order Storage)
-- [ ] Cofniecie statusu faktury (issued -> draft) dla super-adminow
-  - [ ] Stala `IHUMBAK_SUPER_ADMIN_IDS` w wp-config.php (string ID oddzielonych przecinkami, np. "1,5,12")
-  - [ ] Serwis `SuperAdminService` - sprawdzanie czy user ma uprawnienia super-admina
-  - [ ] Modyfikacja `DocumentController` - walidacja przy zmianie statusu
-  - [ ] UI: przycisk "Revert to Draft" widoczny tylko dla super-adminow
-  - [ ] Logowanie operacji cofniecia statusu (opcjonalnie)
-  - [ ] Testy jednostkowe dla SuperAdminService
+- [x] Cofniecie statusu faktury (issued -> draft) dla super-adminow
+  - [x] Stala `IHUMBAK_SUPER_ADMIN_IDS` w wp-config.php (string ID oddzielonych przecinkami, np. "1,5,12")
+  - [x] Serwis `SuperAdminService` - sprawdzanie czy user ma uprawnienia super-admina
+  - [x] Modyfikacja `DocumentController` - walidacja przy zmianie statusu
+  - [x] UI: przycisk "Revert to Draft" widoczny tylko dla super-adminow
+  - [x] Testy jednostkowe dla SuperAdminService
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura
+
+### Internacjonalizacja (i18n)
+- [ ] Audyt szablonow pod katem hardcodowanych fraz
+  - [ ] Szablony PDF (`templates/pdf/default/`)
+    - [ ] invoice.php
+    - [ ] receipt.php
+    - [ ] credit-note.php
+    - [ ] styles.css (jezeli zawiera teksty)
+  - [ ] Szablony admin (`templates/admin/`)
+    - [ ] documents-list.php
+    - [ ] invoice-edit.php
+    - [ ] receipt-edit.php
+    - [ ] credit-note-edit.php
+    - [ ] settings.php
+    - [ ] partials/*.php
+  - [ ] Klasy PHP (komunikaty, etykiety)
+- [ ] Zamiana hardcodowanych fraz na funkcje i18n
+  - [ ] `__()` dla tekstow
+  - [ ] `_e()` dla tekstow wyswietlanych bezposrednio
+  - [ ] `esc_html__()` / `esc_attr__()` dla escapowanych tekstow
+  - [ ] `_n()` dla form liczby mnogiej
+  - [ ] Text domain: `ihumbak-invoices`
+- [ ] Generowanie pliku POT (szablon tlumaczen)
+  - [ ] Konfiguracja WP-CLI lub narzedzia do ekstrakcji
+  - [ ] Plik `languages/ihumbak-invoices.pot`
+- [ ] Ladowanie tlumaczen w pluginie
+  - [ ] `load_plugin_textdomain()` w Plugin.php
+  - [ ] Sciezka: `languages/`
+- [ ] Przykladowe tlumaczenie (pl_PL)
+  - [ ] `languages/ihumbak-invoices-pl_PL.po`
+  - [ ] `languages/ihumbak-invoices-pl_PL.mo`
 
 ---
 
