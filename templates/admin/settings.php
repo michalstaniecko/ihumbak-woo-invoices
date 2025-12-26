@@ -31,6 +31,10 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
            class="nav-tab <?php echo 'automation' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Automation', 'ihumbak-invoices' ); ?>
         </a>
+        <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices-settings&tab=display' ) ); ?>"
+           class="nav-tab <?php echo 'display' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e( 'Display', 'ihumbak-invoices' ); ?>
+        </a>
     </nav>
 
     <form method="post" action="options.php">
@@ -240,6 +244,25 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                                placeholder="_billing_nip">
                         <p class="description">
                             <?php esc_html_e( 'Order meta key where customer NIP/Tax ID is stored. Common values: _billing_nip, billing_nip, _vat_number', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+        <?php elseif ( 'display' === $active_tab ) : ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Orders List Column', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   name="ihumbak_invoices_settings[display][show_order_column]"
+                                   value="1"
+                                   <?php checked( ! empty( $settings['display']['show_order_column'] ) ); ?>>
+                            <?php esc_html_e( 'Show documents column in WooCommerce orders list', 'ihumbak-invoices' ); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e( 'Displays invoice, receipt and credit note numbers directly in the orders list.', 'ihumbak-invoices' ); ?>
                         </p>
                     </td>
                 </tr>

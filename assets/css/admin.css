@@ -433,3 +433,57 @@
     text-align: center;
     white-space: nowrap;
 }
+
+/* ==========================================================================
+   Order List Column (WooCommerce orders list)
+   ========================================================================== */
+
+/* Column width */
+.wp-list-table .column-ihumbak_documents {
+    width: 150px;
+}
+
+/* No documents placeholder */
+.ihumbak-no-docs {
+    color: #999;
+}
+
+/* Document link */
+.ihumbak-doc-link {
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ihumbak-doc-link:hover {
+    text-decoration: underline;
+}
+
+/* Document icon */
+.ihumbak-doc-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+/* Draft documents */
+.ihumbak-doc-draft {
+    color: #999;
+    font-style: italic;
+}
+
+/* Document type colors */
+.ihumbak-doc-invoice {
+    color: #2271b1;
+}
+
+.ihumbak-doc-receipt {
+    color: #00a32a;
+}
+
+.ihumbak-doc-credit_note {
+    color: #d63638;
+}

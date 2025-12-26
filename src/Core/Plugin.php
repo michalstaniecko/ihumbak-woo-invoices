@@ -12,6 +12,7 @@ namespace IHumbak\Invoices\Core;
 use IHumbak\Invoices\Modules\Admin\DocumentController;
 use IHumbak\Invoices\Modules\Admin\AjaxController;
 use IHumbak\Invoices\Modules\Admin\OrderMetaBox;
+use IHumbak\Invoices\Modules\Admin\OrderListColumn;
 use IHumbak\Invoices\Modules\PDF\PdfGenerator;
 use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Modules\PDF\TemplateLoader;
@@ -192,6 +193,10 @@ final class Plugin {
 			// Initialize order metabox.
 			$this->order_metabox = new OrderMetaBox( new DocumentRepository() );
 			$this->order_metabox->init();
+
+			// Initialize order list column.
+			$order_list_column = new OrderListColumn( new DocumentRepository() );
+			$order_list_column->init();
 		}
 	}
 
@@ -570,6 +575,9 @@ final class Plugin {
 				'trigger_status'        => 'completed',
 				'nip_meta_key'          => '_billing_nip',
 			),
+			'display'    => array(
+				'show_order_column' => true,
+			),
 		);
 	}
 
@@ -617,6 +625,13 @@ final class Plugin {
 				'auto_generate_receipt' => ! empty( $input['automation']['auto_generate_receipt'] ),
 				'trigger_status'        => sanitize_text_field( $input['automation']['trigger_status'] ?? 'completed' ),
 				'nip_meta_key'          => sanitize_text_field( $input['automation']['nip_meta_key'] ?? '_billing_nip' ),
+			);
+		}
+
+		// Sanitize display settings.
+		if ( isset( $input['display'] ) && is_array( $input['display'] ) ) {
+			$sanitized['display'] = array(
+				'show_order_column' => ! empty( $input['display']['show_order_column'] ),
 			);
 		}
 

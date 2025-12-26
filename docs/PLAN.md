@@ -209,11 +209,11 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Przycisk "Create Credit Note" na stronie zamowienia
 
 ### Pozostale rozszerzenia
-- [ ] Kolumna z numerem dokumentu na liscie zamowien WC
-  - [ ] Klasa OrderListColumn (hook: manage_edit-shop_order_columns, manage_shop_order_custom_column)
-  - [ ] Opcja w ustawieniach: wlacz/wylacz kolumne
-  - [ ] Wyswietlanie numeru faktury/paragonu/korekty (z linkiem do dokumentu)
-  - [ ] Obsluga HPOS (High-Performance Order Storage)
+- [x] Kolumna z numerem dokumentu na liscie zamowien WC
+  - [x] Klasa OrderListColumn (hook: manage_edit-shop_order_columns, manage_shop_order_custom_column)
+  - [x] Opcja w ustawieniach: wlacz/wylacz kolumne
+  - [x] Wyswietlanie numeru faktury/paragonu/korekty (z linkiem do dokumentu)
+  - [x] Obsluga HPOS (High-Performance Order Storage)
 - [ ] Cofniecie statusu faktury (issued -> draft) dla super-adminow
   - [ ] Stala `IHUMBAK_SUPER_ADMIN_IDS` w wp-config.php (string ID oddzielonych przecinkami, np. "1,5,12")
   - [ ] Serwis `SuperAdminService` - sprawdzanie czy user ma uprawnienia super-admina
@@ -228,4 +228,4 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
 
 ## Podsumowanie testow
 
-**Lacznie:** 190 testow, 554 asercji - wszystkie przechodza
+**Lacznie:** 212 testow, 598 asercji - wszystkie przechodza

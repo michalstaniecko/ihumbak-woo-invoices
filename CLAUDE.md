@@ -62,7 +62,8 @@ ihumbak-woo-invoices/
 │       ├── Admin/            # Panel administracyjny
 │       │   ├── DocumentListTable.php
 │       │   ├── DocumentController.php
-│       │   └── AjaxController.php
+│       │   ├── AjaxController.php
+│       │   └── OrderListColumn.php
 │       ├── PDF/              # Eksport PDF
 │       │   ├── PdfGenerator.php      # Generator PDF z DOMPDF
 │       │   ├── PdfCacheManager.php   # Zarządzanie cache PDF
@@ -403,14 +404,14 @@ composer check            # Wszystkie sprawdzenia
 - NumberingService, CalculationService, OrderDataExtractor, RefundDataExtractor
 
 **Admin:**
-- DocumentListTable, DocumentController, AjaxController, OrderMetaBox
+- DocumentListTable, DocumentController, AjaxController, OrderMetaBox, OrderListColumn
 
 **PDF:**
 - PdfGenerator, PdfCacheManager, TemplateLoader, TemplateRegistry
 - Szablony: invoice.php, receipt.php, credit-note.php, styles.css
 
 **Testy:**
-- 190 testów jednostkowych, wszystkie przechodzą
+- 212 testów jednostkowych, wszystkie przechodzą
 
 ### Do implementacji
 

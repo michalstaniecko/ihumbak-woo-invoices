@@ -35,27 +35,40 @@ if ( ! defined( 'IHUMBAK_INVOICES_BASENAME' ) ) {
     define( 'IHUMBAK_INVOICES_BASENAME', 'ihumbak-woo-invoices/ihumbak-invoices.php' );
 }
 
+// Mock WordPress options storage for unit tests.
+global $mock_wp_options;
+$mock_wp_options = array();
+
 // Mock WordPress functions for unit tests.
 if ( ! function_exists( 'get_option' ) ) {
     function get_option( string $option, $default = false ) {
-        return $default;
+        global $mock_wp_options;
+        return array_key_exists( $option, $mock_wp_options ) ? $mock_wp_options[ $option ] : $default;
     }
 }
 
 if ( ! function_exists( 'update_option' ) ) {
     function update_option( string $option, $value ): bool {
+        global $mock_wp_options;
+        $mock_wp_options[ $option ] = $value;
         return true;
     }
 }
 
 if ( ! function_exists( 'add_option' ) ) {
     function add_option( string $option, $value = '' ): bool {
+        global $mock_wp_options;
+        if ( ! array_key_exists( $option, $mock_wp_options ) ) {
+            $mock_wp_options[ $option ] = $value;
+        }
         return true;
     }
 }
 
 if ( ! function_exists( 'delete_option' ) ) {
     function delete_option( string $option ): bool {
+        global $mock_wp_options;
+        unset( $mock_wp_options[ $option ] );
         return true;
     }
 }
