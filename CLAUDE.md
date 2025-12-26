@@ -222,6 +222,9 @@ do_action('ihumbak_before_pdf_render', Invoice $invoice);
 
 // Po wysłaniu emaila
 do_action('ihumbak_email_sent', Invoice $invoice, string $email);
+
+// Po cofnięciu statusu dokumentu do draft (przez super-admina)
+do_action('ihumbak_document_reverted_to_draft', Document $document, int $user_id);
 ```
 
 ### Filtry
@@ -244,6 +247,12 @@ apply_filters('ihumbak_invoice_shipping_unit', string $unit, WC_Order $order);
 
 // Modyfikacja mapowania metod płatności
 apply_filters('ihumbak_payment_method_map', array $map);
+
+// Sprawdzenie czy bieżący użytkownik jest super-adminem
+apply_filters('ihumbak_is_current_user_super_admin', bool $is_super_admin, int $user_id);
+
+// Sprawdzenie czy konkretny użytkownik jest super-adminem
+apply_filters('ihumbak_is_user_super_admin', bool $is_super_admin, int $user_id);
 ```
 
 ## Ustawienia pluginu
@@ -401,7 +410,7 @@ composer check            # Wszystkie sprawdzenia
 - DocumentRepository, DocumentItemRepository
 
 **Serwisy:**
-- NumberingService, CalculationService, OrderDataExtractor, RefundDataExtractor
+- NumberingService, CalculationService, OrderDataExtractor, RefundDataExtractor, SuperAdminService
 
 **Admin:**
 - DocumentListTable, DocumentController, AjaxController, OrderMetaBox, OrderListColumn
@@ -411,7 +420,7 @@ composer check            # Wszystkie sprawdzenia
 - Szablony: invoice.php, receipt.php, credit-note.php, styles.css
 
 **Testy:**
-- 212 testów jednostkowych, wszystkie przechodzą
+- 233 testy jednostkowe, wszystkie przechodzą
 
 ### Do implementacji
 
