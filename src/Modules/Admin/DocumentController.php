@@ -29,6 +29,11 @@ use IHumbak\Invoices\Core\Plugin;
 class DocumentController {
 
 	/**
+	 * Nonce action for reverting document to draft.
+	 */
+	public const REVERT_NONCE_ACTION = 'ihumbak_revert_to_draft';
+
+	/**
 	 * Document repository.
 	 *
 	 * @var DocumentRepository
@@ -658,7 +663,7 @@ class DocumentController {
 		if ( ! isset( $_POST['ihumbak_revert_nonce'] ) ||
 			! wp_verify_nonce(
 				sanitize_text_field( wp_unslash( $_POST['ihumbak_revert_nonce'] ) ),
-				'ihumbak_revert_to_draft'
+				self::REVERT_NONCE_ACTION
 			)
 		) {
 			wp_die( esc_html__( 'Security check failed.', 'ihumbak-invoices' ) );

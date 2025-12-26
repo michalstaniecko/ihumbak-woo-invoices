@@ -10,6 +10,8 @@
  * @var \IHumbak\Invoices\Modules\Invoice\SuperAdminService $super_admin_service Super admin service.
  */
 
+use IHumbak\Invoices\Modules\Admin\DocumentController;
+
 defined( 'ABSPATH' ) || exit;
 
 // Only show for existing documents that are not draft and not cancelled.
@@ -21,6 +23,8 @@ if ( ! $document || $document->isDraft() || $document->isCancelled() ) {
 if ( ! $super_admin_service->isCurrentUserSuperAdmin() ) {
 	return;
 }
+
+$confirm_message = __( 'Are you sure you want to revert this document to draft? This will allow editing of an issued document.', 'ihumbak-invoices' );
 ?>
 <div class="ihumbak-revert-section">
 	<p class="ihumbak-revert-header">
@@ -28,10 +32,11 @@ if ( ! $super_admin_service->isCurrentUserSuperAdmin() ) {
 		<?php esc_html_e( 'Super Admin Action', 'ihumbak-invoices' ); ?>
 	</p>
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
-		  onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to revert this document to draft? This will allow editing of an issued document.', 'ihumbak-invoices' ) ); ?>');">
+		  id="ihumbak-revert-form"
+		  data-confirm-message="<?php echo esc_attr( $confirm_message ); ?>">
 		<input type="hidden" name="action" value="ihumbak_revert_to_draft">
 		<input type="hidden" name="document_id" value="<?php echo esc_attr( $document->getId() ); ?>">
-		<?php wp_nonce_field( 'ihumbak_revert_to_draft', 'ihumbak_revert_nonce' ); ?>
+		<?php wp_nonce_field( DocumentController::REVERT_NONCE_ACTION, 'ihumbak_revert_nonce' ); ?>
 		<button type="submit" class="button button-secondary">
 			<span class="dashicons dashicons-undo"></span>
 			<?php esc_html_e( 'Revert to Draft', 'ihumbak-invoices' ); ?>
