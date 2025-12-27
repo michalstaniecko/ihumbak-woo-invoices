@@ -222,34 +222,36 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Testy jednostkowe dla SuperAdminService
 
 ### Raporty miesięczne
+**Status: UKOŃCZONA**
+
 Widok tabelaryczny z podsumowaniem wystawionych dokumentów w danym miesiącu.
 Możliwość eksportu do CSV.
 
-- [ ] Serwis ReportService
-  - [ ] Metoda `getMonthlyReport(int $year, int $month, string $document_type)`
-  - [ ] Agregacja danych wg metod płatności
-  - [ ] Obliczanie sum: ilość dokumentów, netto, VAT, brutto
-- [ ] Kontroler ReportController
-  - [ ] Strona admina: WooCommerce > Faktury > Raporty
-  - [ ] Filtry: rok, miesiąc, typ dokumentu (invoice/receipt/credit_note)
-  - [ ] Obsługa eksportu CSV
-- [ ] Szablon admin/reports.php
-  - [ ] Formularz filtrów (selecty: rok, miesiąc, typ dokumentu)
-  - [ ] Tabela wyników z kolumnami:
+- [x] Serwis ReportService
+  - [x] Metoda `getMonthlyReport(int $year, int $month, string $document_type)`
+  - [x] Agregacja danych wg metod płatności
+  - [x] Obliczanie sum: ilość dokumentów, netto, VAT, brutto
+- [x] Kontroler ReportController
+  - [x] Strona admina: WooCommerce > Faktury > Raporty
+  - [x] Filtry: rok, miesiąc, typ dokumentu (invoice/receipt/credit_note)
+  - [x] Obsługa eksportu CSV
+- [x] Szablon admin/reports.php
+  - [x] Formularz filtrów (selecty: rok, miesiąc, typ dokumentu)
+  - [x] Tabela wyników z kolumnami:
     - Metoda płatności (payment_method_title lub payment_method)
     - Ilość dokumentów
     - Suma netto
     - Suma VAT
     - Suma brutto
-  - [ ] Wiersz podsumowania (totale)
-  - [ ] Przycisk "Eksportuj do CSV"
-- [ ] Eksport CSV (CsvExporter)
-  - [ ] Generowanie pliku CSV z nagłówkami
-  - [ ] Poprawne kodowanie UTF-8 (BOM dla Excel)
-  - [ ] Nazwa pliku: `report-{type}-{year}-{month}.csv`
-- [ ] Testy jednostkowe
-  - [ ] ReportServiceTest
-  - [ ] CsvExporterTest
+  - [x] Wiersz podsumowania (totale)
+  - [x] Przycisk "Eksportuj do CSV"
+- [x] Eksport CSV (CsvExporter)
+  - [x] Generowanie pliku CSV z nagłówkami
+  - [x] Poprawne kodowanie UTF-8 (BOM dla Excel)
+  - [x] Nazwa pliku: `report-{type}-{year}-{month}.csv`
+- [x] Testy jednostkowe
+  - [x] ReportServiceTest
+  - [x] CsvExporterTest
 
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura
@@ -317,4 +319,4 @@ Potrzebujemy pelnych danych z zamowienia WC, aby zachowac historie nawet gdy met
 
 ## Podsumowanie testow
 
-**Lacznie:** 252 testy, 756 asercji - wszystkie przechodza
+**Lacznie:** 304 testy, 836 asercji - wszystkie przechodza
