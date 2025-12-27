@@ -693,3 +693,10 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
         return trim( strip_tags( $str ) );
     }
 }
+
+if ( ! function_exists( 'sanitize_file_name' ) ) {
+    function sanitize_file_name( string $filename ): string {
+        // Basic sanitization for tests - removes special characters.
+        return preg_replace( '/[^a-zA-Z0-9._-]/', '', $filename ) ?: $filename;
+    }
+}
