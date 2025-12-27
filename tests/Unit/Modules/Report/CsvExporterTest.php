@@ -287,4 +287,69 @@ class CsvExporterTest extends TestCase {
 		// Should contain empty quoted string.
 		$this->assertStringContainsString( '""', $content );
 	}
+
+	/**
+	 * Test sanitizeHeaderFilename removes control characters.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_header_filename_removes_control_characters(): void {
+		$result = $this->callPrivateMethod( 'sanitizeHeaderFilename', "report\r\n.csv" );
+		$this->assertSame( 'report.csv', $result );
+	}
+
+	/**
+	 * Test sanitizeHeaderFilename removes quotes.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_header_filename_removes_quotes(): void {
+		$result = $this->callPrivateMethod( 'sanitizeHeaderFilename', 'report"test.csv' );
+		$this->assertSame( 'reporttest.csv', $result );
+	}
+
+	/**
+	 * Test sanitizeHeaderFilename removes backslashes.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_header_filename_removes_backslashes(): void {
+		$result = $this->callPrivateMethod( 'sanitizeHeaderFilename', 'report\\test.csv' );
+		$this->assertSame( 'reporttest.csv', $result );
+	}
+
+	/**
+	 * Test sanitizeHeaderFilename returns fallback for empty result.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_header_filename_returns_fallback_for_empty(): void {
+		$result = $this->callPrivateMethod( 'sanitizeHeaderFilename', "\r\n" );
+		$this->assertSame( 'report.csv', $result );
+	}
+
+	/**
+	 * Test sanitizeHeaderFilename preserves valid filename.
+	 *
+	 * @return void
+	 */
+	public function test_sanitize_header_filename_preserves_valid_filename(): void {
+		$result = $this->callPrivateMethod( 'sanitizeHeaderFilename', 'report-invoice-2025-01.csv' );
+		$this->assertSame( 'report-invoice-2025-01.csv', $result );
+	}
+
+	/**
+	 * Call a private method on the exporter.
+	 *
+	 * @param string $method Method name.
+	 * @param mixed  ...$args Method arguments.
+	 * @return mixed Method result.
+	 */
+	private function callPrivateMethod( string $method, mixed ...$args ): mixed {
+		$reflection = new \ReflectionClass( $this->exporter );
+		$method     = $reflection->getMethod( $method );
+		$method->setAccessible( true );
+
+		return $method->invoke( $this->exporter, ...$args );
+	}
 }

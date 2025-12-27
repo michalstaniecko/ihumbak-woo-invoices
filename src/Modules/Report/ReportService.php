@@ -82,7 +82,7 @@ class ReportService {
 					AND YEAR(issue_date) = %d
 					AND MONTH(issue_date) = %d
 					AND status IN (%s, %s, %s)
-				GROUP BY payment_method_name
+				GROUP BY COALESCE(NULLIF(payment_method_title, ''), NULLIF(payment_method, ''), %s)
 				ORDER BY gross_total DESC",
 				$unknown_label,
 				$document_type,
@@ -90,7 +90,8 @@ class ReportService {
 				$month,
 				self::ALLOWED_STATUSES[0],
 				self::ALLOWED_STATUSES[1],
-				self::ALLOWED_STATUSES[2]
+				self::ALLOWED_STATUSES[2],
+				$unknown_label
 			),
 			ARRAY_A
 		);

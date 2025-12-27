@@ -120,10 +120,34 @@ class CsvExporter {
 			ob_end_clean();
 		}
 
+		// Sanitize filename to prevent HTTP Response Splitting.
+		$safe_filename = $this->sanitizeHeaderFilename( $filename );
+
 		header( 'Content-Type: text/csv; charset=utf-8' );
-		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Content-Disposition: attachment; filename="' . $safe_filename . '"' );
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
+	}
+
+	/**
+	 * Sanitize filename for use in HTTP headers.
+	 *
+	 * Prevents HTTP Response Splitting by removing control characters
+	 * and other potentially dangerous characters.
+	 *
+	 * @param string $filename Filename to sanitize.
+	 * @return string Sanitized filename.
+	 */
+	private function sanitizeHeaderFilename( string $filename ): string {
+		// Remove any control characters (including \r, \n) and quotes.
+		$sanitized = preg_replace( '/[\x00-\x1F\x7F"\\\\]/', '', $filename );
+
+		// Fallback if preg_replace fails or returns empty.
+		if ( empty( $sanitized ) ) {
+			return 'report.csv';
+		}
+
+		return $sanitized;
 	}
 
 	/**
