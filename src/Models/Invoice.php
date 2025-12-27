@@ -20,27 +20,6 @@ class Invoice extends Document {
 	public const TYPE = 'invoice';
 
 	/**
-	 * Payment method type (transfer, cash, card, online).
-	 *
-	 * @var string
-	 */
-	private string $payment_method = '';
-
-	/**
-	 * Payment method ID from WooCommerce (e.g., 'bacs', 'przelewy24').
-	 *
-	 * @var string
-	 */
-	private string $payment_method_id = '';
-
-	/**
-	 * Payment method title from WooCommerce (e.g., 'Bank Transfer', 'Przelewy24').
-	 *
-	 * @var string
-	 */
-	private string $payment_method_title = '';
-
-	/**
 	 * Default payment term in days.
 	 */
 	public const DEFAULT_PAYMENT_TERM = 14;
@@ -61,112 +40,6 @@ class Invoice extends Document {
 	 */
 	public function getDocumentTypeLabel(): string {
 		return __( 'VAT Invoice', 'ihumbak-invoices' );
-	}
-
-	/**
-	 * Get payment method.
-	 *
-	 * @return string
-	 */
-	public function getPaymentMethod(): string {
-		return $this->payment_method;
-	}
-
-	/**
-	 * Set payment method.
-	 *
-	 * @param string $method Payment method.
-	 * @return self
-	 * @throws \InvalidArgumentException If payment method is not valid.
-	 */
-	public function setPaymentMethod( string $method ): self {
-		if ( '' !== $method && ! array_key_exists( $method, self::getPaymentMethods() ) ) {
-			throw new \InvalidArgumentException(
-				sprintf(
-					/* translators: 1: Invalid payment method, 2: List of valid methods */
-					esc_html__( 'Invalid payment method "%1$s". Valid methods are: %2$s', 'ihumbak-invoices' ),
-					esc_html( $method ),
-					esc_html( implode( ', ', array_keys( self::getPaymentMethods() ) ) )
-				)
-			);
-		}
-		$this->payment_method = $method;
-		return $this;
-	}
-
-	/**
-	 * Get available payment methods.
-	 *
-	 * @return array<string, string>
-	 */
-	public static function getPaymentMethods(): array {
-		return array(
-			'transfer' => __( 'Bank transfer', 'ihumbak-invoices' ),
-			'cash'     => __( 'Cash', 'ihumbak-invoices' ),
-			'card'     => __( 'Credit/Debit card', 'ihumbak-invoices' ),
-			'online'   => __( 'Online payment', 'ihumbak-invoices' ),
-		);
-	}
-
-	/**
-	 * Get payment method ID from WooCommerce.
-	 *
-	 * @return string
-	 */
-	public function getPaymentMethodId(): string {
-		return $this->payment_method_id;
-	}
-
-	/**
-	 * Set payment method ID from WooCommerce.
-	 *
-	 * @param string $id Payment method ID (e.g., 'bacs', 'przelewy24').
-	 * @return self
-	 */
-	public function setPaymentMethodId( string $id ): self {
-		$this->payment_method_id = $id;
-		return $this;
-	}
-
-	/**
-	 * Get payment method title from WooCommerce.
-	 *
-	 * @return string
-	 */
-	public function getPaymentMethodTitle(): string {
-		return $this->payment_method_title;
-	}
-
-	/**
-	 * Set payment method title from WooCommerce.
-	 *
-	 * @param string $title Payment method title (e.g., 'Bank Transfer', 'Przelewy24').
-	 * @return self
-	 */
-	public function setPaymentMethodTitle( string $title ): self {
-		$this->payment_method_title = $title;
-		return $this;
-	}
-
-	/**
-	 * Get payment method display name.
-	 *
-	 * Returns payment_method_title if available, otherwise falls back to
-	 * the label from getPaymentMethods() based on payment_method type.
-	 *
-	 * @return string
-	 */
-	public function getPaymentMethodDisplayName(): string {
-		if ( '' !== $this->payment_method_title ) {
-			return $this->payment_method_title;
-		}
-
-		if ( '' !== $this->payment_method ) {
-			$methods = self::getPaymentMethods();
-			return $methods[ $this->payment_method ] ?? ucfirst( $this->payment_method );
-		}
-
-		return '';
 	}
 
 	/**
@@ -205,6 +78,12 @@ class Invoice extends Document {
 			$date = self::parseDate( (string) $data['due_date'] );
 			if ( $date ) {
 				$invoice->setDueDate( $date );
+			}
+		}
+		if ( ! empty( $data['payment_date'] ) ) {
+			$date = self::parseDate( (string) $data['payment_date'] );
+			if ( $date ) {
+				$invoice->setPaymentDate( $date );
 			}
 		}
 
@@ -285,6 +164,7 @@ class Invoice extends Document {
 			'issue_date'            => $this->issue_date?->format( 'Y-m-d' ),
 			'sale_date'             => $this->sale_date?->format( 'Y-m-d' ),
 			'due_date'              => $this->due_date?->format( 'Y-m-d' ),
+			'payment_date'          => $this->payment_date?->format( 'Y-m-d' ),
 			'corrected_document_id' => $this->corrected_document_id,
 			'buyer_data'            => $this->buyer?->toJson(),
 			'seller_data'           => $this->seller?->toJson(),

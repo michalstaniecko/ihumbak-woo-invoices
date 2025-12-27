@@ -125,6 +125,40 @@ $page_title = $is_new
                             </td>
                         </tr>
                         <tr>
+                            <th><label for="payment_date"><?php esc_html_e( 'Payment Date', 'ihumbak-invoices' ); ?></label></th>
+                            <td>
+                                <input type="date" id="payment_date" name="payment_date"
+                                       value="<?php echo esc_attr( $document ? $document->getPaymentDate()?->format( 'Y-m-d' ) : '' ); ?>"
+                                       <?php disabled( ! $can_edit ); ?>>
+                                <p class="description"><?php esc_html_e( 'Date when payment was received. Auto-filled from WooCommerce order if paid.', 'ihumbak-invoices' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="payment_method"><?php esc_html_e( 'Payment Type', 'ihumbak-invoices' ); ?></label></th>
+                            <td>
+                                <select id="payment_method" name="payment_method" <?php disabled( ! $can_edit ); ?>>
+                                    <option value=""><?php esc_html_e( '— Select —', 'ihumbak-invoices' ); ?></option>
+                                    <?php foreach ( \IHumbak\Invoices\Models\Document::getPaymentMethods() as $method => $label ) : ?>
+                                        <option value="<?php echo esc_attr( $method ); ?>"
+                                                <?php selected( $document ? $document->getPaymentMethod() : '', $method ); ?>>
+                                            <?php echo esc_html( $label ); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="payment_method_title"><?php esc_html_e( 'Payment Method Name', 'ihumbak-invoices' ); ?></label></th>
+                            <td>
+                                <input type="text" id="payment_method_title" name="payment_method_title"
+                                       value="<?php echo esc_attr( $document ? $document->getPaymentMethodTitle() : '' ); ?>"
+                                       class="regular-text" <?php disabled( ! $can_edit ); ?>>
+                                <input type="hidden" id="payment_method_id" name="payment_method_id"
+                                       value="<?php echo esc_attr( $document ? $document->getPaymentMethodId() : '' ); ?>">
+                                <p class="description"><?php esc_html_e( 'Original payment method name from WooCommerce order.', 'ihumbak-invoices' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
                             <th><label for="order_id"><?php esc_html_e( 'WooCommerce Order', 'ihumbak-invoices' ); ?></label></th>
                             <td>
                                 <div class="ihumbak-order-field-wrapper">

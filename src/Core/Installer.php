@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.3.0';
+	private const DB_VERSION = '1.4.0';
 
 	/**
 	 * Option name for storing database version.
@@ -45,6 +45,7 @@ class Installer {
 		'sku_column_110'     => '1.1.0',
 		'credit_note_120'    => '1.2.0',
 		'payment_method_130' => '1.3.0',
+		'payment_date_140'   => '1.4.0',
 	);
 
 	/**
@@ -264,6 +265,31 @@ class Installer {
 
 			// phpcs:enable
 		}
+
+		// Migration to 1.4.0: Add payment_date column.
+		if ( version_compare( $from_version, '1.4.0', '<' ) ) {
+			$table = self::get_documents_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			// Add payment_date column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'payment_date'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN payment_date date DEFAULT NULL AFTER due_date" );
+			}
+
+			// Migrate existing data from WC orders.
+			$this->migrate_payment_date_data();
+
+			// phpcs:enable
+		}
 	}
 
 	/**
@@ -324,6 +350,60 @@ class Installer {
 	}
 
 	/**
+	 * Migrate payment date data from WooCommerce orders for existing invoices.
+	 *
+	 * @return void
+	 */
+	private function migrate_payment_date_data(): void {
+		global $wpdb;
+
+		// Check if WooCommerce is active.
+		if ( ! function_exists( 'wc_get_order' ) ) {
+			return;
+		}
+
+		$table = self::get_documents_table();
+
+		// Get documents with order_id that have empty payment_date.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$documents = $wpdb->get_results(
+			"SELECT id, order_id FROM {$table}
+			WHERE order_id IS NOT NULL
+			AND payment_date IS NULL"
+		);
+		// phpcs:enable
+
+		if ( empty( $documents ) ) {
+			return;
+		}
+
+		foreach ( $documents as $document ) {
+			$order = wc_get_order( $document->order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			$date_paid = $order->get_date_paid();
+
+			if ( ! $date_paid ) {
+				continue;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$table,
+				array(
+					'payment_date' => $date_paid->format( 'Y-m-d' ),
+				),
+				array( 'id' => $document->id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+		}
+	}
+
+	/**
 	 * Create database tables.
 	 *
 	 * @return void
@@ -360,6 +440,7 @@ class Installer {
             issue_date date DEFAULT NULL,
             sale_date date DEFAULT NULL,
             due_date date DEFAULT NULL,
+            payment_date date DEFAULT NULL,
             corrected_document_id bigint(20) unsigned DEFAULT NULL,
             buyer_data longtext DEFAULT NULL,
             seller_data longtext DEFAULT NULL,

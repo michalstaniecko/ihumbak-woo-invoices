@@ -292,6 +292,7 @@ class DocumentRepository {
 			'issue_date'            => $document->getIssueDate()?->format( 'Y-m-d' ),
 			'sale_date'             => $document->getSaleDate()?->format( 'Y-m-d' ),
 			'due_date'              => $document->getDueDate()?->format( 'Y-m-d' ),
+			'payment_date'          => $document->getPaymentDate()?->format( 'Y-m-d' ),
 			'corrected_document_id' => $document->getCorrectedDocumentId(),
 			'buyer_data'            => $document->getBuyer()?->toJson() ?? '{}',
 			'seller_data'           => $document->getSeller()?->toJson() ?? '{}',

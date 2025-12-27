@@ -86,24 +86,38 @@ $currency = $document->getCurrency();
 								<span class="value"><?php echo esc_html( $document->getDueDate()->format( 'Y-m-d' ) ); ?></span>
 							</div>
 						<?php endif; ?>
+						<?php if ( $document->getPaymentDate() ) : ?>
+							<div class="detail-row">
+								<span class="label">Payment Date:</span>
+								<span class="value"><?php echo esc_html( $document->getPaymentDate()->format( 'Y-m-d' ) ); ?></span>
+							</div>
+						<?php endif; ?>
 						<?php if ( $document->getOrderId() ) : ?>
 							<div class="detail-row">
 								<span class="label">Order No:</span>
 								<span class="value">#<?php echo esc_html( $document->getOrderId() ); ?></span>
 							</div>
 						<?php endif; ?>
-						<div class="detail-row">
-							<span class="label">Amount Due:</span>
-							<span class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
-						</div>
 						<?php
 						$payment_display_name = $document->getPaymentMethodDisplayName();
-						if ( $payment_display_name ) :
-							?>
-							<div class="detail-row">
-								<span class="label">Payment:</span>
+						$is_paid_online       = $document->getPaymentDate() && 'online' === $document->getPaymentMethod();
+						?>
+						<?php if ( $is_paid_online && $payment_display_name ) : ?>
+							<div class="detail-row paid-online">
+								<span class="label">Paid via:</span>
 								<span class="value"><?php echo esc_html( $payment_display_name ); ?></span>
 							</div>
+						<?php else : ?>
+							<div class="detail-row">
+								<span class="label">Amount Due:</span>
+								<span class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
+							</div>
+							<?php if ( $payment_display_name ) : ?>
+								<div class="detail-row">
+									<span class="label">Payment:</span>
+									<span class="value"><?php echo esc_html( $payment_display_name ); ?></span>
+								</div>
+							<?php endif; ?>
 						<?php endif; ?>
 					</div>
 				</td>

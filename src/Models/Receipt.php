@@ -38,20 +38,6 @@ class Receipt extends Document {
 	}
 
 	/**
-	 * Safely parse date string to DateTimeImmutable.
-	 *
-	 * @param string $date_string Date string to parse.
-	 * @return \DateTimeImmutable|null Parsed date or null on failure.
-	 */
-	protected static function parseDate( string $date_string ): ?\DateTimeImmutable {
-		try {
-			return new \DateTimeImmutable( $date_string );
-		} catch ( \Exception $e ) {
-			return null;
-		}
-	}
-
-	/**
 	 * Create from array.
 	 *
 	 * @param array<string, mixed> $data Receipt data.
@@ -83,6 +69,12 @@ class Receipt extends Document {
 				$receipt->setSaleDate( $date );
 			}
 		}
+		if ( ! empty( $data['payment_date'] ) ) {
+			$date = self::parseDate( (string) $data['payment_date'] );
+			if ( $date ) {
+				$receipt->setPaymentDate( $date );
+			}
+		}
 
 		// Buyer/Seller.
 		if ( isset( $data['buyer_data'] ) ) {
@@ -112,6 +104,9 @@ class Receipt extends Document {
 		$receipt->setStatus( (string) ( $data['status'] ?? self::STATUS_DRAFT ) );
 		$receipt->setPdfPath( $data['pdf_path'] ?? null );
 		$receipt->setNotes( (string) ( $data['notes'] ?? '' ) );
+		$receipt->setPaymentMethod( (string) ( $data['payment_method'] ?? '' ) );
+		$receipt->setPaymentMethodId( (string) ( $data['payment_method_id'] ?? '' ) );
+		$receipt->setPaymentMethodTitle( (string) ( $data['payment_method_title'] ?? '' ) );
 
 		// Timestamps - safely parse with error handling.
 		if ( ! empty( $data['created_at'] ) ) {
@@ -137,22 +132,26 @@ class Receipt extends Document {
 	 */
 	public function toArray(): array {
 		return array(
-			'id'              => $this->id,
-			'order_id'        => $this->order_id,
-			'document_type'   => $this->getDocumentType(),
-			'document_number' => $this->document_number,
-			'issue_date'      => $this->issue_date?->format( 'Y-m-d' ),
-			'sale_date'       => $this->sale_date?->format( 'Y-m-d' ),
-			'due_date'        => null, // Receipts don't have due date.
-			'buyer_data'      => $this->buyer?->toJson(),
-			'seller_data'     => $this->seller?->toJson(),
-			'subtotal'        => $this->subtotal,
-			'tax_total'       => $this->tax_total,
-			'total'           => $this->total,
-			'currency'        => $this->currency,
-			'status'          => $this->status,
-			'pdf_path'        => $this->pdf_path,
-			'notes'           => $this->notes,
+			'id'                   => $this->id,
+			'order_id'             => $this->order_id,
+			'document_type'        => $this->getDocumentType(),
+			'document_number'      => $this->document_number,
+			'issue_date'           => $this->issue_date?->format( 'Y-m-d' ),
+			'sale_date'            => $this->sale_date?->format( 'Y-m-d' ),
+			'due_date'             => null, // Receipts don't have due date.
+			'payment_date'         => $this->payment_date?->format( 'Y-m-d' ),
+			'buyer_data'           => $this->buyer?->toJson(),
+			'seller_data'          => $this->seller?->toJson(),
+			'subtotal'             => $this->subtotal,
+			'tax_total'            => $this->tax_total,
+			'total'                => $this->total,
+			'currency'             => $this->currency,
+			'status'               => $this->status,
+			'pdf_path'             => $this->pdf_path,
+			'notes'                => $this->notes,
+			'payment_method'       => $this->payment_method,
+			'payment_method_id'    => $this->payment_method_id,
+			'payment_method_title' => $this->payment_method_title,
 		);
 	}
 }

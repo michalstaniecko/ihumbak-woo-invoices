@@ -946,4 +946,69 @@ class OrderDataExtractorTest extends TestCase {
 
 		$this->assertEquals( 'szt.', $result['unit'] );
 	}
+
+	// =========================================================================
+	// Tests for extractPaymentDate()
+	// =========================================================================
+
+	/**
+	 * Test extractPaymentDate returns null for unpaid order.
+	 */
+	public function test_extract_payment_date_returns_null_for_unpaid_order(): void {
+		$order = $this->createOrder();
+
+		$result = $this->extractor->extractPaymentDate( $order );
+
+		$this->assertNull( $result );
+	}
+
+	/**
+	 * Test extractPaymentDate returns date for paid order.
+	 */
+	public function test_extract_payment_date_returns_date_for_paid_order(): void {
+		$order = $this->createOrder();
+		$order->set_date_paid( '2025-01-15 10:30:00' );
+
+		$result = $this->extractor->extractPaymentDate( $order );
+
+		$this->assertNotNull( $result );
+		$this->assertEquals( '2025-01-15', $result );
+	}
+
+	/**
+	 * Test extractPaymentDate returns correct format.
+	 */
+	public function test_extract_payment_date_returns_ymd_format(): void {
+		$order = $this->createOrder();
+		$order->set_date_paid( '2025-12-31 23:59:59' );
+
+		$result = $this->extractor->extractPaymentDate( $order );
+
+		$this->assertMatchesRegularExpression( '/^\d{4}-\d{2}-\d{2}$/', $result );
+	}
+
+	/**
+	 * Test extractAll includes payment_date for paid order.
+	 */
+	public function test_extract_all_includes_payment_date_for_paid_order(): void {
+		$order = $this->createOrder( array( 'currency' => 'PLN' ) );
+		$order->set_date_paid( '2025-01-20 14:00:00' );
+
+		$result = $this->extractor->extractAll( $order );
+
+		$this->assertArrayHasKey( 'payment_date', $result );
+		$this->assertEquals( '2025-01-20', $result['payment_date'] );
+	}
+
+	/**
+	 * Test extractAll returns null payment_date for unpaid order.
+	 */
+	public function test_extract_all_returns_null_payment_date_for_unpaid_order(): void {
+		$order = $this->createOrder( array( 'currency' => 'PLN' ) );
+
+		$result = $this->extractor->extractAll( $order );
+
+		$this->assertArrayHasKey( 'payment_date', $result );
+		$this->assertNull( $result['payment_date'] );
+	}
 }

@@ -121,6 +121,7 @@ Główna tabela dokumentów (faktury, paragony, korekty).
 | issue_date | DATE | Data wystawienia |
 | sale_date | DATE | Data sprzedaży |
 | due_date | DATE | Termin płatności (nullable) |
+| payment_date | DATE | Data zapłaty (nullable) |
 | corrected_document_id | BIGINT | FK dla korekt (nullable) |
 | buyer_data | JSON | Dane nabywcy |
 | seller_data | JSON | Dane sprzedawcy |
@@ -423,7 +424,7 @@ composer check            # Wszystkie sprawdzenia
 - Szablony: invoice.php, receipt.php, credit-note.php, styles.css
 
 **Testy:**
-- 252 testy jednostkowe, wszystkie przechodzą
+- 265 testów jednostkowych, wszystkie przechodzą
 
 ### Do implementacji
 

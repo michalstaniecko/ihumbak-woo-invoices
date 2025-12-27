@@ -416,6 +416,13 @@
                 }
             }
 
+            // Set payment date if order was paid.
+            // Also set due_date to payment_date for paid orders.
+            if (data.payment_date && $('#payment_date').length) {
+                $('#payment_date').val(data.payment_date);
+                $('#due_date').val(data.payment_date);
+            }
+
             // Recalculate document totals.
             this.recalculateDocument();
         },

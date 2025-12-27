@@ -471,6 +471,9 @@ class DocumentController {
 		if ( ! empty( $_POST['due_date'] ) ) {
 			$document->setDueDate( new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['due_date'] ) ) ) );
 		}
+		if ( ! empty( $_POST['payment_date'] ) ) {
+			$document->setPaymentDate( new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['payment_date'] ) ) ) );
+		}
 
 		// Order ID (can be empty).
 		$order_id = isset( $_POST['order_id'] ) && '' !== $_POST['order_id']
@@ -483,19 +486,17 @@ class DocumentController {
 			$document->setNotes( sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) );
 		}
 
-		// Payment method fields (invoice only).
-		if ( $document instanceof Invoice ) {
-			if ( ! empty( $_POST['payment_method'] ) ) {
-				$document->setPaymentMethod( sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) );
-			}
-			if ( isset( $_POST['payment_method_id'] ) ) {
-				$id = sanitize_text_field( wp_unslash( $_POST['payment_method_id'] ) );
-				$document->setPaymentMethodId( substr( $id, 0, 50 ) );
-			}
-			if ( isset( $_POST['payment_method_title'] ) ) {
-				$title = sanitize_text_field( wp_unslash( $_POST['payment_method_title'] ) );
-				$document->setPaymentMethodTitle( substr( $title, 0, 255 ) );
-			}
+		// Payment method fields (all document types).
+		if ( ! empty( $_POST['payment_method'] ) ) {
+			$document->setPaymentMethod( sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) );
+		}
+		if ( isset( $_POST['payment_method_id'] ) ) {
+			$id = sanitize_text_field( wp_unslash( $_POST['payment_method_id'] ) );
+			$document->setPaymentMethodId( substr( $id, 0, 50 ) );
+		}
+		if ( isset( $_POST['payment_method_title'] ) ) {
+			$title = sanitize_text_field( wp_unslash( $_POST['payment_method_title'] ) );
+			$document->setPaymentMethodTitle( substr( $title, 0, 255 ) );
 		}
 
 		// Credit note specific fields.

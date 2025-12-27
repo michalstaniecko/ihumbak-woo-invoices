@@ -574,4 +574,113 @@ class InvoiceTest extends TestCase {
 		$this->assertEquals( 'przelewy24', $array['payment_method_id'] );
 		$this->assertEquals( 'Przelewy24', $array['payment_method_title'] );
 	}
+
+	/**
+	 * Test payment date getter and setter.
+	 */
+	public function test_payment_date(): void {
+		$invoice      = new Invoice();
+		$payment_date = new \DateTimeImmutable( '2025-01-15' );
+
+		$this->assertNull( $invoice->getPaymentDate() );
+		$this->assertFalse( $invoice->isPaid() );
+
+		$result = $invoice->setPaymentDate( $payment_date );
+
+		$this->assertSame( $invoice, $result );
+		$this->assertEquals( $payment_date, $invoice->getPaymentDate() );
+		$this->assertTrue( $invoice->isPaid() );
+	}
+
+	/**
+	 * Test isPaid returns false when payment date is null.
+	 */
+	public function test_is_paid_returns_false_when_payment_date_null(): void {
+		$invoice = new Invoice();
+
+		$this->assertFalse( $invoice->isPaid() );
+	}
+
+	/**
+	 * Test isPaid returns true when payment date is set.
+	 */
+	public function test_is_paid_returns_true_when_payment_date_set(): void {
+		$invoice = new Invoice();
+		$invoice->setPaymentDate( new \DateTimeImmutable( '2025-01-15' ) );
+
+		$this->assertTrue( $invoice->isPaid() );
+	}
+
+	/**
+	 * Test fromArray with payment_date.
+	 */
+	public function test_from_array_with_payment_date(): void {
+		$data = array(
+			'id'           => 1,
+			'payment_date' => '2025-01-15',
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertNotNull( $invoice->getPaymentDate() );
+		$this->assertEquals( '2025-01-15', $invoice->getPaymentDate()->format( 'Y-m-d' ) );
+		$this->assertTrue( $invoice->isPaid() );
+	}
+
+	/**
+	 * Test fromArray with null payment_date.
+	 */
+	public function test_from_array_with_null_payment_date(): void {
+		$data = array(
+			'id'           => 1,
+			'payment_date' => null,
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertNull( $invoice->getPaymentDate() );
+		$this->assertFalse( $invoice->isPaid() );
+	}
+
+	/**
+	 * Test toArray includes payment_date.
+	 */
+	public function test_to_array_includes_payment_date(): void {
+		$invoice = new Invoice();
+		$invoice->setId( 1 )
+			->setPaymentDate( new \DateTimeImmutable( '2025-01-15' ) );
+
+		$array = $invoice->toArray();
+
+		$this->assertArrayHasKey( 'payment_date', $array );
+		$this->assertEquals( '2025-01-15', $array['payment_date'] );
+	}
+
+	/**
+	 * Test toArray with null payment_date.
+	 */
+	public function test_to_array_with_null_payment_date(): void {
+		$invoice = new Invoice();
+		$invoice->setId( 1 );
+
+		$array = $invoice->toArray();
+
+		$this->assertArrayHasKey( 'payment_date', $array );
+		$this->assertNull( $array['payment_date'] );
+	}
+
+	/**
+	 * Test payment date can be cleared.
+	 */
+	public function test_payment_date_can_be_cleared(): void {
+		$invoice = new Invoice();
+		$invoice->setPaymentDate( new \DateTimeImmutable( '2025-01-15' ) );
+
+		$this->assertTrue( $invoice->isPaid() );
+
+		$invoice->setPaymentDate( null );
+
+		$this->assertNull( $invoice->getPaymentDate() );
+		$this->assertFalse( $invoice->isPaid() );
+	}
 }

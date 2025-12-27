@@ -68,6 +68,13 @@ abstract class Document {
 	protected ?DateTimeImmutable $due_date = null;
 
 	/**
+	 * Payment date (date when order was paid).
+	 *
+	 * @var DateTimeImmutable|null
+	 */
+	protected ?DateTimeImmutable $payment_date = null;
+
+	/**
 	 * Corrected document ID (for corrections).
 	 *
 	 * @var int|null
@@ -143,6 +150,27 @@ abstract class Document {
 	 * @var string
 	 */
 	protected string $notes = '';
+
+	/**
+	 * Payment method type (transfer, cash, card, online).
+	 *
+	 * @var string
+	 */
+	protected string $payment_method = '';
+
+	/**
+	 * Payment method ID from WooCommerce (bacs, przelewy24, etc.).
+	 *
+	 * @var string
+	 */
+	protected string $payment_method_id = '';
+
+	/**
+	 * Payment method title from WooCommerce (human readable name).
+	 *
+	 * @var string
+	 */
+	protected string $payment_method_title = '';
 
 	/**
 	 * Created at timestamp.
@@ -290,6 +318,35 @@ abstract class Document {
 	public function setDueDate( ?DateTimeImmutable $date ): self {
 		$this->due_date = $date;
 		return $this;
+	}
+
+	/**
+	 * Get payment date.
+	 *
+	 * @return DateTimeImmutable|null
+	 */
+	public function getPaymentDate(): ?DateTimeImmutable {
+		return $this->payment_date;
+	}
+
+	/**
+	 * Set payment date.
+	 *
+	 * @param DateTimeImmutable|null $date Payment date.
+	 * @return self
+	 */
+	public function setPaymentDate( ?DateTimeImmutable $date ): self {
+		$this->payment_date = $date;
+		return $this;
+	}
+
+	/**
+	 * Check if document is paid (has payment date).
+	 *
+	 * @return bool
+	 */
+	public function isPaid(): bool {
+		return null !== $this->payment_date;
 	}
 
 	/**
@@ -550,6 +607,113 @@ abstract class Document {
 	public function setNotes( string $notes ): self {
 		$this->notes = $notes;
 		return $this;
+	}
+
+	/**
+	 * Get payment method type.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethod(): string {
+		return $this->payment_method;
+	}
+
+	/**
+	 * Set payment method type.
+	 *
+	 * @param string $method Payment method type.
+	 * @return self
+	 * @throws \InvalidArgumentException If method is not valid (unless empty).
+	 */
+	public function setPaymentMethod( string $method ): self {
+		if ( '' !== $method && ! array_key_exists( $method, self::getPaymentMethods() ) ) {
+			throw new \InvalidArgumentException(
+				sprintf(
+					/* translators: 1: Invalid payment method value */
+					esc_html__( 'Invalid payment method: %s', 'ihumbak-invoices' ),
+					esc_html( $method )
+				)
+			);
+		}
+		$this->payment_method = $method;
+		return $this;
+	}
+
+	/**
+	 * Get payment method ID.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodId(): string {
+		return $this->payment_method_id;
+	}
+
+	/**
+	 * Set payment method ID.
+	 *
+	 * @param string $id Payment method ID.
+	 * @return self
+	 */
+	public function setPaymentMethodId( string $id ): self {
+		$this->payment_method_id = $id;
+		return $this;
+	}
+
+	/**
+	 * Get payment method title.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodTitle(): string {
+		return $this->payment_method_title;
+	}
+
+	/**
+	 * Set payment method title.
+	 *
+	 * @param string $title Payment method title.
+	 * @return self
+	 */
+	public function setPaymentMethodTitle( string $title ): self {
+		$this->payment_method_title = $title;
+		return $this;
+	}
+
+	/**
+	 * Get available payment methods.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function getPaymentMethods(): array {
+		return array(
+			'transfer' => __( 'Bank transfer', 'ihumbak-invoices' ),
+			'cash'     => __( 'Cash', 'ihumbak-invoices' ),
+			'card'     => __( 'Card payment', 'ihumbak-invoices' ),
+			'online'   => __( 'Online payment', 'ihumbak-invoices' ),
+		);
+	}
+
+	/**
+	 * Get human-readable payment method name.
+	 *
+	 * Returns payment_method_title if available, otherwise falls back to
+	 * the label for payment_method type.
+	 *
+	 * @return string Payment method display name, or empty string if not set.
+	 */
+	public function getPaymentMethodDisplayName(): string {
+		// First try the specific title from WooCommerce.
+		if ( '' !== $this->payment_method_title ) {
+			return $this->payment_method_title;
+		}
+
+		// Fall back to type label.
+		if ( '' !== $this->payment_method ) {
+			$methods = self::getPaymentMethods();
+			return $methods[ $this->payment_method ] ?? $this->payment_method;
+		}
+
+		return '';
 	}
 
 	/**

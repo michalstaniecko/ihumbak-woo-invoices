@@ -248,6 +248,22 @@ if ( ! function_exists( 'get_current_user_id' ) ) {
 // of OrderDataExtractor without requiring the full WooCommerce installation.
 // =============================================================================
 
+if ( ! class_exists( 'WC_DateTime' ) ) {
+    /**
+     * Mock WC_DateTime class for unit tests.
+     */
+    class WC_DateTime extends \DateTime {
+        /**
+         * Constructor.
+         *
+         * @param string $datetime Date/time string.
+         */
+        public function __construct( string $datetime = 'now' ) {
+            parent::__construct( $datetime );
+        }
+    }
+}
+
 if ( ! class_exists( 'WC_Order' ) ) {
     /**
      * Mock WC_Order class for unit tests.
@@ -464,6 +480,27 @@ if ( ! class_exists( 'WC_Order' ) ) {
          */
         public function get_meta( string $key, bool $single = true ) {
             return $this->meta[ $key ] ?? '';
+        }
+
+        /**
+         * Get date paid.
+         *
+         * @return \WC_DateTime|null
+         */
+        public function get_date_paid(): ?\WC_DateTime {
+            if ( empty( $this->data['date_paid'] ) ) {
+                return null;
+            }
+            return new \WC_DateTime( $this->data['date_paid'] );
+        }
+
+        /**
+         * Set date paid.
+         *
+         * @param string|null $date Date string or null.
+         */
+        public function set_date_paid( ?string $date ): void {
+            $this->data['date_paid'] = $date;
         }
     }
 }

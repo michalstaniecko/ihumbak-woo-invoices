@@ -137,6 +137,15 @@ $page_title = $is_new
                             </td>
                         </tr>
                         <tr>
+                            <th><label for="payment_date"><?php esc_html_e( 'Payment Date', 'ihumbak-invoices' ); ?></label></th>
+                            <td>
+                                <input type="date" id="payment_date" name="payment_date"
+                                       value="<?php echo esc_attr( $document ? $document->getPaymentDate()?->format( 'Y-m-d' ) : '' ); ?>"
+                                       <?php disabled( ! $can_edit ); ?>>
+                                <p class="description"><?php esc_html_e( 'Date when payment was received. Auto-filled from WooCommerce order if paid.', 'ihumbak-invoices' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr>
                             <th><label for="payment_method"><?php esc_html_e( 'Payment Type', 'ihumbak-invoices' ); ?></label></th>
                             <td>
                                 <select id="payment_method" name="payment_method" <?php disabled( ! $can_edit ); ?>>

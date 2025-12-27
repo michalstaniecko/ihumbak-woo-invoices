@@ -78,6 +78,7 @@ class OrderDataExtractor {
 			'items'          => $items,
 			'buyer'          => $this->extractBuyer( $order, $nip_meta_key ),
 			'payment_method' => $this->extractPaymentMethod( $order ),
+			'payment_date'   => $this->extractPaymentDate( $order ),
 			'currency'       => $order->get_currency(),
 		);
 	}
@@ -270,6 +271,24 @@ class OrderDataExtractor {
 			'id'    => $payment_method_id,
 			'title' => $payment_method_title,
 		);
+	}
+
+	/**
+	 * Extract payment date from WooCommerce order.
+	 *
+	 * Returns the date when the order was paid, or null if not paid.
+	 *
+	 * @param WC_Order $order WooCommerce order.
+	 * @return string|null Date in Y-m-d format or null if not paid.
+	 */
+	public function extractPaymentDate( WC_Order $order ): ?string {
+		$date_paid = $order->get_date_paid();
+
+		if ( ! $date_paid ) {
+			return null;
+		}
+
+		return $date_paid->format( 'Y-m-d' );
 	}
 
 	/**
