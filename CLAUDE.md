@@ -128,6 +128,9 @@ Główna tabela dokumentów (faktury, paragony, korekty).
 | tax_total | DECIMAL(10,2) | Suma VAT |
 | total | DECIMAL(10,2) | Suma brutto |
 | currency | VARCHAR(3) | Kod waluty |
+| payment_method | VARCHAR(20) | Typ płatności (transfer/cash/card/online) |
+| payment_method_id | VARCHAR(50) | ID metody z WC (np. "bacs", "przelewy24") |
+| payment_method_title | VARCHAR(255) | Nazwa słowna z WC (np. "Przelewy24") |
 | status | ENUM | 'draft', 'issued', 'sent', 'paid', 'cancelled' |
 | pdf_path | VARCHAR(255) | Ścieżka do PDF (nullable) |
 | notes | TEXT | Uwagi (nullable) |
@@ -420,12 +423,14 @@ composer check            # Wszystkie sprawdzenia
 - Szablony: invoice.php, receipt.php, credit-note.php, styles.css
 
 **Testy:**
-- 233 testy jednostkowe, wszystkie przechodzą
+- 252 testy jednostkowe, wszystkie przechodzą
 
 ### Do implementacji
 
+- Raporty miesięczne (z eksportem CSV)
 - Portal klienta (My Account)
 - Wysyłka email z fakturą
+- Internacjonalizacja (i18n)
 
 ## Plan prac
 

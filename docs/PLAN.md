@@ -220,6 +220,7 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Modyfikacja `DocumentController` - walidacja przy zmianie statusu
   - [x] UI: przycisk "Revert to Draft" widoczny tylko dla super-adminow
   - [x] Testy jednostkowe dla SuperAdminService
+
 ### Raporty miesięczne
 Widok tabelaryczny z podsumowaniem wystawionych dokumentów w danym miesiącu.
 Możliwość eksportu do CSV.
