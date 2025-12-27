@@ -63,7 +63,7 @@ class OrderDataExtractor {
 	 *
 	 * @param WC_Order $order        WooCommerce order.
 	 * @param string   $nip_meta_key Meta key for NIP field.
-	 * @return array{items: array<int, array<string, mixed>>, buyer: array<string, string>, payment_method: string, currency: string}
+	 * @return array{items: array<int, array<string, mixed>>, buyer: array<string, string>, payment_method: array{type: string, id: string, title: string}, currency: string}
 	 */
 	public function extractAll( WC_Order $order, string $nip_meta_key = '_billing_nip' ): array {
 		$items = $this->extractItems( $order );
@@ -227,34 +227,49 @@ class OrderDataExtractor {
 	}
 
 	/**
-	 * Extract payment method and map to invoice payment methods.
+	 * Extract payment method data from WooCommerce order.
+	 *
+	 * Returns an array with:
+	 * - type: Mapped payment type (transfer, cash, card, online)
+	 * - id: Original WooCommerce payment method ID (e.g., 'bacs', 'przelewy24')
+	 * - title: Human-readable payment method title from WooCommerce
 	 *
 	 * @param WC_Order $order WooCommerce order.
-	 * @return string One of: transfer, cash, card, online, or empty string.
+	 * @return array{type: string, id: string, title: string}
 	 */
-	public function extractPaymentMethod( WC_Order $order ): string {
-		$payment_method = $order->get_payment_method();
+	public function extractPaymentMethod( WC_Order $order ): array {
+		$payment_method_id    = $order->get_payment_method();
+		$payment_method_title = $order->get_payment_method_title();
 
-		if ( empty( $payment_method ) ) {
-			return '';
+		if ( empty( $payment_method_id ) ) {
+			return array(
+				'type'  => '',
+				'id'    => '',
+				'title' => '',
+			);
 		}
 
 		$payment_map = $this->getPaymentMethodMap();
+		$type        = 'online'; // Default for unknown gateways.
 
 		// Direct mapping.
-		if ( isset( $payment_map[ $payment_method ] ) ) {
-			return $payment_map[ $payment_method ];
-		}
-
-		// Check for partial matches (e.g., stripe_sepa -> card).
-		foreach ( $payment_map as $key => $value ) {
-			if ( str_starts_with( $payment_method, $key ) ) {
-				return $value;
+		if ( isset( $payment_map[ $payment_method_id ] ) ) {
+			$type = $payment_map[ $payment_method_id ];
+		} else {
+			// Check for partial matches (e.g., stripe_sepa -> card).
+			foreach ( $payment_map as $key => $value ) {
+				if ( str_starts_with( $payment_method_id, $key ) ) {
+					$type = $value;
+					break;
+				}
 			}
 		}
 
-		// Default to online for unknown payment gateways.
-		return 'online';
+		return array(
+			'type'  => $type,
+			'id'    => $payment_method_id,
+			'title' => $payment_method_title,
+		);
 	}
 
 	/**

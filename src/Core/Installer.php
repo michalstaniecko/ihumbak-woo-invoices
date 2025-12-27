@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.2.0';
+	private const DB_VERSION = '1.3.0';
 
 	/**
 	 * Option name for storing database version.
@@ -41,9 +41,10 @@ class Installer {
 	 * @var array<string, string>
 	 */
 	private const MIGRATIONS = array(
-		'schema_fix_101'  => '1.0.0',
-		'sku_column_110'  => '1.1.0',
-		'credit_note_120' => '1.2.0',
+		'schema_fix_101'     => '1.0.0',
+		'sku_column_110'     => '1.1.0',
+		'credit_note_120'    => '1.2.0',
+		'payment_method_130' => '1.3.0',
 	);
 
 	/**
@@ -212,6 +213,114 @@ class Installer {
 
 			// phpcs:enable
 		}
+
+		// Migration to 1.3.0: Add payment method columns.
+		if ( version_compare( $from_version, '1.3.0', '<' ) ) {
+			$table = self::get_documents_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			// Add payment_method column (for old installations that never had it).
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'payment_method'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN payment_method varchar(20) DEFAULT '' AFTER notes" );
+			}
+
+			// Add payment_method_id column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'payment_method_id'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN payment_method_id varchar(50) DEFAULT '' AFTER payment_method" );
+			}
+
+			// Add payment_method_title column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'payment_method_title'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN payment_method_title varchar(255) DEFAULT '' AFTER payment_method_id" );
+			}
+
+			// Migrate existing data from WC orders.
+			$this->migrate_payment_method_data();
+
+			// phpcs:enable
+		}
+	}
+
+	/**
+	 * Migrate payment method data from WooCommerce orders for existing invoices.
+	 *
+	 * @return void
+	 */
+	private function migrate_payment_method_data(): void {
+		global $wpdb;
+
+		// Check if WooCommerce is active.
+		if ( ! function_exists( 'wc_get_order' ) ) {
+			return;
+		}
+
+		$table = self::get_documents_table();
+
+		// Get invoices with order_id that have empty payment_method_id.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$invoices = $wpdb->get_results(
+			"SELECT id, order_id FROM {$table}
+			WHERE document_type = 'invoice'
+			AND order_id IS NOT NULL
+			AND (payment_method_id = '' OR payment_method_id IS NULL)"
+		);
+		// phpcs:enable
+
+		if ( empty( $invoices ) ) {
+			return;
+		}
+
+		foreach ( $invoices as $invoice ) {
+			$order = wc_get_order( $invoice->order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			$payment_method_id    = $order->get_payment_method();
+			$payment_method_title = $order->get_payment_method_title();
+
+			if ( empty( $payment_method_id ) ) {
+				continue;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$table,
+				array(
+					'payment_method_id'    => $payment_method_id,
+					'payment_method_title' => $payment_method_title,
+				),
+				array( 'id' => $invoice->id ),
+				array( '%s', '%s' ),
+				array( '%d' )
+			);
+		}
 	}
 
 	/**
@@ -261,6 +370,9 @@ class Installer {
             status varchar(20) NOT NULL DEFAULT 'draft',
             pdf_path varchar(255) DEFAULT NULL,
             notes text DEFAULT NULL,
+            payment_method varchar(20) DEFAULT '',
+            payment_method_id varchar(50) DEFAULT '',
+            payment_method_title varchar(255) DEFAULT '',
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id),

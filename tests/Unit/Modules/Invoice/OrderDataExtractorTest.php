@@ -421,57 +421,57 @@ class OrderDataExtractorTest extends TestCase {
 	/**
 	 * Data provider for payment method mapping tests.
 	 *
-	 * @return array<string, array{input: string, expected: string}>
+	 * @return array<string, array{input: string, expected_type: string}>
 	 */
 	public static function paymentMethodMappingProvider(): array {
 		return array(
 			'bacs to transfer'       => array(
-				'input'    => 'bacs',
-				'expected' => 'transfer',
+				'input'         => 'bacs',
+				'expected_type' => 'transfer',
 			),
 			'cod to cash'            => array(
-				'input'    => 'cod',
-				'expected' => 'cash',
+				'input'         => 'cod',
+				'expected_type' => 'cash',
 			),
 			'cheque to transfer'     => array(
-				'input'    => 'cheque',
-				'expected' => 'transfer',
+				'input'         => 'cheque',
+				'expected_type' => 'transfer',
 			),
 			'stripe to card'         => array(
-				'input'    => 'stripe',
-				'expected' => 'card',
+				'input'         => 'stripe',
+				'expected_type' => 'card',
 			),
 			'stripe_cc to card'      => array(
-				'input'    => 'stripe_cc',
-				'expected' => 'card',
+				'input'         => 'stripe_cc',
+				'expected_type' => 'card',
 			),
 			'paypal to online'       => array(
-				'input'    => 'paypal',
-				'expected' => 'online',
+				'input'         => 'paypal',
+				'expected_type' => 'online',
 			),
 			'przelewy24 to online'   => array(
-				'input'    => 'przelewy24',
-				'expected' => 'online',
+				'input'         => 'przelewy24',
+				'expected_type' => 'online',
 			),
 			'tpay to online'         => array(
-				'input'    => 'tpay',
-				'expected' => 'online',
+				'input'         => 'tpay',
+				'expected_type' => 'online',
 			),
 			'payu to online'         => array(
-				'input'    => 'payu',
-				'expected' => 'online',
+				'input'         => 'payu',
+				'expected_type' => 'online',
 			),
 			'dotpay to online'       => array(
-				'input'    => 'dotpay',
-				'expected' => 'online',
+				'input'         => 'dotpay',
+				'expected_type' => 'online',
 			),
 			'partial match stripe_sepa to card' => array(
-				'input'    => 'stripe_sepa',
-				'expected' => 'card',
+				'input'         => 'stripe_sepa',
+				'expected_type' => 'card',
 			),
 			'unknown defaults to online' => array(
-				'input'    => 'unknown_gateway',
-				'expected' => 'online',
+				'input'         => 'unknown_gateway',
+				'expected_type' => 'online',
 			),
 		);
 	}
@@ -481,26 +481,52 @@ class OrderDataExtractorTest extends TestCase {
 	 *
 	 * @dataProvider paymentMethodMappingProvider
 	 *
-	 * @param string $input    WooCommerce payment method.
-	 * @param string $expected Expected mapped value.
+	 * @param string $input         WooCommerce payment method.
+	 * @param string $expected_type Expected mapped type value.
 	 */
-	public function test_extract_payment_method_mapping( string $input, string $expected ): void {
+	public function test_extract_payment_method_mapping( string $input, string $expected_type ): void {
 		$order = $this->createOrder( array( 'payment_method' => $input ) );
 
 		$result = $this->extractor->extractPaymentMethod( $order );
 
-		$this->assertEquals( $expected, $result );
+		$this->assertIsArray( $result );
+		$this->assertArrayHasKey( 'type', $result );
+		$this->assertArrayHasKey( 'id', $result );
+		$this->assertArrayHasKey( 'title', $result );
+		$this->assertEquals( $expected_type, $result['type'] );
+		$this->assertEquals( $input, $result['id'] );
 	}
 
 	/**
-	 * Test extracting payment method returns empty string for no method.
+	 * Test extracting payment method returns empty values for no method.
 	 */
 	public function test_extract_payment_method_returns_empty_for_no_method(): void {
 		$order = $this->createOrder();
 
 		$result = $this->extractor->extractPaymentMethod( $order );
 
-		$this->assertEquals( '', $result );
+		$this->assertIsArray( $result );
+		$this->assertEquals( '', $result['type'] );
+		$this->assertEquals( '', $result['id'] );
+		$this->assertEquals( '', $result['title'] );
+	}
+
+	/**
+	 * Test extractPaymentMethod returns title from WC order.
+	 */
+	public function test_extract_payment_method_returns_title(): void {
+		$order = $this->createOrder(
+			array(
+				'payment_method'       => 'przelewy24',
+				'payment_method_title' => 'Przelewy24',
+			)
+		);
+
+		$result = $this->extractor->extractPaymentMethod( $order );
+
+		$this->assertEquals( 'online', $result['type'] );
+		$this->assertEquals( 'przelewy24', $result['id'] );
+		$this->assertEquals( 'Przelewy24', $result['title'] );
 	}
 
 	// =========================================================================
@@ -513,10 +539,11 @@ class OrderDataExtractorTest extends TestCase {
 	public function test_extract_all_returns_complete_data(): void {
 		$order = $this->createOrder(
 			array(
-				'currency'           => 'PLN',
-				'payment_method'     => 'bacs',
-				'billing_first_name' => 'John',
-				'billing_last_name'  => 'Doe',
+				'currency'             => 'PLN',
+				'payment_method'       => 'bacs',
+				'payment_method_title' => 'Bank Transfer',
+				'billing_first_name'   => 'John',
+				'billing_last_name'    => 'Doe',
 			)
 		);
 
@@ -542,7 +569,13 @@ class OrderDataExtractorTest extends TestCase {
 
 		$this->assertCount( 1, $result['items'] );
 		$this->assertEquals( 'John Doe', $result['buyer']['name'] );
-		$this->assertEquals( 'transfer', $result['payment_method'] );
+
+		// payment_method is now an array with type, id, title.
+		$this->assertIsArray( $result['payment_method'] );
+		$this->assertEquals( 'transfer', $result['payment_method']['type'] );
+		$this->assertEquals( 'bacs', $result['payment_method']['id'] );
+		$this->assertEquals( 'Bank Transfer', $result['payment_method']['title'] );
+
 		$this->assertEquals( 'PLN', $result['currency'] );
 	}
 

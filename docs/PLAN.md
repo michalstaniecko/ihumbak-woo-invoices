@@ -254,26 +254,32 @@ Możliwość eksportu do CSV.
 - [ ] Email z faktura
 
 ### Metoda platnosci - pelne dane z zamowienia WC
+**Status: UKONCZONA**
+
 Aktualnie `payment_method` przechowuje tylko typ (transfer, cash, card, online).
 Potrzebujemy pelnych danych z zamowienia WC, aby zachowac historie nawet gdy metoda zostanie zmieniona/usunieta.
 
-- [ ] Rozszerzenie modelu Invoice
-  - [ ] Nowe pole `payment_method_id` (string) - ID metody z WC (np. "bacs", "przelewy24")
-  - [ ] Nowe pole `payment_method_title` (string) - Nazwa slowna z WC (np. "Przelewy24", "Przelew bankowy")
-  - [ ] Zachowanie `payment_method` jako typ (transfer/cash/card/online) dla kategoryzacji
-- [ ] Migracja bazy danych
-  - [ ] Dodanie kolumn `payment_method_id` i `payment_method_title` do tabeli `ihumbak_documents`
-  - [ ] Migracja istniejacych danych (jesli mozliwe odtworzenie z order_id)
-- [ ] Modyfikacja OrderDataExtractor
-  - [ ] `extractPaymentMethod()` zwraca array z id, title, type
-  - [ ] Uzycie `$order->get_payment_method()` dla ID
-  - [ ] Uzycie `$order->get_payment_method_title()` dla nazwy slownej
-- [ ] Modyfikacja formularzy admin
-  - [ ] Wyswietlanie nazwy slownej metody platnosci
-  - [ ] Edycja/wybor metody platnosci
-- [ ] Modyfikacja szablonow PDF
-  - [ ] Wyswietlanie nazwy slownej zamiast typu
-- [ ] Aktualizacja testow jednostkowych
+- [x] Rozszerzenie modelu Invoice
+  - [x] Nowe pole `payment_method_id` (string) - ID metody z WC (np. "bacs", "przelewy24")
+  - [x] Nowe pole `payment_method_title` (string) - Nazwa slowna z WC (np. "Przelewy24", "Przelew bankowy")
+  - [x] Zachowanie `payment_method` jako typ (transfer/cash/card/online) dla kategoryzacji
+  - [x] Metoda `getPaymentMethodDisplayName()` - zwraca title lub fallback do typu
+- [x] Migracja bazy danych
+  - [x] Dodanie kolumn `payment_method_id` i `payment_method_title` do tabeli `ihumbak_documents`
+  - [x] Migracja istniejacych danych z zamowien WC (automatyczna przy upgrade do 1.3.0)
+- [x] Modyfikacja OrderDataExtractor
+  - [x] `extractPaymentMethod()` zwraca array z id, title, type
+  - [x] Uzycie `$order->get_payment_method()` dla ID
+  - [x] Uzycie `$order->get_payment_method_title()` dla nazwy slownej
+- [x] Modyfikacja formularzy admin
+  - [x] Wyswietlanie nazwy slownej metody platnosci (Payment Method Name)
+  - [x] Edycja/wybor typu platnosci (Payment Type)
+  - [x] Walidacja dlugosci pol (payment_method_id: 50, payment_method_title: 255)
+- [x] Modyfikacja szablonow PDF
+  - [x] Wyswietlanie nazwy slownej zamiast typu (getPaymentMethodDisplayName)
+- [x] Aktualizacja testow jednostkowych
+  - [x] Testy Invoice: payment_method_id, payment_method_title, getPaymentMethodDisplayName
+  - [x] Testy OrderDataExtractor: nowy format zwracanych danych
 
 ### Internacjonalizacja (i18n)
 - [ ] Audyt szablonow pod katem hardcodowanych fraz
@@ -310,4 +316,4 @@ Potrzebujemy pelnych danych z zamowienia WC, aby zachowac historie nawet gdy met
 
 ## Podsumowanie testow
 
-**Lacznie:** 212 testow, 598 asercji - wszystkie przechodza
+**Lacznie:** 252 testy, 756 asercji - wszystkie przechodza

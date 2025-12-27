@@ -461,4 +461,117 @@ class InvoiceTest extends TestCase {
 		$this->assertArrayHasKey( 'corrected_document_id', $array );
 		$this->assertEquals( 5, $array['corrected_document_id'] );
 	}
+
+	/**
+	 * Test payment method ID getter and setter.
+	 */
+	public function test_payment_method_id(): void {
+		$invoice = new Invoice();
+
+		$this->assertEquals( '', $invoice->getPaymentMethodId() );
+
+		$result = $invoice->setPaymentMethodId( 'przelewy24' );
+
+		$this->assertSame( $invoice, $result );
+		$this->assertEquals( 'przelewy24', $invoice->getPaymentMethodId() );
+	}
+
+	/**
+	 * Test payment method title getter and setter.
+	 */
+	public function test_payment_method_title(): void {
+		$invoice = new Invoice();
+
+		$this->assertEquals( '', $invoice->getPaymentMethodTitle() );
+
+		$result = $invoice->setPaymentMethodTitle( 'Przelewy24' );
+
+		$this->assertSame( $invoice, $result );
+		$this->assertEquals( 'Przelewy24', $invoice->getPaymentMethodTitle() );
+	}
+
+	/**
+	 * Test getPaymentMethodDisplayName returns title when available.
+	 */
+	public function test_payment_method_display_name_returns_title(): void {
+		$invoice = new Invoice();
+		$invoice->setPaymentMethod( 'online' );
+		$invoice->setPaymentMethodTitle( 'Przelewy24' );
+
+		$this->assertEquals( 'Przelewy24', $invoice->getPaymentMethodDisplayName() );
+	}
+
+	/**
+	 * Test getPaymentMethodDisplayName falls back to type label.
+	 */
+	public function test_payment_method_display_name_falls_back_to_type_label(): void {
+		$invoice = new Invoice();
+		$invoice->setPaymentMethod( 'transfer' );
+
+		$this->assertEquals( 'Bank transfer', $invoice->getPaymentMethodDisplayName() );
+	}
+
+	/**
+	 * Test getPaymentMethodDisplayName returns empty string when no method set.
+	 */
+	public function test_payment_method_display_name_returns_empty_string(): void {
+		$invoice = new Invoice();
+
+		$this->assertEquals( '', $invoice->getPaymentMethodDisplayName() );
+	}
+
+	/**
+	 * Test fromArray with payment method extended fields.
+	 */
+	public function test_from_array_with_payment_method_extended_fields(): void {
+		$data = array(
+			'id'                   => 1,
+			'payment_method'       => 'online',
+			'payment_method_id'    => 'przelewy24',
+			'payment_method_title' => 'Przelewy24',
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertEquals( 'online', $invoice->getPaymentMethod() );
+		$this->assertEquals( 'przelewy24', $invoice->getPaymentMethodId() );
+		$this->assertEquals( 'Przelewy24', $invoice->getPaymentMethodTitle() );
+	}
+
+	/**
+	 * Test fromArray with missing payment method extended fields (backward compatibility).
+	 */
+	public function test_from_array_backward_compatibility(): void {
+		$data = array(
+			'id'             => 1,
+			'payment_method' => 'transfer',
+		);
+
+		$invoice = Invoice::fromArray( $data );
+
+		$this->assertEquals( 'transfer', $invoice->getPaymentMethod() );
+		$this->assertEquals( '', $invoice->getPaymentMethodId() );
+		$this->assertEquals( '', $invoice->getPaymentMethodTitle() );
+		$this->assertEquals( 'Bank transfer', $invoice->getPaymentMethodDisplayName() );
+	}
+
+	/**
+	 * Test toArray includes payment method extended fields.
+	 */
+	public function test_to_array_includes_payment_method_extended_fields(): void {
+		$invoice = new Invoice();
+		$invoice->setId( 1 )
+			->setPaymentMethod( 'online' )
+			->setPaymentMethodId( 'przelewy24' )
+			->setPaymentMethodTitle( 'Przelewy24' );
+
+		$array = $invoice->toArray();
+
+		$this->assertArrayHasKey( 'payment_method', $array );
+		$this->assertArrayHasKey( 'payment_method_id', $array );
+		$this->assertArrayHasKey( 'payment_method_title', $array );
+		$this->assertEquals( 'online', $array['payment_method'] );
+		$this->assertEquals( 'przelewy24', $array['payment_method_id'] );
+		$this->assertEquals( 'Przelewy24', $array['payment_method_title'] );
+	}
 }
