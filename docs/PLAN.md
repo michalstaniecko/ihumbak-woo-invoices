@@ -223,6 +223,28 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura
 
+### Metoda platnosci - pelne dane z zamowienia WC
+Aktualnie `payment_method` przechowuje tylko typ (transfer, cash, card, online).
+Potrzebujemy pelnych danych z zamowienia WC, aby zachowac historie nawet gdy metoda zostanie zmieniona/usunieta.
+
+- [ ] Rozszerzenie modelu Invoice
+  - [ ] Nowe pole `payment_method_id` (string) - ID metody z WC (np. "bacs", "przelewy24")
+  - [ ] Nowe pole `payment_method_title` (string) - Nazwa slowna z WC (np. "Przelewy24", "Przelew bankowy")
+  - [ ] Zachowanie `payment_method` jako typ (transfer/cash/card/online) dla kategoryzacji
+- [ ] Migracja bazy danych
+  - [ ] Dodanie kolumn `payment_method_id` i `payment_method_title` do tabeli `ihumbak_documents`
+  - [ ] Migracja istniejacych danych (jesli mozliwe odtworzenie z order_id)
+- [ ] Modyfikacja OrderDataExtractor
+  - [ ] `extractPaymentMethod()` zwraca array z id, title, type
+  - [ ] Uzycie `$order->get_payment_method()` dla ID
+  - [ ] Uzycie `$order->get_payment_method_title()` dla nazwy slownej
+- [ ] Modyfikacja formularzy admin
+  - [ ] Wyswietlanie nazwy slownej metody platnosci
+  - [ ] Edycja/wybor metody platnosci
+- [ ] Modyfikacja szablonow PDF
+  - [ ] Wyswietlanie nazwy slownej zamiast typu
+- [ ] Aktualizacja testow jednostkowych
+
 ### Internacjonalizacja (i18n)
 - [ ] Audyt szablonow pod katem hardcodowanych fraz
   - [ ] Szablony PDF (`templates/pdf/default/`)
