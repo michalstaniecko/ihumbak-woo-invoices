@@ -283,35 +283,35 @@ Potrzebujemy pelnych danych z zamowienia WC, aby zachowac historie nawet gdy met
   - [x] Testy OrderDataExtractor: nowy format zwracanych danych
 
 ### Internacjonalizacja (i18n)
-- [ ] Audyt szablonow pod katem hardcodowanych fraz
-  - [ ] Szablony PDF (`templates/pdf/default/`)
-    - [ ] invoice.php
-    - [ ] receipt.php
-    - [ ] credit-note.php
-    - [ ] styles.css (jezeli zawiera teksty)
-  - [ ] Szablony admin (`templates/admin/`)
-    - [ ] documents-list.php
-    - [ ] invoice-edit.php
-    - [ ] receipt-edit.php
-    - [ ] credit-note-edit.php
-    - [ ] settings.php
-    - [ ] partials/*.php
-  - [ ] Klasy PHP (komunikaty, etykiety)
-- [ ] Zamiana hardcodowanych fraz na funkcje i18n
-  - [ ] `__()` dla tekstow
-  - [ ] `_e()` dla tekstow wyswietlanych bezposrednio
-  - [ ] `esc_html__()` / `esc_attr__()` dla escapowanych tekstow
-  - [ ] `_n()` dla form liczby mnogiej
-  - [ ] Text domain: `ihumbak-invoices`
-- [ ] Generowanie pliku POT (szablon tlumaczen)
-  - [ ] Konfiguracja WP-CLI lub narzedzia do ekstrakcji
-  - [ ] Plik `languages/ihumbak-invoices.pot`
-- [ ] Ladowanie tlumaczen w pluginie
-  - [ ] `load_plugin_textdomain()` w Plugin.php
-  - [ ] Sciezka: `languages/`
-- [ ] Przykladowe tlumaczenie (pl_PL)
-  - [ ] `languages/ihumbak-invoices-pl_PL.po`
-  - [ ] `languages/ihumbak-invoices-pl_PL.mo`
+- [x] Audyt szablonow pod katem hardcodowanych fraz
+  - [x] Szablony PDF (`templates/pdf/default/`)
+    - [x] invoice.php
+    - [x] receipt.php
+    - [x] credit-note.php
+    - [x] styles.css (brak tekstow - tylko CSS)
+  - [x] Szablony admin (`templates/admin/`) - juz byly zinternacjonalizowane
+    - [x] documents-list.php
+    - [x] invoice-edit.php
+    - [x] receipt-edit.php
+    - [x] credit-note-edit.php
+    - [x] settings.php
+    - [x] partials/*.php
+  - [x] Klasy PHP (komunikaty, etykiety) - juz byly zinternacjonalizowane
+- [x] Zamiana hardcodowanych fraz na funkcje i18n
+  - [x] `__()` dla tekstow
+  - [x] `_e()` dla tekstow wyswietlanych bezposrednio
+  - [x] `esc_html__()` / `esc_attr__()` dla escapowanych tekstow
+  - [x] `_n()` dla form liczby mnogiej
+  - [x] Text domain: `ihumbak-invoices`
+- [x] Generowanie pliku POT (szablon tlumaczen)
+  - [x] Konfiguracja xgettext do ekstrakcji
+  - [x] Plik `languages/ihumbak-invoices.pot` (1312 linii, ~200 stringow)
+- [x] Ladowanie tlumaczen w pluginie
+  - [x] `load_plugin_textdomain()` w Plugin.php - juz zaimplementowane
+  - [x] Sciezka: `languages/`
+- [x] Tlumaczenie norweskie (nb_NO)
+  - [x] `languages/ihumbak-invoices-nb_NO.po`
+  - [x] `languages/ihumbak-invoices-nb_NO.mo`
 
 ---
 

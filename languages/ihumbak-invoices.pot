@@ -1,0 +1,1312 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the iHumbak WooCommerce Invoices package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: iHumbak WooCommerce Invoices 0.1.0\n"
+"Report-Msgid-Bugs-To: https://ihumbak.com/support\n"
+"POT-Creation-Date: 2025-12-27 23:23+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#. translators: %s: Required PHP version
+#: ihumbak-invoices.php:56
+#, php-format
+msgid "iHumbak Invoices requires PHP %s or higher."
+msgstr ""
+
+#. translators: %s: Required WordPress version
+#: ihumbak-invoices.php:65
+#, php-format
+msgid "iHumbak Invoices requires WordPress %s or higher."
+msgstr ""
+
+#: ihumbak-invoices.php:72
+msgid "iHumbak Invoices requires WooCommerce to be installed and activated."
+msgstr ""
+
+#. translators: %s: Required WooCommerce version
+#: ihumbak-invoices.php:76
+#, php-format
+msgid "iHumbak Invoices requires WooCommerce %s or higher."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:22
+msgid "New Invoice"
+msgstr ""
+
+#. translators: %s: Document number
+#: templates/admin/invoice-edit.php:25
+#, php-format
+msgid "Edit Invoice: %s"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:34 templates/admin/credit-note-edit.php:41
+#: templates/admin/receipt-edit.php:34
+msgid "Back to List"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:47 templates/admin/receipt-edit.php:47
+#: templates/admin/documents-list.php:38
+msgid "Document saved successfully."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:53 templates/admin/credit-note-edit.php:60
+#: templates/admin/receipt-edit.php:53
+msgid "Document status reverted to draft. You can now edit the document."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:62 templates/admin/receipt-edit.php:62
+msgid "Error saving document."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:74 templates/admin/receipt-edit.php:74
+msgid "This document has been issued and cannot be edited."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:93 templates/pdf/default/invoice.php:70
+msgid "Invoice Details"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:97
+msgid "Invoice Number"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:103
+#: templates/admin/credit-note-edit.php:253
+#: templates/admin/receipt-edit.php:103
+msgid "Number will be assigned automatically upon save."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:112
+#: templates/admin/credit-note-edit.php:262
+#: templates/admin/receipt-edit.php:112
+#: src/Modules/Admin/DocumentListTable.php:59
+msgid "Issue Date"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:120
+#: templates/admin/credit-note-edit.php:270
+#: templates/admin/receipt-edit.php:120
+msgid "Sale Date"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:128
+msgid "Due Date"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:140 templates/admin/receipt-edit.php:128
+msgid "Payment Date"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:145 templates/admin/receipt-edit.php:133
+msgid ""
+"Date when payment was received. Auto-filled from WooCommerce order if paid."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:149 templates/admin/receipt-edit.php:137
+msgid "Payment Type"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:152 templates/admin/receipt-edit.php:140
+msgid "— Select —"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:163 templates/admin/receipt-edit.php:151
+msgid "Payment Method Name"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:170 templates/admin/receipt-edit.php:158
+msgid "Original payment method name from WooCommerce order."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:174 templates/admin/receipt-edit.php:162
+msgid "WooCommerce Order"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:191 templates/admin/receipt-edit.php:179
+msgid "Fetch Order Data"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:196 templates/admin/receipt-edit.php:184
+msgid ""
+"Enter order number and click \"Fetch Order Data\" to import items and buyer "
+"info."
+msgstr ""
+
+#: templates/admin/invoice-edit.php:210
+#: templates/admin/credit-note-edit.php:289
+#: templates/admin/receipt-edit.php:198 templates/pdf/default/receipt.php:206
+#: templates/pdf/default/invoice.php:205
+#: templates/pdf/default/credit-note.php:207
+msgid "Notes"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:222
+#: templates/admin/credit-note-edit.php:301
+#: templates/admin/receipt-edit.php:210
+msgid "Actions"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:226
+#: templates/admin/credit-note-edit.php:305
+#: templates/admin/receipt-edit.php:214
+msgid "Status:"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:236
+#: templates/admin/credit-note-edit.php:315
+#: templates/admin/receipt-edit.php:224
+msgid "Save as Draft"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:241
+#: templates/admin/credit-note-edit.php:320
+#: templates/admin/receipt-edit.php:229
+msgid "Save and Issue"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:252
+#: templates/admin/credit-note-edit.php:331
+#: templates/admin/receipt-edit.php:240
+#: templates/admin/metabox/order-invoices.php:46
+#: src/Modules/Admin/DocumentListTable.php:203
+msgid "Download PDF"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:256 templates/admin/receipt-edit.php:244
+#: src/Modules/Admin/DocumentListTable.php:221
+msgid "Regenerate PDF"
+msgstr ""
+
+#: templates/admin/invoice-edit.php:276
+#: templates/admin/metabox/order-invoices.php:52
+msgid "Create Credit Note"
+msgstr ""
+
+#: templates/admin/settings.php:15 src/Core/Plugin.php:253
+#: src/Core/Plugin.php:254
+msgid "Invoice Settings"
+msgstr ""
+
+#: templates/admin/settings.php:20
+msgid "Seller Data"
+msgstr ""
+
+#: templates/admin/settings.php:24
+msgid "Numbering"
+msgstr ""
+
+#: templates/admin/settings.php:28
+msgid "PDF"
+msgstr ""
+
+#: templates/admin/settings.php:32
+msgid "Automation"
+msgstr ""
+
+#: templates/admin/settings.php:36
+msgid "Display"
+msgstr ""
+
+#: templates/admin/settings.php:47
+#: templates/admin/partials/seller-fields.php:18
+msgid "Company Name"
+msgstr ""
+
+#: templates/admin/settings.php:59
+msgid "Company Details"
+msgstr ""
+
+#: templates/admin/settings.php:66
+msgid "Address, VAT ID, bank account, phone, email..."
+msgstr ""
+
+#: templates/admin/settings.php:68
+msgid ""
+"Enter all company details including address, VAT ID (NIP), bank account, "
+"phone and email. Each line will be displayed separately in documents."
+msgstr ""
+
+#: templates/admin/settings.php:78
+msgid "Invoice Pattern"
+msgstr ""
+
+#: templates/admin/settings.php:87
+msgid "Available placeholders: {YYYY}, {YY}, {MM}, {DD}, {NNNN}, {NNN}, {NN}"
+msgstr ""
+
+#: templates/admin/settings.php:93
+msgid "Receipt Pattern"
+msgstr ""
+
+#: templates/admin/settings.php:105
+msgid "Correction Pattern"
+msgstr ""
+
+#: templates/admin/settings.php:116
+msgid "Reset Monthly"
+msgstr ""
+
+#: templates/admin/settings.php:123
+msgid "Reset numbering at the beginning of each month"
+msgstr ""
+
+#: templates/admin/settings.php:138
+msgid "PDF Template"
+msgstr ""
+
+#. translators: %s: theme directory path
+#: templates/admin/settings.php:152
+#, php-format
+msgid "You can add custom templates in your theme: %s"
+msgstr ""
+
+#: templates/admin/settings.php:161
+msgid "Logo"
+msgstr ""
+
+#: templates/admin/settings.php:169 src/Core/Plugin.php:347
+msgid "Select Logo"
+msgstr ""
+
+#: templates/admin/settings.php:172
+msgid "Remove Logo"
+msgstr ""
+
+#: templates/admin/settings.php:179
+msgid "Footer Text"
+msgstr ""
+
+#: templates/admin/settings.php:193
+msgid "Auto-generate Invoice"
+msgstr ""
+
+#: templates/admin/settings.php:200
+msgid "Automatically generate invoice when order status changes"
+msgstr ""
+
+#: templates/admin/settings.php:205
+msgid "Auto-generate Receipt"
+msgstr ""
+
+#: templates/admin/settings.php:212
+msgid "Automatically generate receipt for orders without NIP"
+msgstr ""
+
+#: templates/admin/settings.php:218
+msgid "Trigger Status"
+msgstr ""
+
+#: templates/admin/settings.php:223
+msgid "Processing"
+msgstr ""
+
+#: templates/admin/settings.php:226
+msgid "Completed"
+msgstr ""
+
+#: templates/admin/settings.php:230
+msgid "Order status that triggers automatic document generation"
+msgstr ""
+
+#: templates/admin/settings.php:236
+msgid "NIP Meta Key"
+msgstr ""
+
+#: templates/admin/settings.php:246
+msgid ""
+"Order meta key where customer NIP/Tax ID is stored. Common values: "
+"_billing_nip, billing_nip, _vat_number"
+msgstr ""
+
+#: templates/admin/settings.php:255
+msgid "Orders List Column"
+msgstr ""
+
+#: templates/admin/settings.php:262
+msgid "Show documents column in WooCommerce orders list"
+msgstr ""
+
+#: templates/admin/settings.php:265
+msgid ""
+"Displays invoice, receipt and credit note numbers directly in the orders "
+"list."
+msgstr ""
+
+#: templates/admin/reports.php:22
+msgid "Monthly Reports"
+msgstr ""
+
+#: templates/admin/reports.php:30
+msgid "Year"
+msgstr ""
+
+#: templates/admin/reports.php:39
+msgid "Month"
+msgstr ""
+
+#: templates/admin/reports.php:48
+msgid "Document Type"
+msgstr ""
+
+#: templates/admin/reports.php:58
+msgid "Generate Report"
+msgstr ""
+
+#. translators: 1: Document type, 2: Month name, 3: Year
+#: templates/admin/reports.php:67
+#, php-format
+msgid "Report: %1$s - %2$s %3$d"
+msgstr ""
+
+#: templates/admin/reports.php:80 src/Modules/Report/CsvExporter.php:61
+msgid "Payment Method"
+msgstr ""
+
+#: templates/admin/reports.php:81 templates/admin/documents-list.php:15
+#: src/Modules/Admin/DocumentListTable.php:39
+#: src/Modules/Admin/OrderListColumn.php:100
+#: src/Modules/Admin/OrderListColumn.php:106
+msgid "Documents"
+msgstr ""
+
+#: templates/admin/reports.php:82 src/Modules/Report/CsvExporter.php:63
+msgid "Net Total"
+msgstr ""
+
+#: templates/admin/reports.php:83 src/Modules/Report/CsvExporter.php:64
+msgid "VAT Total"
+msgstr ""
+
+#: templates/admin/reports.php:84 src/Modules/Report/CsvExporter.php:65
+msgid "Gross Total"
+msgstr ""
+
+#: templates/admin/reports.php:100 src/Modules/Report/CsvExporter.php:83
+msgid "TOTAL"
+msgstr ""
+
+#: templates/admin/reports.php:118
+msgid "Export to CSV"
+msgstr ""
+
+#: templates/admin/reports.php:125
+msgid "No documents found for the selected period."
+msgstr ""
+
+#: templates/admin/invoices-list.php:13 src/Core/Plugin.php:244
+#: src/Core/Plugin.php:245 src/Modules/Admin/DocumentListTable.php:380
+#: src/Modules/Admin/OrderMetaBox.php:66
+msgid "Invoices"
+msgstr ""
+
+#: templates/admin/invoices-list.php:21
+msgid "Invoice management coming soon. Configure your settings first."
+msgstr ""
+
+#: templates/admin/invoices-list.php:27
+msgid "Go to Settings"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:29
+msgid "New Credit Note"
+msgstr ""
+
+#. translators: %s: Document number
+#: templates/admin/credit-note-edit.php:32
+#, php-format
+msgid "Edit Credit Note: %s"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:54
+msgid "Credit Note saved successfully."
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:69
+msgid "Error saving Credit Note."
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:81
+msgid "This Credit Note has been issued and cannot be edited."
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:100
+msgid "Source Invoice"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:106
+msgid "Select Invoice to Correct"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:114
+msgid "-- Select Invoice --"
+msgstr ""
+
+#. translators: %d: Number of existing corrections
+#: templates/admin/credit-note-edit.php:131
+#, php-format
+msgid "[%d correction]"
+msgid_plural "[%d corrections]"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/admin/credit-note-edit.php:146
+msgid "Load Invoice Data"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:152
+msgid ""
+"This invoice already has existing credit notes. Creating another correction "
+"may result in over-correction."
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:158
+msgid "Original Invoice"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:162
+msgid "Date:"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:164
+msgid "Total:"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:175
+msgid "Correction Details"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:179
+msgid "Correction Type"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:188 src/Models/CreditNote.php:181
+msgid "Partial Correction"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:194
+msgid "Full Correction (Cancel Entire Invoice)"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:201
+msgid "Correction Reason"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:214
+msgid "Link to WC Refund (Optional)"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:217
+msgid "-- No Refund --"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:232
+msgid "Apply Refund Data"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:243
+#: templates/pdf/default/credit-note.php:91
+msgid "Credit Note Details"
+msgstr ""
+
+#: templates/admin/credit-note-edit.php:247
+msgid "Credit Note Number"
+msgstr ""
+
+#: templates/admin/receipt-edit.php:22
+msgid "New Receipt"
+msgstr ""
+
+#. translators: %s: Document number
+#: templates/admin/receipt-edit.php:25
+#, php-format
+msgid "Edit Receipt: %s"
+msgstr ""
+
+#: templates/admin/receipt-edit.php:93 templates/pdf/default/receipt.php:71
+msgid "Receipt Details"
+msgstr ""
+
+#: templates/admin/receipt-edit.php:97
+msgid "Receipt Number"
+msgstr ""
+
+#: templates/admin/metabox/order-invoices.php:22
+msgid "No documents for this order."
+msgstr ""
+
+#: templates/admin/metabox/order-invoices.php:36
+#: src/Modules/Admin/DocumentListTable.php:247
+#: src/Modules/Admin/OrderListColumn.php:183
+msgid "(Draft)"
+msgstr ""
+
+#: templates/admin/metabox/order-invoices.php:64
+msgid "Create Invoice"
+msgstr ""
+
+#: templates/admin/metabox/order-invoices.php:67
+msgid "Create Receipt"
+msgstr ""
+
+#: templates/admin/documents-list.php:19
+msgid "Add Invoice"
+msgstr ""
+
+#: templates/admin/documents-list.php:23
+msgid "Add Receipt"
+msgstr ""
+
+#: templates/admin/documents-list.php:27
+msgid "Add Credit Note"
+msgstr ""
+
+#: templates/admin/documents-list.php:39
+msgid "Document deleted successfully."
+msgstr ""
+
+#: templates/admin/documents-list.php:56
+msgid "Search"
+msgstr ""
+
+#: templates/admin/partials/seller-fields.php:14
+msgid "Seller"
+msgstr ""
+
+#: templates/admin/partials/seller-fields.php:23
+msgid "Details"
+msgstr ""
+
+#: templates/admin/partials/seller-fields.php:25
+msgid "Address, VAT ID, bank, phone..."
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:17
+#: templates/pdf/default/receipt.php:121 templates/pdf/default/invoice.php:126
+#: templates/pdf/default/credit-note.php:118
+#: src/Modules/Admin/DocumentListTable.php:57
+msgid "Buyer"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:21
+msgid "Name / Company"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:27
+#: templates/admin/partials/buyer-fields.php:33
+msgid "NIP"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:36
+msgid "Optional for receipts"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:40
+msgid "Address"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:44
+msgid "Postcode"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:49
+msgid "City"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:54
+msgid "Country"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:59
+msgid "Email"
+msgstr ""
+
+#: templates/admin/partials/buyer-fields.php:64
+msgid "Phone"
+msgstr ""
+
+#: templates/admin/partials/revert-button.php:27
+msgid ""
+"Are you sure you want to revert this document to draft? This will allow "
+"editing of an issued document."
+msgstr ""
+
+#: templates/admin/partials/revert-button.php:32
+msgid "Super Admin Action"
+msgstr ""
+
+#: templates/admin/partials/revert-button.php:42
+msgid "Revert to Draft"
+msgstr ""
+
+#: templates/admin/partials/revert-button.php:46
+msgid "Warning: This will allow editing of an issued document."
+msgstr ""
+
+#: templates/admin/partials/items-table.php:19
+msgid "Items"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:24
+msgid "Name"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:25
+msgid "SKU"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:26
+#: templates/pdf/default/receipt.php:150 templates/pdf/default/invoice.php:149
+#: templates/pdf/default/credit-note.php:151
+msgid "Qty"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:27
+msgid "Unit"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:28
+msgid "Price Net"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:29
+#: templates/pdf/default/receipt.php:152 templates/pdf/default/invoice.php:151
+#: templates/pdf/default/credit-note.php:153
+msgid "VAT %"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:30
+msgid "Price Gross"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:31
+msgid "Total Net"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:32
+msgid "VAT"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:33
+msgid "Total Gross"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:95
+#: templates/admin/partials/items-table.php:168
+msgid "Remove"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:105
+msgid "Totals:"
+msgstr ""
+
+#: templates/admin/partials/items-table.php:126
+msgid "Add Item"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:32
+#, php-format
+msgid "Receipt %s"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:62 src/Models/Receipt.php:37
+#: src/Modules/Admin/OrderListColumn.php:229
+#: src/Modules/Report/ReportService.php:209
+msgid "Receipt"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:73
+msgid "Receipt No:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:77 templates/pdf/default/invoice.php:76
+#: templates/pdf/default/credit-note.php:97
+msgid "Issue Date:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:81 templates/pdf/default/invoice.php:80
+#: templates/pdf/default/credit-note.php:101
+msgid "Sale Date:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:86 templates/pdf/default/invoice.php:91
+msgid "Payment Date:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:92 templates/pdf/default/invoice.php:97
+msgid "Order No:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:102 templates/pdf/default/invoice.php:107
+msgid "Paid via:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:107 templates/pdf/default/invoice.php:112
+msgid "Amount Due:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:112 templates/pdf/default/invoice.php:117
+msgid "Payment:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:134 templates/pdf/default/invoice.php:135
+#: templates/pdf/default/credit-note.php:127
+msgid "VAT ID:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:137
+msgid "Individual Customer"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:149 templates/pdf/default/invoice.php:148
+#: templates/pdf/default/credit-note.php:150
+msgid "Description"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:151 templates/pdf/default/invoice.php:150
+#: templates/pdf/default/credit-note.php:152
+#, php-format
+msgid "Net (%s)"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:153 templates/pdf/default/invoice.php:152
+#: templates/pdf/default/credit-note.php:154
+#, php-format
+msgid "VAT (%s)"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:154 templates/pdf/default/invoice.php:153
+#: templates/pdf/default/credit-note.php:155
+#, php-format
+msgid "Gross (%s)"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:163 templates/pdf/default/invoice.php:162
+#: templates/pdf/default/credit-note.php:164
+msgid "SKU:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:199
+msgid "RECEIPT TOTAL:"
+msgstr ""
+
+#: templates/pdf/default/receipt.php:216
+msgid ""
+"This receipt was generated electronically and is valid without a signature."
+msgstr ""
+
+#: templates/pdf/default/invoice.php:31
+#, php-format
+msgid "Invoice %s"
+msgstr ""
+
+#: templates/pdf/default/invoice.php:61 src/Models/Invoice.php:42
+msgid "VAT Invoice"
+msgstr ""
+
+#: templates/pdf/default/invoice.php:72
+msgid "Invoice No:"
+msgstr ""
+
+#: templates/pdf/default/invoice.php:85
+msgid "Due Date:"
+msgstr ""
+
+#: templates/pdf/default/invoice.php:198
+msgid "INVOICE TOTAL:"
+msgstr ""
+
+#: templates/pdf/default/invoice.php:215
+msgid ""
+"This invoice was generated electronically and is valid without a signature."
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:33
+#, php-format
+msgid "Credit Note %s"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:63 src/Models/CreditNote.php:70
+#: src/Modules/Admin/OrderListColumn.php:230
+#: src/Modules/Report/ReportService.php:210
+msgid "Credit Note"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:70
+msgid "Corrects Invoice"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:72
+msgid "Original Invoice No:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:76
+msgid "Original Issue Date:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:80
+msgid "Original Total:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:93
+msgid "Credit Note No:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:105
+msgid "Correction Type:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:107
+msgid "Full"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:107
+msgid "Partial"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:111
+msgid "Credit Amount:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:138
+msgid "Reason for Correction"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:200
+msgid "CREDIT AMOUNT:"
+msgstr ""
+
+#: templates/pdf/default/credit-note.php:217
+msgid ""
+"This credit note was generated electronically and is valid without a "
+"signature."
+msgstr ""
+
+#: src/Core/Plugin.php:262 src/Core/Plugin.php:263
+msgid "Invoice Reports"
+msgstr ""
+
+#: src/Core/Plugin.php:348
+msgid "Use this logo"
+msgstr ""
+
+#: src/Core/Plugin.php:350
+msgid "Are you sure you want to delete this item?"
+msgstr ""
+
+#: src/Core/Plugin.php:351
+msgid "Calculating..."
+msgstr ""
+
+#: src/Core/Plugin.php:352
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: src/Core/Plugin.php:353
+msgid "Order data loaded successfully."
+msgstr ""
+
+#: src/Core/Plugin.php:354 src/Modules/Admin/OrderMetaBox.php:85
+#: src/Modules/Admin/AjaxController.php:260
+msgid "Order not found."
+msgstr ""
+
+#: src/Core/Plugin.php:355
+msgid ""
+"The form already contains items. Do you want to replace them with order data?"
+msgstr ""
+
+#: src/Core/Plugin.php:386 src/Core/Plugin.php:437 src/Core/Plugin.php:450
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: src/Core/Plugin.php:490
+msgid "You do not have permission to download this document."
+msgstr ""
+
+#: src/Core/Plugin.php:494 src/Modules/Admin/DocumentController.php:697
+msgid "Invalid document ID."
+msgstr ""
+
+#: src/Core/Plugin.php:501 src/Modules/Admin/ReportController.php:103
+#: src/Modules/Admin/DocumentController.php:333
+#: src/Modules/Admin/DocumentController.php:680
+msgid "Security check failed."
+msgstr ""
+
+#: src/Core/Plugin.php:513 src/Modules/Admin/DocumentController.php:348
+#: src/Modules/Admin/DocumentController.php:704
+msgid "Document not found."
+msgstr ""
+
+#: src/Core/Plugin.php:518
+msgid "Cannot generate PDF for draft documents."
+msgstr ""
+
+#. translators: %s: Error message
+#: src/Core/Plugin.php:536
+#, php-format
+msgid "Failed to generate PDF: %s"
+msgstr ""
+
+#: src/Core/Activator.php:54
+msgid "iHumbak Invoices requires PHP 8.0 or higher."
+msgstr ""
+
+#: src/Core/Activator.php:55
+msgid "Plugin Activation Error"
+msgstr ""
+
+#. translators: 1: Array index, 2: Actual type
+#: src/Models/Document.php:443
+#, php-format
+msgid "Item at index %1$d must be a DocumentItem instance, %2$s given."
+msgstr ""
+
+#. translators: 1: Invalid status value, 2: List of valid statuses
+#: src/Models/Document.php:574
+#, php-format
+msgid "Invalid document status \"%1$s\". Valid statuses are: %2$s"
+msgstr ""
+
+#. translators: 1: Invalid payment method value
+#: src/Models/Document.php:646
+#, php-format
+msgid "Invalid payment method: %s"
+msgstr ""
+
+#: src/Models/Document.php:702
+msgid "Bank transfer"
+msgstr ""
+
+#: src/Models/Document.php:703
+msgid "Cash"
+msgstr ""
+
+#: src/Models/Document.php:704
+msgid "Card payment"
+msgstr ""
+
+#: src/Models/Document.php:705
+msgid "Online payment"
+msgstr ""
+
+#: src/Models/Document.php:815
+msgid "Draft"
+msgstr ""
+
+#: src/Models/Document.php:816
+msgid "Issued"
+msgstr ""
+
+#: src/Models/Document.php:817
+msgid "Sent"
+msgstr ""
+
+#: src/Models/Document.php:818
+msgid "Paid"
+msgstr ""
+
+#: src/Models/Document.php:819
+msgid "Cancelled"
+msgstr ""
+
+#. translators: 1: Invalid correction type, 2: List of valid types
+#: src/Models/CreditNote.php:116
+#, php-format
+msgid "Invalid correction type \"%1$s\". Valid types are: %2$s"
+msgstr ""
+
+#: src/Models/CreditNote.php:182
+msgid "Full Correction"
+msgstr ""
+
+#. translators: 1: Item ID, 2: Database error message
+#: src/Infrastructure/Database/DocumentItemRepository.php:125
+#, php-format
+msgid "Failed to update item ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s: Database error message
+#: src/Infrastructure/Database/DocumentItemRepository.php:142
+#, php-format
+msgid "Failed to insert document item: %s"
+msgstr ""
+
+#: src/Infrastructure/Database/DocumentItemRepository.php:151
+msgid "Failed to get inserted item ID."
+msgstr ""
+
+#. translators: 1: Document ID, 2: Database error message
+#: src/Infrastructure/Database/DocumentRepository.php:165
+#, php-format
+msgid "Failed to update document ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s: Database error message
+#: src/Infrastructure/Database/DocumentRepository.php:186
+#, php-format
+msgid "Failed to insert document: %s"
+msgstr ""
+
+#: src/Infrastructure/Database/DocumentRepository.php:195
+msgid "Failed to get inserted document ID."
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:38
+msgid "Document"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:55
+msgid "Number"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:56
+msgid "Type"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:58
+msgid "Total"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:60
+msgid "Status"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:61
+msgid "Order"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:86
+#: src/Modules/Admin/DocumentListTable.php:240
+msgid "Delete"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:184
+msgid "Edit"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:239
+msgid "Are you sure you want to delete this document?"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:292
+msgid "Net"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:357
+msgid "No documents found."
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:379
+msgid "All types"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:381
+msgid "Receipts"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:382
+msgid "Credit Notes"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:386
+msgid "All statuses"
+msgstr ""
+
+#: src/Modules/Admin/DocumentListTable.php:394
+msgid "Filter"
+msgstr ""
+
+#: src/Modules/Admin/ReportController.php:94
+msgid "You do not have permission to export reports."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:86
+#: src/Modules/Admin/AjaxController.php:120
+#: src/Modules/Admin/AjaxController.php:171
+#: src/Modules/Admin/AjaxController.php:242
+#: src/Modules/Admin/AjaxController.php:286
+#: src/Modules/Admin/AjaxController.php:351
+msgid "Permission denied."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:249
+msgid "Invalid order ID."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:254
+msgid "WooCommerce is not active."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:293
+msgid "Invalid invoice ID."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:302
+msgid "Invoice not found."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:358
+msgid "Invalid refund ID."
+msgstr ""
+
+#: src/Modules/Admin/AjaxController.php:364
+msgid "Refund not found."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:338
+#: src/Modules/Admin/DocumentController.php:685
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:351
+msgid "This document cannot be edited."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:395
+msgid "Please add at least one item to the document."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:507
+msgid "Please select a source invoice for the credit note."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:517
+msgid "The selected source invoice does not exist."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:522
+msgid "Credit notes can only be created for invoices."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:536
+msgid "Please provide a correction reason."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:642
+msgid "Document cannot be deleted."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:690
+msgid "Only super-admins can revert document status."
+msgstr ""
+
+#: src/Modules/Admin/DocumentController.php:711
+msgid "Only issued, sent, or paid documents can be reverted to draft."
+msgstr ""
+
+#: src/Modules/Admin/OrderListColumn.php:228
+#: src/Modules/Report/ReportService.php:208
+msgid "Invoice"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:179
+msgid "Child Theme"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:180
+msgid "Theme"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:186
+msgid "[Incomplete]"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:266
+msgid "Default (EU Standard)"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:267
+msgid "EU Standard"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:268
+msgid "Polish"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:269
+msgid "German"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:270
+msgid "French"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:271
+msgid "Spanish"
+msgstr ""
+
+#: src/Modules/PDF/TemplateRegistry.php:272
+msgid "Italian"
+msgstr ""
+
+#: src/Modules/Report/CsvExporter.php:62
+msgid "Document Count"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:69
+msgid "Unknown"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:186
+msgid "January"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:187
+msgid "February"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:188
+msgid "March"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:189
+msgid "April"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:190
+msgid "May"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:191
+msgid "June"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:192
+msgid "July"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:193
+msgid "August"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:194
+msgid "September"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:195
+msgid "October"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:196
+msgid "November"
+msgstr ""
+
+#: src/Modules/Report/ReportService.php:197
+msgid "December"
+msgstr ""
+
+#: src/Modules/Invoice/OrderDataExtractor.php:176
+msgid "Shipping"
+msgstr ""
