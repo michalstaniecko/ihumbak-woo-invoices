@@ -357,6 +357,15 @@ if ( ! class_exists( 'WC_Order' ) ) {
         }
 
         /**
+         * Get payment method title.
+         *
+         * @return string
+         */
+        public function get_payment_method_title(): string {
+            return $this->data['payment_method_title'] ?? '';
+        }
+
+        /**
          * Get billing company.
          *
          * @return string

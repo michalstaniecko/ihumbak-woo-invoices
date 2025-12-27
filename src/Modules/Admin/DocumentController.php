@@ -483,9 +483,19 @@ class DocumentController {
 			$document->setNotes( sanitize_textarea_field( wp_unslash( $_POST['notes'] ) ) );
 		}
 
-		// Payment method (invoice only).
-		if ( $document instanceof Invoice && ! empty( $_POST['payment_method'] ) ) {
-			$document->setPaymentMethod( sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) );
+		// Payment method fields (invoice only).
+		if ( $document instanceof Invoice ) {
+			if ( ! empty( $_POST['payment_method'] ) ) {
+				$document->setPaymentMethod( sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) );
+			}
+			if ( isset( $_POST['payment_method_id'] ) ) {
+				$id = sanitize_text_field( wp_unslash( $_POST['payment_method_id'] ) );
+				$document->setPaymentMethodId( substr( $id, 0, 50 ) );
+			}
+			if ( isset( $_POST['payment_method_title'] ) ) {
+				$title = sanitize_text_field( wp_unslash( $_POST['payment_method_title'] ) );
+				$document->setPaymentMethodTitle( substr( $title, 0, 255 ) );
+			}
 		}
 
 		// Credit note specific fields.

@@ -304,6 +304,13 @@ class DocumentRepository {
 			'notes'                 => $document->getNotes(),
 		);
 
+		// Add invoice specific fields.
+		if ( $document instanceof Invoice ) {
+			$data['payment_method']       = $document->getPaymentMethod();
+			$data['payment_method_id']    = $document->getPaymentMethodId();
+			$data['payment_method_title'] = $document->getPaymentMethodTitle();
+		}
+
 		// Add credit note specific fields.
 		if ( $document instanceof CreditNote ) {
 			$data['correction_reason'] = $document->getCorrectionReason();

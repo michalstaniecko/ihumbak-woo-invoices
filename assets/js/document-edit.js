@@ -402,9 +402,18 @@
                 this.populateBuyerFields(data.buyer);
             }
 
-            // Set payment method (invoice only).
+            // Set payment method fields (invoice only).
             if (data.payment_method && $('#payment_method').length) {
-                $('#payment_method').val(data.payment_method);
+                // Handle both old string format and new object format.
+                if (typeof data.payment_method === 'object') {
+                    // New format with type, id, title.
+                    $('#payment_method').val(data.payment_method.type || '');
+                    $('#payment_method_id').val(data.payment_method.id || '');
+                    $('#payment_method_title').val(data.payment_method.title || '');
+                } else {
+                    // Old string format (backward compatibility).
+                    $('#payment_method').val(data.payment_method);
+                }
             }
 
             // Recalculate document totals.

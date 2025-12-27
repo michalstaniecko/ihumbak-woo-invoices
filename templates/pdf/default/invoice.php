@@ -97,18 +97,12 @@ $currency = $document->getCurrency();
 							<span class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
 						</div>
 						<?php
-						$payment_methods = array(
-							'transfer' => 'Bank Transfer',
-							'cash'     => 'Cash',
-							'card'     => 'Card',
-							'online'   => 'Online Payment',
-						);
-						$method          = $document->getPaymentMethod();
-						if ( $method ) :
+						$payment_display_name = $document->getPaymentMethodDisplayName();
+						if ( $payment_display_name ) :
 							?>
 							<div class="detail-row">
 								<span class="label">Payment:</span>
-								<span class="value"><?php echo esc_html( $payment_methods[ $method ] ?? ucfirst( $method ) ); ?></span>
+								<span class="value"><?php echo esc_html( $payment_display_name ); ?></span>
 							</div>
 						<?php endif; ?>
 					</div>

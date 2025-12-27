@@ -20,11 +20,25 @@ class Invoice extends Document {
 	public const TYPE = 'invoice';
 
 	/**
-	 * Payment method.
+	 * Payment method type (transfer, cash, card, online).
 	 *
 	 * @var string
 	 */
 	private string $payment_method = '';
+
+	/**
+	 * Payment method ID from WooCommerce (e.g., 'bacs', 'przelewy24').
+	 *
+	 * @var string
+	 */
+	private string $payment_method_id = '';
+
+	/**
+	 * Payment method title from WooCommerce (e.g., 'Bank Transfer', 'Przelewy24').
+	 *
+	 * @var string
+	 */
+	private string $payment_method_title = '';
 
 	/**
 	 * Default payment term in days.
@@ -92,6 +106,67 @@ class Invoice extends Document {
 			'card'     => __( 'Credit/Debit card', 'ihumbak-invoices' ),
 			'online'   => __( 'Online payment', 'ihumbak-invoices' ),
 		);
+	}
+
+	/**
+	 * Get payment method ID from WooCommerce.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodId(): string {
+		return $this->payment_method_id;
+	}
+
+	/**
+	 * Set payment method ID from WooCommerce.
+	 *
+	 * @param string $id Payment method ID (e.g., 'bacs', 'przelewy24').
+	 * @return self
+	 */
+	public function setPaymentMethodId( string $id ): self {
+		$this->payment_method_id = $id;
+		return $this;
+	}
+
+	/**
+	 * Get payment method title from WooCommerce.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodTitle(): string {
+		return $this->payment_method_title;
+	}
+
+	/**
+	 * Set payment method title from WooCommerce.
+	 *
+	 * @param string $title Payment method title (e.g., 'Bank Transfer', 'Przelewy24').
+	 * @return self
+	 */
+	public function setPaymentMethodTitle( string $title ): self {
+		$this->payment_method_title = $title;
+		return $this;
+	}
+
+	/**
+	 * Get payment method display name.
+	 *
+	 * Returns payment_method_title if available, otherwise falls back to
+	 * the label from getPaymentMethods() based on payment_method type.
+	 *
+	 * @return string
+	 */
+	public function getPaymentMethodDisplayName(): string {
+		if ( '' !== $this->payment_method_title ) {
+			return $this->payment_method_title;
+		}
+
+		if ( '' !== $this->payment_method ) {
+			$methods = self::getPaymentMethods();
+			return $methods[ $this->payment_method ] ?? ucfirst( $this->payment_method );
+		}
+
+		return '';
 	}
 
 	/**
@@ -167,6 +242,8 @@ class Invoice extends Document {
 		$invoice->setPdfPath( $data['pdf_path'] ?? null );
 		$invoice->setNotes( (string) ( $data['notes'] ?? '' ) );
 		$invoice->setPaymentMethod( (string) ( $data['payment_method'] ?? '' ) );
+		$invoice->setPaymentMethodId( (string) ( $data['payment_method_id'] ?? '' ) );
+		$invoice->setPaymentMethodTitle( (string) ( $data['payment_method_title'] ?? '' ) );
 
 		// Timestamps - safely parse with error handling.
 		if ( ! empty( $data['created_at'] ) ) {
@@ -219,6 +296,8 @@ class Invoice extends Document {
 			'pdf_path'              => $this->pdf_path,
 			'notes'                 => $this->notes,
 			'payment_method'        => $this->payment_method,
+			'payment_method_id'     => $this->payment_method_id,
+			'payment_method_title'  => $this->payment_method_title,
 			'items'                 => array_map(
 				static fn( DocumentItem $item ): array => $item->toArray(),
 				$this->items
