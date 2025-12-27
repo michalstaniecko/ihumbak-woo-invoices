@@ -13,6 +13,7 @@ use IHumbak\Invoices\Modules\Admin\DocumentController;
 use IHumbak\Invoices\Modules\Admin\AjaxController;
 use IHumbak\Invoices\Modules\Admin\OrderMetaBox;
 use IHumbak\Invoices\Modules\Admin\OrderListColumn;
+use IHumbak\Invoices\Modules\Admin\ReportController;
 use IHumbak\Invoices\Modules\PDF\PdfGenerator;
 use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Modules\PDF\TemplateLoader;
@@ -45,6 +46,13 @@ final class Plugin {
 	 * @var OrderMetaBox|null
 	 */
 	private ?OrderMetaBox $order_metabox = null;
+
+	/**
+	 * Report controller.
+	 *
+	 * @var ReportController|null
+	 */
+	private ?ReportController $report_controller = null;
 
 	/**
 	 * Plugin instance.
@@ -197,6 +205,10 @@ final class Plugin {
 			// Initialize order list column.
 			$order_list_column = new OrderListColumn( new DocumentRepository() );
 			$order_list_column->init();
+
+			// Initialize report controller.
+			$this->report_controller = new ReportController();
+			$this->report_controller->init();
 		}
 	}
 
@@ -243,6 +255,15 @@ final class Plugin {
 			'manage_woocommerce',
 			'ihumbak-invoices-settings',
 			array( $this, 'render_settings_page' )
+		);
+
+		add_submenu_page(
+			'woocommerce',
+			__( 'Invoice Reports', 'ihumbak-invoices' ),
+			__( 'Invoice Reports', 'ihumbak-invoices' ),
+			'manage_woocommerce',
+			'ihumbak-invoices-reports',
+			array( $this, 'render_reports_page' )
 		);
 	}
 
@@ -417,6 +438,19 @@ final class Plugin {
 		}
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/settings.php';
+	}
+
+	/**
+	 * Render reports page.
+	 *
+	 * @return void
+	 */
+	public function render_reports_page(): void {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to access this page.', 'ihumbak-invoices' ) );
+		}
+
+		$this->report_controller->render_reports_page();
 	}
 
 	/**
