@@ -192,34 +192,8 @@ class CreditNote extends Document {
 	public static function fromArray( array $data ): self {
 		$credit_note = new self();
 
-		// Set base properties.
-		if ( isset( $data['id'] ) ) {
-			$credit_note->setId( (int) $data['id'] );
-		}
-		if ( isset( $data['order_id'] ) ) {
-			$credit_note->setOrderId( (int) $data['order_id'] );
-		}
-
-		$credit_note->setDocumentNumber( (string) ( $data['document_number'] ?? '' ) );
-
-		// Dates - safely parse with error handling.
-		if ( ! empty( $data['issue_date'] ) ) {
-			$date = self::parseDate( (string) $data['issue_date'] );
-			if ( $date ) {
-				$credit_note->setIssueDate( $date );
-			}
-		}
-		if ( ! empty( $data['sale_date'] ) ) {
-			$date = self::parseDate( (string) $data['sale_date'] );
-			if ( $date ) {
-				$credit_note->setSaleDate( $date );
-			}
-		}
-
-		// Corrected document ID (required for credit notes).
-		if ( isset( $data['corrected_document_id'] ) ) {
-			$credit_note->setCorrectedDocumentId( (int) $data['corrected_document_id'] );
-		}
+		// Hydrate common document properties.
+		$credit_note->hydrateFromArray( $data );
 
 		// Credit note specific fields.
 		if ( ! empty( $data['correction_reason'] ) ) {
@@ -235,58 +209,6 @@ class CreditNote extends Document {
 		}
 		if ( isset( $data['refund_id'] ) && $data['refund_id'] ) {
 			$credit_note->setRefundId( (int) $data['refund_id'] );
-		}
-
-		// Buyer/Seller.
-		if ( isset( $data['buyer_data'] ) ) {
-			$buyer_data = is_string( $data['buyer_data'] )
-				? json_decode( $data['buyer_data'], true )
-				: $data['buyer_data'];
-			if ( is_array( $buyer_data ) ) {
-				$credit_note->setBuyer( Buyer::fromArray( $buyer_data ) );
-			}
-		}
-		if ( isset( $data['seller_data'] ) ) {
-			$seller_data = is_string( $data['seller_data'] )
-				? json_decode( $data['seller_data'], true )
-				: $data['seller_data'];
-			if ( is_array( $seller_data ) ) {
-				$credit_note->setSeller( Seller::fromArray( $seller_data ) );
-			}
-		}
-
-		// Totals (can be negative for credit notes).
-		$credit_note->setSubtotal( (float) ( $data['subtotal'] ?? 0.0 ) );
-		$credit_note->setTaxTotal( (float) ( $data['tax_total'] ?? 0.0 ) );
-		$credit_note->setTotal( (float) ( $data['total'] ?? 0.0 ) );
-		$credit_note->setCurrency( (string) ( $data['currency'] ?? 'PLN' ) );
-
-		// Status and other.
-		$credit_note->setStatus( (string) ( $data['status'] ?? self::STATUS_DRAFT ) );
-		$credit_note->setPdfPath( $data['pdf_path'] ?? null );
-		$credit_note->setNotes( (string) ( $data['notes'] ?? '' ) );
-
-		// Timestamps - safely parse with error handling.
-		if ( ! empty( $data['created_at'] ) ) {
-			$date = self::parseDate( (string) $data['created_at'] );
-			if ( $date ) {
-				$credit_note->setCreatedAt( $date );
-			}
-		}
-		if ( ! empty( $data['updated_at'] ) ) {
-			$date = self::parseDate( (string) $data['updated_at'] );
-			if ( $date ) {
-				$credit_note->setUpdatedAt( $date );
-			}
-		}
-
-		// Items.
-		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
-			foreach ( $data['items'] as $item_data ) {
-				if ( is_array( $item_data ) ) {
-					$credit_note->addItem( DocumentItem::fromArray( $item_data ) );
-				}
-			}
 		}
 
 		return $credit_note;

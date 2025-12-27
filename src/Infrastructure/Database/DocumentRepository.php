@@ -269,12 +269,12 @@ class DocumentRepository {
 	 * @return Document
 	 */
 	private function hydrate( array $row ): Document {
-		$type = $row['document_type'] ?? 'invoice';
+		$type = $row['document_type'] ?? Invoice::TYPE;
 
 		return match ( $type ) {
-			'receipt'     => Receipt::fromArray( $row ),
-			'credit_note' => CreditNote::fromArray( $row ),
-			default       => Invoice::fromArray( $row ),
+			Receipt::TYPE    => Receipt::fromArray( $row ),
+			CreditNote::TYPE => CreditNote::fromArray( $row ),
+			default          => Invoice::fromArray( $row ),
 		};
 	}
 

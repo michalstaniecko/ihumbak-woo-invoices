@@ -432,8 +432,21 @@ abstract class Document {
 	 *
 	 * @param DocumentItem[] $items Document items.
 	 * @return self
+	 * @throws \InvalidArgumentException If any item is not a DocumentItem instance.
 	 */
 	public function setItems( array $items ): self {
+		foreach ( $items as $index => $item ) {
+			if ( ! $item instanceof DocumentItem ) {
+				throw new \InvalidArgumentException(
+					sprintf(
+						/* translators: 1: Array index, 2: Actual type */
+						esc_html__( 'Item at index %1$d must be a DocumentItem instance, %2$s given.', 'ihumbak-invoices' ),
+						absint( $index ),
+						esc_html( get_debug_type( $item ) )
+					)
+				);
+			}
+		}
 		$this->items = $items;
 		return $this;
 	}
@@ -829,5 +842,125 @@ abstract class Document {
 		} catch ( \Exception $e ) {
 			return null;
 		}
+	}
+
+	/**
+	 * Hydrate common document properties from array data.
+	 *
+	 * This method sets all common properties shared between Invoice, Receipt, and CreditNote.
+	 * Subclasses should call this method in their fromArray() implementation.
+	 *
+	 * @param array<string, mixed> $data Document data from database or form.
+	 * @return void
+	 */
+	protected function hydrateFromArray( array $data ): void {
+		// ID fields.
+		if ( isset( $data['id'] ) ) {
+			$this->setId( (int) $data['id'] );
+		}
+		if ( isset( $data['order_id'] ) ) {
+			$this->setOrderId( (int) $data['order_id'] );
+		}
+
+		// Document number.
+		$this->setDocumentNumber( (string) ( $data['document_number'] ?? '' ) );
+
+		// Dates - safely parse with error handling.
+		if ( ! empty( $data['issue_date'] ) ) {
+			$date = self::parseDate( (string) $data['issue_date'] );
+			if ( $date ) {
+				$this->setIssueDate( $date );
+			}
+		}
+		if ( ! empty( $data['sale_date'] ) ) {
+			$date = self::parseDate( (string) $data['sale_date'] );
+			if ( $date ) {
+				$this->setSaleDate( $date );
+			}
+		}
+		if ( ! empty( $data['due_date'] ) ) {
+			$date = self::parseDate( (string) $data['due_date'] );
+			if ( $date ) {
+				$this->setDueDate( $date );
+			}
+		}
+		if ( ! empty( $data['payment_date'] ) ) {
+			$date = self::parseDate( (string) $data['payment_date'] );
+			if ( $date ) {
+				$this->setPaymentDate( $date );
+			}
+		}
+
+		// Corrected document ID (for corrections).
+		if ( isset( $data['corrected_document_id'] ) ) {
+			$this->setCorrectedDocumentId( (int) $data['corrected_document_id'] );
+		}
+
+		// Buyer/Seller.
+		if ( isset( $data['buyer_data'] ) ) {
+			$buyer_data = is_string( $data['buyer_data'] )
+				? json_decode( $data['buyer_data'], true )
+				: $data['buyer_data'];
+			if ( is_array( $buyer_data ) ) {
+				$this->setBuyer( Buyer::fromArray( $buyer_data ) );
+			}
+		}
+		if ( isset( $data['seller_data'] ) ) {
+			$seller_data = is_string( $data['seller_data'] )
+				? json_decode( $data['seller_data'], true )
+				: $data['seller_data'];
+			if ( is_array( $seller_data ) ) {
+				$this->setSeller( Seller::fromArray( $seller_data ) );
+			}
+		}
+
+		// Totals.
+		$this->setSubtotal( (float) ( $data['subtotal'] ?? 0.0 ) );
+		$this->setTaxTotal( (float) ( $data['tax_total'] ?? 0.0 ) );
+		$this->setTotal( (float) ( $data['total'] ?? 0.0 ) );
+		$this->setCurrency( (string) ( $data['currency'] ?? 'PLN' ) );
+
+		// Status and other.
+		$this->setStatus( (string) ( $data['status'] ?? self::STATUS_DRAFT ) );
+		$this->setPdfPath( $data['pdf_path'] ?? null );
+		$this->setNotes( (string) ( $data['notes'] ?? '' ) );
+		$this->setPaymentMethod( (string) ( $data['payment_method'] ?? '' ) );
+		$this->setPaymentMethodId( (string) ( $data['payment_method_id'] ?? '' ) );
+		$this->setPaymentMethodTitle( (string) ( $data['payment_method_title'] ?? '' ) );
+
+		// Timestamps - safely parse with error handling.
+		if ( ! empty( $data['created_at'] ) ) {
+			$date = self::parseDate( (string) $data['created_at'] );
+			if ( $date ) {
+				$this->setCreatedAt( $date );
+			}
+		}
+		if ( ! empty( $data['updated_at'] ) ) {
+			$date = self::parseDate( (string) $data['updated_at'] );
+			if ( $date ) {
+				$this->setUpdatedAt( $date );
+			}
+		}
+
+		// Items.
+		if ( isset( $data['items'] ) && is_array( $data['items'] ) ) {
+			foreach ( $data['items'] as $item_data ) {
+				if ( is_array( $item_data ) ) {
+					$this->addItem( DocumentItem::fromArray( $item_data ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get default currency from WooCommerce or fallback to PLN.
+	 *
+	 * @return string Currency code.
+	 */
+	public static function getDefaultCurrency(): string {
+		if ( function_exists( 'get_woocommerce_currency' ) ) {
+			return get_woocommerce_currency();
+		}
+		return 'PLN';
 	}
 }

@@ -578,7 +578,7 @@ class DocumentController {
 		$document->setTaxTotal( (float) wp_unslash( $_POST['tax_total'] ?? 0 ) );
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Cast to float is sufficient sanitization.
 		$document->setTotal( (float) wp_unslash( $_POST['total'] ?? 0 ) );
-		$document->setCurrency( 'PLN' );
+		$document->setCurrency( Document::getDefaultCurrency() );
 
         // phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
