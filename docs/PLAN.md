@@ -220,6 +220,36 @@ w katalogu motywu i wybrac je w ustawieniach pluginu.
   - [x] Modyfikacja `DocumentController` - walidacja przy zmianie statusu
   - [x] UI: przycisk "Revert to Draft" widoczny tylko dla super-adminow
   - [x] Testy jednostkowe dla SuperAdminService
+### Raporty miesięczne
+Widok tabelaryczny z podsumowaniem wystawionych dokumentów w danym miesiącu.
+Możliwość eksportu do CSV.
+
+- [ ] Serwis ReportService
+  - [ ] Metoda `getMonthlyReport(int $year, int $month, string $document_type)`
+  - [ ] Agregacja danych wg metod płatności
+  - [ ] Obliczanie sum: ilość dokumentów, netto, VAT, brutto
+- [ ] Kontroler ReportController
+  - [ ] Strona admina: WooCommerce > Faktury > Raporty
+  - [ ] Filtry: rok, miesiąc, typ dokumentu (invoice/receipt/credit_note)
+  - [ ] Obsługa eksportu CSV
+- [ ] Szablon admin/reports.php
+  - [ ] Formularz filtrów (selecty: rok, miesiąc, typ dokumentu)
+  - [ ] Tabela wyników z kolumnami:
+    - Metoda płatności (payment_method_title lub payment_method)
+    - Ilość dokumentów
+    - Suma netto
+    - Suma VAT
+    - Suma brutto
+  - [ ] Wiersz podsumowania (totale)
+  - [ ] Przycisk "Eksportuj do CSV"
+- [ ] Eksport CSV (CsvExporter)
+  - [ ] Generowanie pliku CSV z nagłówkami
+  - [ ] Poprawne kodowanie UTF-8 (BOM dla Excel)
+  - [ ] Nazwa pliku: `report-{type}-{year}-{month}.csv`
+- [ ] Testy jednostkowe
+  - [ ] ReportServiceTest
+  - [ ] CsvExporterTest
+
 - [ ] Portal klienta (My Account)
 - [ ] Email z faktura
 
