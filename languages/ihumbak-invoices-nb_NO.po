@@ -1,0 +1,1268 @@
+# Norwegian (Bokmål) translation for iHumbak WooCommerce Invoices
+# Copyright (C) 2024 iHumbak
+# This file is distributed under the GPL-2.0-or-later license.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: iHumbak WooCommerce Invoices 0.1.0\n"
+"Report-Msgid-Bugs-To: https://ihumbak.com/support\n"
+"POT-Creation-Date: 2025-12-27 23:23+0100\n"
+"PO-Revision-Date: 2025-12-27 23:30+0100\n"
+"Last-Translator: iHumbak <hello@ihumbak.com>\n"
+"Language-Team: Norwegian Bokmål\n"
+"Language: nb_NO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Claude AI\n"
+
+#: ihumbak-invoices.php:56
+#, php-format
+msgid "iHumbak Invoices requires PHP %s or higher."
+msgstr "iHumbak Invoices krever PHP %s eller høyere."
+
+#: ihumbak-invoices.php:65
+#, php-format
+msgid "iHumbak Invoices requires WordPress %s or higher."
+msgstr "iHumbak Invoices krever WordPress %s eller høyere."
+
+#: ihumbak-invoices.php:72
+msgid "iHumbak Invoices requires WooCommerce to be installed and activated."
+msgstr "iHumbak Invoices krever at WooCommerce er installert og aktivert."
+
+#: ihumbak-invoices.php:76
+#, php-format
+msgid "iHumbak Invoices requires WooCommerce %s or higher."
+msgstr "iHumbak Invoices krever WooCommerce %s eller høyere."
+
+#: templates/admin/invoice-edit.php:22
+msgid "New Invoice"
+msgstr "Ny faktura"
+
+#: templates/admin/invoice-edit.php:25
+#, php-format
+msgid "Edit Invoice: %s"
+msgstr "Rediger faktura: %s"
+
+#: templates/admin/invoice-edit.php:34
+msgid "Back to List"
+msgstr "Tilbake til listen"
+
+#: templates/admin/invoice-edit.php:47
+msgid "Document saved successfully."
+msgstr "Dokumentet ble lagret."
+
+#: templates/admin/invoice-edit.php:53
+msgid "Document status reverted to draft. You can now edit the document."
+msgstr "Dokumentstatus tilbakestilt til utkast. Du kan nå redigere dokumentet."
+
+#: templates/admin/invoice-edit.php:62
+msgid "Error saving document."
+msgstr "Feil ved lagring av dokument."
+
+#: templates/admin/invoice-edit.php:74
+msgid "This document has been issued and cannot be edited."
+msgstr "Dette dokumentet er utstedt og kan ikke redigeres."
+
+#: templates/admin/invoice-edit.php:93
+#: templates/pdf/default/invoice.php:70
+msgid "Invoice Details"
+msgstr "Fakturadetaljer"
+
+#: templates/admin/invoice-edit.php:97
+msgid "Invoice Number"
+msgstr "Fakturanummer"
+
+#: templates/admin/invoice-edit.php:103
+msgid "Number will be assigned automatically upon save."
+msgstr "Nummeret tildeles automatisk ved lagring."
+
+#: templates/admin/invoice-edit.php:112
+#: src/Modules/Admin/DocumentListTable.php:59
+msgid "Issue Date"
+msgstr "Utstedelsesdato"
+
+#: templates/admin/invoice-edit.php:120
+msgid "Sale Date"
+msgstr "Salgsdato"
+
+#: templates/admin/invoice-edit.php:128
+msgid "Due Date"
+msgstr "Forfallsdato"
+
+#: templates/admin/invoice-edit.php:140
+msgid "Payment Date"
+msgstr "Betalingsdato"
+
+#: templates/admin/invoice-edit.php:145
+msgid "Date when payment was received. Auto-filled from WooCommerce order if paid."
+msgstr "Dato for mottatt betaling. Fylles automatisk fra WooCommerce-ordre hvis betalt."
+
+#: templates/admin/invoice-edit.php:149
+msgid "Payment Type"
+msgstr "Betalingstype"
+
+#: templates/admin/invoice-edit.php:152
+msgid "— Select —"
+msgstr "— Velg —"
+
+#: templates/admin/invoice-edit.php:163
+msgid "Payment Method Name"
+msgstr "Betalingsmetodenavn"
+
+#: templates/admin/invoice-edit.php:170
+msgid "Original payment method name from WooCommerce order."
+msgstr "Opprinnelig betalingsmetodenavn fra WooCommerce-ordre."
+
+#: templates/admin/invoice-edit.php:174
+msgid "WooCommerce Order"
+msgstr "WooCommerce-ordre"
+
+#: templates/admin/invoice-edit.php:191
+msgid "Fetch Order Data"
+msgstr "Hent ordredata"
+
+#: templates/admin/invoice-edit.php:196
+msgid "Enter order number and click \"Fetch Order Data\" to import items and buyer info."
+msgstr "Skriv inn ordrenummer og klikk \"Hent ordredata\" for å importere varer og kjøperinformasjon."
+
+#: templates/admin/invoice-edit.php:210
+#: templates/pdf/default/receipt.php:206
+#: templates/pdf/default/invoice.php:205
+#: templates/pdf/default/credit-note.php:207
+msgid "Notes"
+msgstr "Merknader"
+
+#: templates/admin/invoice-edit.php:222
+msgid "Actions"
+msgstr "Handlinger"
+
+#: templates/admin/invoice-edit.php:226
+msgid "Status:"
+msgstr "Status:"
+
+#: templates/admin/invoice-edit.php:236
+msgid "Save as Draft"
+msgstr "Lagre som utkast"
+
+#: templates/admin/invoice-edit.php:241
+msgid "Save and Issue"
+msgstr "Lagre og utsted"
+
+#: templates/admin/invoice-edit.php:252
+#: src/Modules/Admin/DocumentListTable.php:203
+msgid "Download PDF"
+msgstr "Last ned PDF"
+
+#: templates/admin/invoice-edit.php:256
+#: src/Modules/Admin/DocumentListTable.php:221
+msgid "Regenerate PDF"
+msgstr "Regenerer PDF"
+
+#: templates/admin/invoice-edit.php:276
+msgid "Create Credit Note"
+msgstr "Opprett kreditnota"
+
+#: templates/admin/settings.php:15
+#: src/Core/Plugin.php:253
+msgid "Invoice Settings"
+msgstr "Fakturainnstillinger"
+
+#: templates/admin/settings.php:20
+msgid "Seller Data"
+msgstr "Selgerdata"
+
+#: templates/admin/settings.php:24
+msgid "Numbering"
+msgstr "Nummerering"
+
+#: templates/admin/settings.php:28
+msgid "PDF"
+msgstr "PDF"
+
+#: templates/admin/settings.php:32
+msgid "Automation"
+msgstr "Automatisering"
+
+#: templates/admin/settings.php:36
+msgid "Display"
+msgstr "Visning"
+
+#: templates/admin/settings.php:47
+msgid "Company Name"
+msgstr "Firmanavn"
+
+#: templates/admin/settings.php:59
+msgid "Company Details"
+msgstr "Firmadetaljer"
+
+#: templates/admin/settings.php:66
+msgid "Address, VAT ID, bank account, phone, email..."
+msgstr "Adresse, org.nr., bankkonto, telefon, e-post..."
+
+#: templates/admin/settings.php:68
+msgid "Enter all company details including address, VAT ID (NIP), bank account, phone and email. Each line will be displayed separately in documents."
+msgstr "Skriv inn alle firmadetaljer inkludert adresse, org.nr., bankkonto, telefon og e-post. Hver linje vises separat i dokumentene."
+
+#: templates/admin/settings.php:78
+msgid "Invoice Pattern"
+msgstr "Fakturamønster"
+
+#: templates/admin/settings.php:87
+msgid "Available placeholders: {YYYY}, {YY}, {MM}, {DD}, {NNNN}, {NNN}, {NN}"
+msgstr "Tilgjengelige plassholdere: {YYYY}, {YY}, {MM}, {DD}, {NNNN}, {NNN}, {NN}"
+
+#: templates/admin/settings.php:93
+msgid "Receipt Pattern"
+msgstr "Kvitteringsmønster"
+
+#: templates/admin/settings.php:105
+msgid "Correction Pattern"
+msgstr "Korreksjonsmønster"
+
+#: templates/admin/settings.php:116
+msgid "Reset Monthly"
+msgstr "Månedlig tilbakestilling"
+
+#: templates/admin/settings.php:123
+msgid "Reset numbering at the beginning of each month"
+msgstr "Tilbakestill nummerering ved starten av hver måned"
+
+#: templates/admin/settings.php:138
+msgid "PDF Template"
+msgstr "PDF-mal"
+
+#: templates/admin/settings.php:152
+#, php-format
+msgid "You can add custom templates in your theme: %s"
+msgstr "Du kan legge til egne maler i temaet ditt: %s"
+
+#: templates/admin/settings.php:161
+msgid "Logo"
+msgstr "Logo"
+
+#: templates/admin/settings.php:169
+#: src/Core/Plugin.php:347
+msgid "Select Logo"
+msgstr "Velg logo"
+
+#: templates/admin/settings.php:172
+msgid "Remove Logo"
+msgstr "Fjern logo"
+
+#: templates/admin/settings.php:179
+msgid "Footer Text"
+msgstr "Bunntekst"
+
+#: templates/admin/settings.php:193
+msgid "Auto-generate Invoice"
+msgstr "Automatisk generering av faktura"
+
+#: templates/admin/settings.php:200
+msgid "Automatically generate invoice when order status changes"
+msgstr "Generer faktura automatisk når ordrestatus endres"
+
+#: templates/admin/settings.php:205
+msgid "Auto-generate Receipt"
+msgstr "Automatisk generering av kvittering"
+
+#: templates/admin/settings.php:212
+msgid "Automatically generate receipt for orders without NIP"
+msgstr "Generer kvittering automatisk for ordrer uten org.nr."
+
+#: templates/admin/settings.php:218
+msgid "Trigger Status"
+msgstr "Utløserstatus"
+
+#: templates/admin/settings.php:223
+msgid "Processing"
+msgstr "Under behandling"
+
+#: templates/admin/settings.php:226
+msgid "Completed"
+msgstr "Fullført"
+
+#: templates/admin/settings.php:230
+msgid "Order status that triggers automatic document generation"
+msgstr "Ordrestatus som utløser automatisk dokumentgenerering"
+
+#: templates/admin/settings.php:236
+msgid "NIP Meta Key"
+msgstr "Org.nr. meta-nøkkel"
+
+#: templates/admin/settings.php:246
+msgid "Order meta key where customer NIP/Tax ID is stored. Common values: _billing_nip, billing_nip, _vat_number"
+msgstr "Ordre meta-nøkkel der kundens org.nr. er lagret. Vanlige verdier: _billing_nip, billing_nip, _vat_number"
+
+#: templates/admin/settings.php:255
+msgid "Orders List Column"
+msgstr "Ordrelistekolonne"
+
+#: templates/admin/settings.php:262
+msgid "Show documents column in WooCommerce orders list"
+msgstr "Vis dokumentkolonne i WooCommerce-ordrelisten"
+
+#: templates/admin/settings.php:265
+msgid "Displays invoice, receipt and credit note numbers directly in the orders list."
+msgstr "Viser faktura-, kvitterings- og kreditnotanumre direkte i ordrelisten."
+
+#: templates/admin/reports.php:22
+msgid "Monthly Reports"
+msgstr "Månedsrapporter"
+
+#: templates/admin/reports.php:30
+msgid "Year"
+msgstr "År"
+
+#: templates/admin/reports.php:39
+msgid "Month"
+msgstr "Måned"
+
+#: templates/admin/reports.php:48
+msgid "Document Type"
+msgstr "Dokumenttype"
+
+#: templates/admin/reports.php:58
+msgid "Generate Report"
+msgstr "Generer rapport"
+
+#: templates/admin/reports.php:67
+#, php-format
+msgid "Report: %1$s - %2$s %3$d"
+msgstr "Rapport: %1$s - %2$s %3$d"
+
+#: templates/admin/reports.php:80
+#: src/Modules/Report/CsvExporter.php:61
+msgid "Payment Method"
+msgstr "Betalingsmetode"
+
+#: templates/admin/reports.php:81
+#: templates/admin/documents-list.php:15
+#: src/Modules/Admin/DocumentListTable.php:39
+msgid "Documents"
+msgstr "Dokumenter"
+
+#: templates/admin/reports.php:82
+#: src/Modules/Report/CsvExporter.php:63
+msgid "Net Total"
+msgstr "Netto totalt"
+
+#: templates/admin/reports.php:83
+#: src/Modules/Report/CsvExporter.php:64
+msgid "VAT Total"
+msgstr "MVA totalt"
+
+#: templates/admin/reports.php:84
+#: src/Modules/Report/CsvExporter.php:65
+msgid "Gross Total"
+msgstr "Brutto totalt"
+
+#: templates/admin/reports.php:100
+#: src/Modules/Report/CsvExporter.php:83
+msgid "TOTAL"
+msgstr "TOTALT"
+
+#: templates/admin/reports.php:118
+msgid "Export to CSV"
+msgstr "Eksporter til CSV"
+
+#: templates/admin/reports.php:125
+msgid "No documents found for the selected period."
+msgstr "Ingen dokumenter funnet for valgt periode."
+
+#: templates/admin/invoices-list.php:13
+#: src/Core/Plugin.php:244
+#: src/Modules/Admin/OrderMetaBox.php:66
+msgid "Invoices"
+msgstr "Fakturaer"
+
+#: templates/admin/invoices-list.php:21
+msgid "Invoice management coming soon. Configure your settings first."
+msgstr "Fakturaadministrasjon kommer snart. Konfigurer innstillingene dine først."
+
+#: templates/admin/invoices-list.php:27
+msgid "Go to Settings"
+msgstr "Gå til innstillinger"
+
+#: templates/admin/credit-note-edit.php:29
+msgid "New Credit Note"
+msgstr "Ny kreditnota"
+
+#: templates/admin/credit-note-edit.php:32
+#, php-format
+msgid "Edit Credit Note: %s"
+msgstr "Rediger kreditnota: %s"
+
+#: templates/admin/credit-note-edit.php:54
+msgid "Credit Note saved successfully."
+msgstr "Kreditnotaen ble lagret."
+
+#: templates/admin/credit-note-edit.php:69
+msgid "Error saving Credit Note."
+msgstr "Feil ved lagring av kreditnota."
+
+#: templates/admin/credit-note-edit.php:81
+msgid "This Credit Note has been issued and cannot be edited."
+msgstr "Denne kreditnotaen er utstedt og kan ikke redigeres."
+
+#: templates/admin/credit-note-edit.php:100
+msgid "Source Invoice"
+msgstr "Kildefaktura"
+
+#: templates/admin/credit-note-edit.php:106
+msgid "Select Invoice to Correct"
+msgstr "Velg faktura å korrigere"
+
+#: templates/admin/credit-note-edit.php:114
+msgid "-- Select Invoice --"
+msgstr "-- Velg faktura --"
+
+#: templates/admin/credit-note-edit.php:131
+#, php-format
+msgid "[%d correction]"
+msgid_plural "[%d corrections]"
+msgstr[0] "[%d korreksjon]"
+msgstr[1] "[%d korreksjoner]"
+
+#: templates/admin/credit-note-edit.php:146
+msgid "Load Invoice Data"
+msgstr "Last inn fakturadata"
+
+#: templates/admin/credit-note-edit.php:152
+msgid "This invoice already has existing credit notes. Creating another correction may result in over-correction."
+msgstr "Denne fakturaen har allerede eksisterende kreditnotaer. Å opprette en ny korreksjon kan føre til overkorreksjon."
+
+#: templates/admin/credit-note-edit.php:158
+msgid "Original Invoice"
+msgstr "Opprinnelig faktura"
+
+#: templates/admin/credit-note-edit.php:162
+msgid "Date:"
+msgstr "Dato:"
+
+#: templates/admin/credit-note-edit.php:164
+msgid "Total:"
+msgstr "Total:"
+
+#: templates/admin/credit-note-edit.php:175
+msgid "Correction Details"
+msgstr "Korreksjonsdetaljer"
+
+#: templates/admin/credit-note-edit.php:179
+msgid "Correction Type"
+msgstr "Korreksjonstype"
+
+#: templates/admin/credit-note-edit.php:188
+#: src/Models/CreditNote.php:181
+msgid "Partial Correction"
+msgstr "Delvis korreksjon"
+
+#: templates/admin/credit-note-edit.php:194
+msgid "Full Correction (Cancel Entire Invoice)"
+msgstr "Full korreksjon (Kanseller hele fakturaen)"
+
+#: templates/admin/credit-note-edit.php:201
+msgid "Correction Reason"
+msgstr "Korreksjonsårsak"
+
+#: templates/admin/credit-note-edit.php:214
+msgid "Link to WC Refund (Optional)"
+msgstr "Koble til WC-refusjon (valgfritt)"
+
+#: templates/admin/credit-note-edit.php:217
+msgid "-- No Refund --"
+msgstr "-- Ingen refusjon --"
+
+#: templates/admin/credit-note-edit.php:232
+msgid "Apply Refund Data"
+msgstr "Bruk refusjonsdata"
+
+#: templates/admin/credit-note-edit.php:243
+#: templates/pdf/default/credit-note.php:91
+msgid "Credit Note Details"
+msgstr "Kreditnotadetaljer"
+
+#: templates/admin/credit-note-edit.php:247
+msgid "Credit Note Number"
+msgstr "Kreditnotanummer"
+
+#: templates/admin/receipt-edit.php:22
+msgid "New Receipt"
+msgstr "Ny kvittering"
+
+#: templates/admin/receipt-edit.php:25
+#, php-format
+msgid "Edit Receipt: %s"
+msgstr "Rediger kvittering: %s"
+
+#: templates/admin/receipt-edit.php:93
+#: templates/pdf/default/receipt.php:71
+msgid "Receipt Details"
+msgstr "Kvitteringsdetaljer"
+
+#: templates/admin/receipt-edit.php:97
+msgid "Receipt Number"
+msgstr "Kvitteringsnummer"
+
+#: templates/admin/metabox/order-invoices.php:22
+msgid "No documents for this order."
+msgstr "Ingen dokumenter for denne ordren."
+
+#: templates/admin/metabox/order-invoices.php:36
+#: src/Modules/Admin/DocumentListTable.php:247
+msgid "(Draft)"
+msgstr "(Utkast)"
+
+#: templates/admin/metabox/order-invoices.php:64
+msgid "Create Invoice"
+msgstr "Opprett faktura"
+
+#: templates/admin/metabox/order-invoices.php:67
+msgid "Create Receipt"
+msgstr "Opprett kvittering"
+
+#: templates/admin/documents-list.php:19
+msgid "Add Invoice"
+msgstr "Legg til faktura"
+
+#: templates/admin/documents-list.php:23
+msgid "Add Receipt"
+msgstr "Legg til kvittering"
+
+#: templates/admin/documents-list.php:27
+msgid "Add Credit Note"
+msgstr "Legg til kreditnota"
+
+#: templates/admin/documents-list.php:39
+msgid "Document deleted successfully."
+msgstr "Dokumentet ble slettet."
+
+#: templates/admin/documents-list.php:56
+msgid "Search"
+msgstr "Søk"
+
+#: templates/admin/partials/seller-fields.php:14
+msgid "Seller"
+msgstr "Selger"
+
+#: templates/admin/partials/seller-fields.php:23
+msgid "Details"
+msgstr "Detaljer"
+
+#: templates/admin/partials/seller-fields.php:25
+msgid "Address, VAT ID, bank, phone..."
+msgstr "Adresse, org.nr., bank, telefon..."
+
+#: templates/admin/partials/buyer-fields.php:17
+#: templates/pdf/default/receipt.php:121
+#: templates/pdf/default/invoice.php:126
+#: templates/pdf/default/credit-note.php:118
+#: src/Modules/Admin/DocumentListTable.php:57
+msgid "Buyer"
+msgstr "Kjøper"
+
+#: templates/admin/partials/buyer-fields.php:21
+msgid "Name / Company"
+msgstr "Navn / Firma"
+
+#: templates/admin/partials/buyer-fields.php:27
+msgid "NIP"
+msgstr "Org.nr."
+
+#: templates/admin/partials/buyer-fields.php:36
+msgid "Optional for receipts"
+msgstr "Valgfritt for kvitteringer"
+
+#: templates/admin/partials/buyer-fields.php:40
+msgid "Address"
+msgstr "Adresse"
+
+#: templates/admin/partials/buyer-fields.php:44
+msgid "Postcode"
+msgstr "Postnummer"
+
+#: templates/admin/partials/buyer-fields.php:49
+msgid "City"
+msgstr "By"
+
+#: templates/admin/partials/buyer-fields.php:54
+msgid "Country"
+msgstr "Land"
+
+#: templates/admin/partials/buyer-fields.php:59
+msgid "Email"
+msgstr "E-post"
+
+#: templates/admin/partials/buyer-fields.php:64
+msgid "Phone"
+msgstr "Telefon"
+
+#: templates/admin/partials/revert-button.php:27
+msgid "Are you sure you want to revert this document to draft? This will allow editing of an issued document."
+msgstr "Er du sikker på at du vil tilbakestille dette dokumentet til utkast? Dette vil tillate redigering av et utstedt dokument."
+
+#: templates/admin/partials/revert-button.php:32
+msgid "Super Admin Action"
+msgstr "Superadmin-handling"
+
+#: templates/admin/partials/revert-button.php:42
+msgid "Revert to Draft"
+msgstr "Tilbakestill til utkast"
+
+#: templates/admin/partials/revert-button.php:46
+msgid "Warning: This will allow editing of an issued document."
+msgstr "Advarsel: Dette vil tillate redigering av et utstedt dokument."
+
+#: templates/admin/partials/items-table.php:19
+msgid "Items"
+msgstr "Varelinjer"
+
+#: templates/admin/partials/items-table.php:24
+msgid "Name"
+msgstr "Navn"
+
+#: templates/admin/partials/items-table.php:25
+msgid "SKU"
+msgstr "Varenr."
+
+#: templates/admin/partials/items-table.php:26
+#: templates/pdf/default/receipt.php:150
+#: templates/pdf/default/invoice.php:149
+#: templates/pdf/default/credit-note.php:151
+msgid "Qty"
+msgstr "Antall"
+
+#: templates/admin/partials/items-table.php:27
+msgid "Unit"
+msgstr "Enhet"
+
+#: templates/admin/partials/items-table.php:28
+msgid "Price Net"
+msgstr "Pris netto"
+
+#: templates/admin/partials/items-table.php:29
+#: templates/pdf/default/receipt.php:152
+#: templates/pdf/default/invoice.php:151
+#: templates/pdf/default/credit-note.php:153
+msgid "VAT %"
+msgstr "MVA %"
+
+#: templates/admin/partials/items-table.php:30
+msgid "Price Gross"
+msgstr "Pris brutto"
+
+#: templates/admin/partials/items-table.php:31
+msgid "Total Net"
+msgstr "Total netto"
+
+#: templates/admin/partials/items-table.php:32
+msgid "VAT"
+msgstr "MVA"
+
+#: templates/admin/partials/items-table.php:33
+msgid "Total Gross"
+msgstr "Total brutto"
+
+#: templates/admin/partials/items-table.php:95
+msgid "Remove"
+msgstr "Fjern"
+
+#: templates/admin/partials/items-table.php:105
+msgid "Totals:"
+msgstr "Totaler:"
+
+#: templates/admin/partials/items-table.php:126
+msgid "Add Item"
+msgstr "Legg til varelinje"
+
+#: templates/pdf/default/receipt.php:32
+#, php-format
+msgid "Receipt %s"
+msgstr "Kvittering %s"
+
+#: templates/pdf/default/receipt.php:62
+#: src/Models/Receipt.php:37
+#: src/Modules/Report/ReportService.php:209
+msgid "Receipt"
+msgstr "Kvittering"
+
+#: templates/pdf/default/receipt.php:73
+msgid "Receipt No:"
+msgstr "Kvitteringsnr.:"
+
+#: templates/pdf/default/receipt.php:77
+#: templates/pdf/default/invoice.php:76
+#: templates/pdf/default/credit-note.php:97
+msgid "Issue Date:"
+msgstr "Utstedelsesdato:"
+
+#: templates/pdf/default/receipt.php:81
+#: templates/pdf/default/invoice.php:80
+#: templates/pdf/default/credit-note.php:101
+msgid "Sale Date:"
+msgstr "Salgsdato:"
+
+#: templates/pdf/default/receipt.php:86
+#: templates/pdf/default/invoice.php:91
+msgid "Payment Date:"
+msgstr "Betalingsdato:"
+
+#: templates/pdf/default/receipt.php:92
+#: templates/pdf/default/invoice.php:97
+msgid "Order No:"
+msgstr "Ordrenr.:"
+
+#: templates/pdf/default/receipt.php:102
+#: templates/pdf/default/invoice.php:107
+msgid "Paid via:"
+msgstr "Betalt via:"
+
+#: templates/pdf/default/receipt.php:107
+#: templates/pdf/default/invoice.php:112
+msgid "Amount Due:"
+msgstr "Beløp skyldig:"
+
+#: templates/pdf/default/receipt.php:112
+#: templates/pdf/default/invoice.php:117
+msgid "Payment:"
+msgstr "Betaling:"
+
+#: templates/pdf/default/receipt.php:134
+#: templates/pdf/default/invoice.php:135
+#: templates/pdf/default/credit-note.php:127
+msgid "VAT ID:"
+msgstr "Org.nr.:"
+
+#: templates/pdf/default/receipt.php:137
+msgid "Individual Customer"
+msgstr "Privatkunde"
+
+#: templates/pdf/default/receipt.php:149
+#: templates/pdf/default/invoice.php:148
+#: templates/pdf/default/credit-note.php:150
+msgid "Description"
+msgstr "Beskrivelse"
+
+#: templates/pdf/default/receipt.php:151
+#: templates/pdf/default/invoice.php:150
+#: templates/pdf/default/credit-note.php:152
+#, php-format
+msgid "Net (%s)"
+msgstr "Netto (%s)"
+
+#: templates/pdf/default/receipt.php:153
+#: templates/pdf/default/invoice.php:152
+#: templates/pdf/default/credit-note.php:154
+#, php-format
+msgid "VAT (%s)"
+msgstr "MVA (%s)"
+
+#: templates/pdf/default/receipt.php:154
+#: templates/pdf/default/invoice.php:153
+#: templates/pdf/default/credit-note.php:155
+#, php-format
+msgid "Gross (%s)"
+msgstr "Brutto (%s)"
+
+#: templates/pdf/default/receipt.php:163
+#: templates/pdf/default/invoice.php:162
+#: templates/pdf/default/credit-note.php:164
+msgid "SKU:"
+msgstr "Varenr.:"
+
+#: templates/pdf/default/receipt.php:199
+msgid "RECEIPT TOTAL:"
+msgstr "KVITTERING TOTALT:"
+
+#: templates/pdf/default/receipt.php:216
+msgid "This receipt was generated electronically and is valid without a signature."
+msgstr "Denne kvitteringen er generert elektronisk og er gyldig uten signatur."
+
+#: templates/pdf/default/invoice.php:31
+#, php-format
+msgid "Invoice %s"
+msgstr "Faktura %s"
+
+#: templates/pdf/default/invoice.php:61
+#: src/Models/Invoice.php:42
+msgid "VAT Invoice"
+msgstr "MVA-faktura"
+
+#: templates/pdf/default/invoice.php:72
+msgid "Invoice No:"
+msgstr "Fakturanr.:"
+
+#: templates/pdf/default/invoice.php:85
+msgid "Due Date:"
+msgstr "Forfallsdato:"
+
+#: templates/pdf/default/invoice.php:198
+msgid "INVOICE TOTAL:"
+msgstr "FAKTURA TOTALT:"
+
+#: templates/pdf/default/invoice.php:215
+msgid "This invoice was generated electronically and is valid without a signature."
+msgstr "Denne fakturaen er generert elektronisk og er gyldig uten signatur."
+
+#: templates/pdf/default/credit-note.php:33
+#, php-format
+msgid "Credit Note %s"
+msgstr "Kreditnota %s"
+
+#: templates/pdf/default/credit-note.php:63
+#: src/Models/CreditNote.php:70
+#: src/Modules/Report/ReportService.php:210
+msgid "Credit Note"
+msgstr "Kreditnota"
+
+#: templates/pdf/default/credit-note.php:70
+msgid "Corrects Invoice"
+msgstr "Korrigerer faktura"
+
+#: templates/pdf/default/credit-note.php:72
+msgid "Original Invoice No:"
+msgstr "Opprinnelig fakturanr.:"
+
+#: templates/pdf/default/credit-note.php:76
+msgid "Original Issue Date:"
+msgstr "Opprinnelig utstedelsesdato:"
+
+#: templates/pdf/default/credit-note.php:80
+msgid "Original Total:"
+msgstr "Opprinnelig totalsum:"
+
+#: templates/pdf/default/credit-note.php:93
+msgid "Credit Note No:"
+msgstr "Kreditnotanr.:"
+
+#: templates/pdf/default/credit-note.php:105
+msgid "Correction Type:"
+msgstr "Korreksjonstype:"
+
+#: templates/pdf/default/credit-note.php:107
+msgid "Full"
+msgstr "Full"
+
+#: templates/pdf/default/credit-note.php:107
+msgid "Partial"
+msgstr "Delvis"
+
+#: templates/pdf/default/credit-note.php:111
+msgid "Credit Amount:"
+msgstr "Kreditbeløp:"
+
+#: templates/pdf/default/credit-note.php:138
+msgid "Reason for Correction"
+msgstr "Årsak til korreksjon"
+
+#: templates/pdf/default/credit-note.php:200
+msgid "CREDIT AMOUNT:"
+msgstr "KREDITBELØP:"
+
+#: templates/pdf/default/credit-note.php:217
+msgid "This credit note was generated electronically and is valid without a signature."
+msgstr "Denne kreditnotaen er generert elektronisk og er gyldig uten signatur."
+
+#: src/Core/Plugin.php:262
+msgid "Invoice Reports"
+msgstr "Fakturarapporter"
+
+#: src/Core/Plugin.php:348
+msgid "Use this logo"
+msgstr "Bruk denne logoen"
+
+#: src/Core/Plugin.php:350
+msgid "Are you sure you want to delete this item?"
+msgstr "Er du sikker på at du vil slette denne varelinjen?"
+
+#: src/Core/Plugin.php:351
+msgid "Calculating..."
+msgstr "Beregner..."
+
+#: src/Core/Plugin.php:352
+msgid "An error occurred. Please try again."
+msgstr "Det oppsto en feil. Vennligst prøv igjen."
+
+#: src/Core/Plugin.php:353
+msgid "Order data loaded successfully."
+msgstr "Ordredata lastet inn."
+
+#: src/Core/Plugin.php:354
+#: src/Modules/Admin/AjaxController.php:260
+msgid "Order not found."
+msgstr "Ordre ikke funnet."
+
+#: src/Core/Plugin.php:355
+msgid "The form already contains items. Do you want to replace them with order data?"
+msgstr "Skjemaet inneholder allerede varelinjer. Vil du erstatte dem med ordredata?"
+
+#: src/Core/Plugin.php:386
+msgid "You do not have permission to access this page."
+msgstr "Du har ikke tilgang til denne siden."
+
+#: src/Core/Plugin.php:490
+msgid "You do not have permission to download this document."
+msgstr "Du har ikke tillatelse til å laste ned dette dokumentet."
+
+#: src/Core/Plugin.php:494
+#: src/Modules/Admin/DocumentController.php:697
+msgid "Invalid document ID."
+msgstr "Ugyldig dokument-ID."
+
+#: src/Core/Plugin.php:501
+#: src/Modules/Admin/DocumentController.php:333
+msgid "Security check failed."
+msgstr "Sikkerhetskontroll mislyktes."
+
+#: src/Core/Plugin.php:513
+#: src/Modules/Admin/DocumentController.php:348
+msgid "Document not found."
+msgstr "Dokument ikke funnet."
+
+#: src/Core/Plugin.php:518
+msgid "Cannot generate PDF for draft documents."
+msgstr "Kan ikke generere PDF for utkastdokumenter."
+
+#: src/Core/Plugin.php:536
+#, php-format
+msgid "Failed to generate PDF: %s"
+msgstr "Kunne ikke generere PDF: %s"
+
+#: src/Core/Activator.php:54
+msgid "iHumbak Invoices requires PHP 8.0 or higher."
+msgstr "iHumbak Invoices krever PHP 8.0 eller høyere."
+
+#: src/Core/Activator.php:55
+msgid "Plugin Activation Error"
+msgstr "Feil ved aktivering av plugin"
+
+#: src/Models/Document.php:443
+#, php-format
+msgid "Item at index %1$d must be a DocumentItem instance, %2$s given."
+msgstr "Element ved indeks %1$d må være en DocumentItem-instans, %2$s gitt."
+
+#: src/Models/Document.php:574
+#, php-format
+msgid "Invalid document status \"%1$s\". Valid statuses are: %2$s"
+msgstr "Ugyldig dokumentstatus \"%1$s\". Gyldige statuser er: %2$s"
+
+#: src/Models/Document.php:646
+#, php-format
+msgid "Invalid payment method: %s"
+msgstr "Ugyldig betalingsmetode: %s"
+
+#: src/Models/Document.php:702
+msgid "Bank transfer"
+msgstr "Bankoverføring"
+
+#: src/Models/Document.php:703
+msgid "Cash"
+msgstr "Kontant"
+
+#: src/Models/Document.php:704
+msgid "Card payment"
+msgstr "Kortbetaling"
+
+#: src/Models/Document.php:705
+msgid "Online payment"
+msgstr "Nettbetaling"
+
+#: src/Models/Document.php:815
+msgid "Draft"
+msgstr "Utkast"
+
+#: src/Models/Document.php:816
+msgid "Issued"
+msgstr "Utstedt"
+
+#: src/Models/Document.php:817
+msgid "Sent"
+msgstr "Sendt"
+
+#: src/Models/Document.php:818
+msgid "Paid"
+msgstr "Betalt"
+
+#: src/Models/Document.php:819
+msgid "Cancelled"
+msgstr "Kansellert"
+
+#: src/Models/CreditNote.php:116
+#, php-format
+msgid "Invalid correction type \"%1$s\". Valid types are: %2$s"
+msgstr "Ugyldig korreksjonstype \"%1$s\". Gyldige typer er: %2$s"
+
+#: src/Models/CreditNote.php:182
+msgid "Full Correction"
+msgstr "Full korreksjon"
+
+#: src/Infrastructure/Database/DocumentItemRepository.php:125
+#, php-format
+msgid "Failed to update item ID %1$d: %2$s"
+msgstr "Kunne ikke oppdatere vare-ID %1$d: %2$s"
+
+#: src/Infrastructure/Database/DocumentItemRepository.php:142
+#, php-format
+msgid "Failed to insert document item: %s"
+msgstr "Kunne ikke sette inn dokumentvare: %s"
+
+#: src/Infrastructure/Database/DocumentItemRepository.php:151
+msgid "Failed to get inserted item ID."
+msgstr "Kunne ikke hente innsatt vare-ID."
+
+#: src/Infrastructure/Database/DocumentRepository.php:165
+#, php-format
+msgid "Failed to update document ID %1$d: %2$s"
+msgstr "Kunne ikke oppdatere dokument-ID %1$d: %2$s"
+
+#: src/Infrastructure/Database/DocumentRepository.php:186
+#, php-format
+msgid "Failed to insert document: %s"
+msgstr "Kunne ikke sette inn dokument: %s"
+
+#: src/Infrastructure/Database/DocumentRepository.php:195
+msgid "Failed to get inserted document ID."
+msgstr "Kunne ikke hente innsatt dokument-ID."
+
+#: src/Modules/Admin/DocumentListTable.php:38
+msgid "Document"
+msgstr "Dokument"
+
+#: src/Modules/Admin/DocumentListTable.php:55
+msgid "Number"
+msgstr "Nummer"
+
+#: src/Modules/Admin/DocumentListTable.php:56
+msgid "Type"
+msgstr "Type"
+
+#: src/Modules/Admin/DocumentListTable.php:58
+msgid "Total"
+msgstr "Total"
+
+#: src/Modules/Admin/DocumentListTable.php:60
+msgid "Status"
+msgstr "Status"
+
+#: src/Modules/Admin/DocumentListTable.php:61
+msgid "Order"
+msgstr "Ordre"
+
+#: src/Modules/Admin/DocumentListTable.php:86
+#: src/Modules/Admin/DocumentListTable.php:240
+msgid "Delete"
+msgstr "Slett"
+
+#: src/Modules/Admin/DocumentListTable.php:184
+msgid "Edit"
+msgstr "Rediger"
+
+#: src/Modules/Admin/DocumentListTable.php:239
+msgid "Are you sure you want to delete this document?"
+msgstr "Er du sikker på at du vil slette dette dokumentet?"
+
+#: src/Modules/Admin/DocumentListTable.php:292
+msgid "Net"
+msgstr "Netto"
+
+#: src/Modules/Admin/DocumentListTable.php:357
+msgid "No documents found."
+msgstr "Ingen dokumenter funnet."
+
+#: src/Modules/Admin/DocumentListTable.php:379
+msgid "All types"
+msgstr "Alle typer"
+
+#: src/Modules/Admin/DocumentListTable.php:381
+msgid "Receipts"
+msgstr "Kvitteringer"
+
+#: src/Modules/Admin/DocumentListTable.php:382
+msgid "Credit Notes"
+msgstr "Kreditnotaer"
+
+#: src/Modules/Admin/DocumentListTable.php:386
+msgid "All statuses"
+msgstr "Alle statuser"
+
+#: src/Modules/Admin/DocumentListTable.php:394
+msgid "Filter"
+msgstr "Filtrer"
+
+#: src/Modules/Admin/ReportController.php:94
+msgid "You do not have permission to export reports."
+msgstr "Du har ikke tillatelse til å eksportere rapporter."
+
+#: src/Modules/Admin/AjaxController.php:86
+msgid "Permission denied."
+msgstr "Tilgang nektet."
+
+#: src/Modules/Admin/AjaxController.php:249
+msgid "Invalid order ID."
+msgstr "Ugyldig ordre-ID."
+
+#: src/Modules/Admin/AjaxController.php:254
+msgid "WooCommerce is not active."
+msgstr "WooCommerce er ikke aktivt."
+
+#: src/Modules/Admin/AjaxController.php:293
+msgid "Invalid invoice ID."
+msgstr "Ugyldig faktura-ID."
+
+#: src/Modules/Admin/AjaxController.php:302
+msgid "Invoice not found."
+msgstr "Faktura ikke funnet."
+
+#: src/Modules/Admin/AjaxController.php:358
+msgid "Invalid refund ID."
+msgstr "Ugyldig refusjons-ID."
+
+#: src/Modules/Admin/AjaxController.php:364
+msgid "Refund not found."
+msgstr "Refusjon ikke funnet."
+
+#: src/Modules/Admin/DocumentController.php:338
+msgid "You do not have permission to perform this action."
+msgstr "Du har ikke tillatelse til å utføre denne handlingen."
+
+#: src/Modules/Admin/DocumentController.php:351
+msgid "This document cannot be edited."
+msgstr "Dette dokumentet kan ikke redigeres."
+
+#: src/Modules/Admin/DocumentController.php:395
+msgid "Please add at least one item to the document."
+msgstr "Legg til minst en varelinje i dokumentet."
+
+#: src/Modules/Admin/DocumentController.php:507
+msgid "Please select a source invoice for the credit note."
+msgstr "Velg en kildefaktura for kreditnotaen."
+
+#: src/Modules/Admin/DocumentController.php:517
+msgid "The selected source invoice does not exist."
+msgstr "Den valgte kildefakturaen finnes ikke."
+
+#: src/Modules/Admin/DocumentController.php:522
+msgid "Credit notes can only be created for invoices."
+msgstr "Kreditnotaer kan bare opprettes for fakturaer."
+
+#: src/Modules/Admin/DocumentController.php:536
+msgid "Please provide a correction reason."
+msgstr "Oppgi en årsak til korreksjonen."
+
+#: src/Modules/Admin/DocumentController.php:642
+msgid "Document cannot be deleted."
+msgstr "Dokumentet kan ikke slettes."
+
+#: src/Modules/Admin/DocumentController.php:690
+msgid "Only super-admins can revert document status."
+msgstr "Kun superadministratorer kan tilbakestille dokumentstatus."
+
+#: src/Modules/Admin/DocumentController.php:711
+msgid "Only issued, sent, or paid documents can be reverted to draft."
+msgstr "Kun utstedte, sendte eller betalte dokumenter kan tilbakestilles til utkast."
+
+#: src/Modules/Admin/OrderListColumn.php:228
+#: src/Modules/Report/ReportService.php:208
+msgid "Invoice"
+msgstr "Faktura"
+
+#: src/Modules/PDF/TemplateRegistry.php:179
+msgid "Child Theme"
+msgstr "Barnetema"
+
+#: src/Modules/PDF/TemplateRegistry.php:180
+msgid "Theme"
+msgstr "Tema"
+
+#: src/Modules/PDF/TemplateRegistry.php:186
+msgid "[Incomplete]"
+msgstr "[Ufullstendig]"
+
+#: src/Modules/PDF/TemplateRegistry.php:266
+msgid "Default (EU Standard)"
+msgstr "Standard (EU-standard)"
+
+#: src/Modules/PDF/TemplateRegistry.php:267
+msgid "EU Standard"
+msgstr "EU-standard"
+
+#: src/Modules/PDF/TemplateRegistry.php:268
+msgid "Polish"
+msgstr "Polsk"
+
+#: src/Modules/PDF/TemplateRegistry.php:269
+msgid "German"
+msgstr "Tysk"
+
+#: src/Modules/PDF/TemplateRegistry.php:270
+msgid "French"
+msgstr "Fransk"
+
+#: src/Modules/PDF/TemplateRegistry.php:271
+msgid "Spanish"
+msgstr "Spansk"
+
+#: src/Modules/PDF/TemplateRegistry.php:272
+msgid "Italian"
+msgstr "Italiensk"
+
+#: src/Modules/Report/CsvExporter.php:62
+msgid "Document Count"
+msgstr "Antall dokumenter"
+
+#: src/Modules/Report/ReportService.php:69
+msgid "Unknown"
+msgstr "Ukjent"
+
+#: src/Modules/Report/ReportService.php:186
+msgid "January"
+msgstr "Januar"
+
+#: src/Modules/Report/ReportService.php:187
+msgid "February"
+msgstr "Februar"
+
+#: src/Modules/Report/ReportService.php:188
+msgid "March"
+msgstr "Mars"
+
+#: src/Modules/Report/ReportService.php:189
+msgid "April"
+msgstr "April"
+
+#: src/Modules/Report/ReportService.php:190
+msgid "May"
+msgstr "Mai"
+
+#: src/Modules/Report/ReportService.php:191
+msgid "June"
+msgstr "Juni"
+
+#: src/Modules/Report/ReportService.php:192
+msgid "July"
+msgstr "Juli"
+
+#: src/Modules/Report/ReportService.php:193
+msgid "August"
+msgstr "August"
+
+#: src/Modules/Report/ReportService.php:194
+msgid "September"
+msgstr "September"
+
+#: src/Modules/Report/ReportService.php:195
+msgid "October"
+msgstr "Oktober"
+
+#: src/Modules/Report/ReportService.php:196
+msgid "November"
+msgstr "November"
+
+#: src/Modules/Report/ReportService.php:197
+msgid "December"
+msgstr "Desember"
+
+#: src/Modules/Invoice/OrderDataExtractor.php:176
+msgid "Shipping"
+msgstr "Frakt"

@@ -26,11 +26,12 @@ defined( 'ABSPATH' ) || exit;
 $currency = $document->getCurrency();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo esc_attr( get_locale() ); ?>">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>Credit Note <?php echo esc_html( $document->getDocumentNumber() ); ?></title>
+	<?php // translators: %s: Document number ?>
+	<title><?php echo esc_html( sprintf( __( 'Credit Note %s', 'ihumbak-invoices' ), $document->getDocumentNumber() ) ); ?></title>
 	<style>
 		<?php echo $styles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</style>
@@ -60,24 +61,24 @@ $currency = $document->getCurrency();
 
 		<!-- Row 2: Centered Document Title -->
 		<div class="document-title-section">
-			<div class="document-title">CREDIT NOTE</div>
+			<div class="document-title"><?php echo esc_html( strtoupper( __( 'Credit Note', 'ihumbak-invoices' ) ) ); ?></div>
 			<div class="document-number"><?php echo esc_html( $document->getDocumentNumber() ); ?></div>
 		</div>
 
 		<!-- Correction Reference Box -->
 		<?php if ( $original_document ) : ?>
 		<div class="detail-box correction-details">
-			<div class="detail-box-title">Corrects Invoice</div>
+			<div class="detail-box-title"><?php esc_html_e( 'Corrects Invoice', 'ihumbak-invoices' ); ?></div>
 			<div class="detail-row">
-				<span class="label">Original Invoice No:</span>
+				<span class="label"><?php esc_html_e( 'Original Invoice No:', 'ihumbak-invoices' ); ?></span>
 				<span class="value"><?php echo esc_html( $original_document->getDocumentNumber() ); ?></span>
 			</div>
 			<div class="detail-row">
-				<span class="label">Original Issue Date:</span>
+				<span class="label"><?php esc_html_e( 'Original Issue Date:', 'ihumbak-invoices' ); ?></span>
 				<span class="value"><?php echo $original_document->getIssueDate() ? esc_html( $original_document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 			</div>
 			<div class="detail-row">
-				<span class="label">Original Total:</span>
+				<span class="label"><?php esc_html_e( 'Original Total:', 'ihumbak-invoices' ); ?></span>
 				<span class="value"><?php echo esc_html( number_format( $original_document->getTotal(), 2, '.', ' ' ) . ' ' . $original_document->getCurrency() ); ?></span>
 			</div>
 		</div>
@@ -88,34 +89,34 @@ $currency = $document->getCurrency();
 			<tr>
 				<td class="details-left">
 					<div class="detail-box">
-						<div class="detail-box-title">Credit Note Details</div>
+						<div class="detail-box-title"><?php esc_html_e( 'Credit Note Details', 'ihumbak-invoices' ); ?></div>
 						<div class="detail-row">
-							<span class="label">Credit Note No:</span>
+							<span class="label"><?php esc_html_e( 'Credit Note No:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo esc_html( $document->getDocumentNumber() ); ?></span>
 						</div>
 						<div class="detail-row">
-							<span class="label">Issue Date:</span>
+							<span class="label"><?php esc_html_e( 'Issue Date:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo $document->getIssueDate() ? esc_html( $document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 						</div>
 						<div class="detail-row">
-							<span class="label">Sale Date:</span>
+							<span class="label"><?php esc_html_e( 'Sale Date:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo $document->getSaleDate() ? esc_html( $document->getSaleDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 						</div>
 						<div class="detail-row">
-							<span class="label">Correction Type:</span>
+							<span class="label"><?php esc_html_e( 'Correction Type:', 'ihumbak-invoices' ); ?></span>
 							<span class="value">
 								<?php echo $document->isFullCorrection() ? esc_html__( 'Full', 'ihumbak-invoices' ) : esc_html__( 'Partial', 'ihumbak-invoices' ); ?>
 							</span>
 						</div>
 						<div class="detail-row">
-							<span class="label">Credit Amount:</span>
+							<span class="label"><?php esc_html_e( 'Credit Amount:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo esc_html( number_format( abs( $document->getTotal() ), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
 						</div>
 					</div>
 				</td>
 				<td class="details-right">
 					<div class="detail-box">
-						<div class="detail-box-title">Buyer</div>
+						<div class="detail-box-title"><?php esc_html_e( 'Buyer', 'ihumbak-invoices' ); ?></div>
 						<?php if ( $buyer ) : ?>
 							<div class="party-name"><?php echo esc_html( $buyer->getName() ); ?></div>
 							<div class="party-address">
@@ -124,7 +125,7 @@ $currency = $document->getCurrency();
 								<?php echo esc_html( $buyer->getCountry() ); ?>
 							</div>
 							<?php if ( $buyer->getNip() ) : ?>
-								<div class="party-tax-id">VAT ID: <?php echo esc_html( $buyer->getNip() ); ?></div>
+								<div class="party-tax-id"><?php esc_html_e( 'VAT ID:', 'ihumbak-invoices' ); ?> <?php echo esc_html( $buyer->getNip() ); ?></div>
 							<?php endif; ?>
 						<?php endif; ?>
 					</div>
@@ -135,7 +136,7 @@ $currency = $document->getCurrency();
 		<!-- Correction Reason -->
 		<?php if ( $document->getCorrectionReason() ) : ?>
 		<div class="detail-box correction-reason">
-			<div class="detail-box-title">Reason for Correction</div>
+			<div class="detail-box-title"><?php esc_html_e( 'Reason for Correction', 'ihumbak-invoices' ); ?></div>
 			<div class="detail-row">
 				<span class="value"><?php echo nl2br( esc_html( $document->getCorrectionReason() ) ); ?></span>
 			</div>
@@ -161,7 +162,7 @@ $currency = $document->getCurrency();
 							<td class="item-name">
 								<?php echo esc_html( $item->getName() ); ?>
 								<?php if ( $item->getSku() ) : ?>
-									<div class="item-sku">SKU: <?php echo esc_html( $item->getSku() ); ?></div>
+									<div class="item-sku"><?php esc_html_e( 'SKU:', 'ihumbak-invoices' ); ?> <?php echo esc_html( $item->getSku() ); ?></div>
 								<?php endif; ?>
 							</td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
@@ -204,7 +205,7 @@ $currency = $document->getCurrency();
 		<!-- Notes -->
 		<?php if ( $document->getNotes() ) : ?>
 			<div class="notes-section">
-				<div class="notes-title">Notes</div>
+				<div class="notes-title"><?php esc_html_e( 'Notes', 'ihumbak-invoices' ); ?></div>
 				<div class="notes-content"><?php echo nl2br( esc_html( $document->getNotes() ) ); ?></div>
 			</div>
 		<?php endif; ?>

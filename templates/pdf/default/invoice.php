@@ -24,11 +24,12 @@ defined( 'ABSPATH' ) || exit;
 $currency = $document->getCurrency();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?php echo esc_attr( get_locale() ); ?>">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>Invoice <?php echo esc_html( $document->getDocumentNumber() ); ?></title>
+	<?php // translators: %s: Document number ?>
+	<title><?php echo esc_html( sprintf( __( 'Invoice %s', 'ihumbak-invoices' ), $document->getDocumentNumber() ) ); ?></title>
 	<style>
 		<?php echo $styles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</style>
@@ -58,7 +59,7 @@ $currency = $document->getCurrency();
 
 		<!-- Row 2: Centered Document Title -->
 		<div class="document-title-section">
-			<div class="document-title">VAT Invoice</div>
+			<div class="document-title"><?php esc_html_e( 'VAT Invoice', 'ihumbak-invoices' ); ?></div>
 			<div class="document-number"><?php echo esc_html( $document->getDocumentNumber() ); ?></div>
 		</div>
 
@@ -67,34 +68,34 @@ $currency = $document->getCurrency();
 			<tr>
 				<td class="details-left">
 					<div class="detail-box">
-						<div class="detail-box-title">Invoice Details</div>
+						<div class="detail-box-title"><?php esc_html_e( 'Invoice Details', 'ihumbak-invoices' ); ?></div>
 						<div class="detail-row">
-							<span class="label">Invoice No:</span>
+							<span class="label"><?php esc_html_e( 'Invoice No:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo esc_html( $document->getDocumentNumber() ); ?></span>
 						</div>
 						<div class="detail-row">
-							<span class="label">Issue Date:</span>
+							<span class="label"><?php esc_html_e( 'Issue Date:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo $document->getIssueDate() ? esc_html( $document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 						</div>
 						<div class="detail-row">
-							<span class="label">Sale Date:</span>
+							<span class="label"><?php esc_html_e( 'Sale Date:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo $document->getSaleDate() ? esc_html( $document->getSaleDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 						</div>
 						<?php if ( $document->getDueDate() ) : ?>
 							<div class="detail-row">
-								<span class="label">Due Date:</span>
+								<span class="label"><?php esc_html_e( 'Due Date:', 'ihumbak-invoices' ); ?></span>
 								<span class="value"><?php echo esc_html( $document->getDueDate()->format( 'Y-m-d' ) ); ?></span>
 							</div>
 						<?php endif; ?>
 						<?php if ( $document->getPaymentDate() ) : ?>
 							<div class="detail-row">
-								<span class="label">Payment Date:</span>
+								<span class="label"><?php esc_html_e( 'Payment Date:', 'ihumbak-invoices' ); ?></span>
 								<span class="value"><?php echo esc_html( $document->getPaymentDate()->format( 'Y-m-d' ) ); ?></span>
 							</div>
 						<?php endif; ?>
 						<?php if ( $document->getOrderId() ) : ?>
 							<div class="detail-row">
-								<span class="label">Order No:</span>
+								<span class="label"><?php esc_html_e( 'Order No:', 'ihumbak-invoices' ); ?></span>
 								<span class="value">#<?php echo esc_html( $document->getOrderId() ); ?></span>
 							</div>
 						<?php endif; ?>
@@ -104,17 +105,17 @@ $currency = $document->getCurrency();
 						?>
 						<?php if ( $is_paid_online && $payment_display_name ) : ?>
 							<div class="detail-row paid-online">
-								<span class="label">Paid via:</span>
+								<span class="label"><?php esc_html_e( 'Paid via:', 'ihumbak-invoices' ); ?></span>
 								<span class="value"><?php echo esc_html( $payment_display_name ); ?></span>
 							</div>
 						<?php else : ?>
 							<div class="detail-row">
-								<span class="label">Amount Due:</span>
+								<span class="label"><?php esc_html_e( 'Amount Due:', 'ihumbak-invoices' ); ?></span>
 								<span class="value"><?php echo esc_html( number_format( $document->getTotal(), 2, '.', ' ' ) . ' ' . $currency ); ?></span>
 							</div>
 							<?php if ( $payment_display_name ) : ?>
 								<div class="detail-row">
-									<span class="label">Payment:</span>
+									<span class="label"><?php esc_html_e( 'Payment:', 'ihumbak-invoices' ); ?></span>
 									<span class="value"><?php echo esc_html( $payment_display_name ); ?></span>
 								</div>
 							<?php endif; ?>
@@ -123,7 +124,7 @@ $currency = $document->getCurrency();
 				</td>
 				<td class="details-right">
 					<div class="detail-box">
-						<div class="detail-box-title">Buyer</div>
+						<div class="detail-box-title"><?php esc_html_e( 'Buyer', 'ihumbak-invoices' ); ?></div>
 						<?php if ( $buyer ) : ?>
 							<div class="party-name"><?php echo esc_html( $buyer->getName() ); ?></div>
 							<div class="party-address">
@@ -132,7 +133,7 @@ $currency = $document->getCurrency();
 								<?php echo esc_html( $buyer->getCountry() ); ?>
 							</div>
 							<?php if ( $buyer->getNip() ) : ?>
-								<div class="party-tax-id">VAT ID: <?php echo esc_html( $buyer->getNip() ); ?></div>
+								<div class="party-tax-id"><?php esc_html_e( 'VAT ID:', 'ihumbak-invoices' ); ?> <?php echo esc_html( $buyer->getNip() ); ?></div>
 							<?php endif; ?>
 						<?php endif; ?>
 					</div>
@@ -159,7 +160,7 @@ $currency = $document->getCurrency();
 							<td class="item-name">
 								<?php echo esc_html( $item->getName() ); ?>
 								<?php if ( $item->getSku() ) : ?>
-									<div class="item-sku">SKU: <?php echo esc_html( $item->getSku() ); ?></div>
+									<div class="item-sku"><?php esc_html_e( 'SKU:', 'ihumbak-invoices' ); ?> <?php echo esc_html( $item->getSku() ); ?></div>
 								<?php endif; ?>
 							</td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
@@ -202,7 +203,7 @@ $currency = $document->getCurrency();
 		<!-- Notes -->
 		<?php if ( $document->getNotes() ) : ?>
 			<div class="notes-section">
-				<div class="notes-title">Notes</div>
+				<div class="notes-title"><?php esc_html_e( 'Notes', 'ihumbak-invoices' ); ?></div>
 				<div class="notes-content"><?php echo nl2br( esc_html( $document->getNotes() ) ); ?></div>
 			</div>
 		<?php endif; ?>
