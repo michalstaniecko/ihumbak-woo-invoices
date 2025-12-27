@@ -588,7 +588,9 @@ final class Plugin {
 	 * @return array<string, mixed>
 	 */
 	public function sanitize_settings( array $input ): array {
-		$sanitized = array();
+		// Retrieve existing settings to avoid overwriting values from other tabs.
+		$existing  = get_option( 'ihumbak_invoices_settings', array() );
+		$sanitized = is_array( $existing ) ? $existing : array();
 
 		// Sanitize seller data.
 		if ( isset( $input['seller'] ) && is_array( $input['seller'] ) ) {

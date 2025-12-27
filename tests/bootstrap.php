@@ -629,3 +629,67 @@ if ( ! class_exists( 'WC_Product' ) ) {
         }
     }
 }
+
+// =============================================================================
+// Additional WordPress function mocks for Plugin class tests.
+// =============================================================================
+
+if ( ! function_exists( 'load_plugin_textdomain' ) ) {
+    function load_plugin_textdomain( string $domain, $deprecated = false, string $plugin_rel_path = '' ): bool {
+        return true;
+    }
+}
+
+if ( ! function_exists( 'wp_doing_ajax' ) ) {
+    function wp_doing_ajax(): bool {
+        return defined( 'DOING_AJAX' ) && DOING_AJAX;
+    }
+}
+
+if ( ! function_exists( 'is_admin' ) ) {
+    function is_admin(): bool {
+        return defined( 'WP_ADMIN' ) && WP_ADMIN;
+    }
+}
+
+if ( ! function_exists( 'add_action' ) ) {
+    function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
+        return true;
+    }
+}
+
+if ( ! function_exists( 'add_filter' ) ) {
+    function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
+        return true;
+    }
+}
+
+if ( ! function_exists( 'register_setting' ) ) {
+    function register_setting( string $option_group, string $option_name, $args = array() ): void {
+        // Do nothing in tests.
+    }
+}
+
+if ( ! function_exists( 'add_settings_section' ) ) {
+    function add_settings_section( string $id, string $title, $callback, string $page, array $args = array() ): void {
+        // Do nothing in tests.
+    }
+}
+
+if ( ! function_exists( 'add_menu_page' ) ) {
+    function add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, $callback = '', string $icon_url = '', $position = null ): string {
+        return '';
+    }
+}
+
+if ( ! function_exists( 'add_submenu_page' ) ) {
+    function add_submenu_page( string $parent_slug, string $page_title, string $menu_title, string $capability, string $menu_slug, $callback = '', $position = null ): string|false {
+        return '';
+    }
+}
+
+if ( ! function_exists( 'sanitize_textarea_field' ) ) {
+    function sanitize_textarea_field( string $str ): string {
+        return trim( strip_tags( $str ) );
+    }
+}
