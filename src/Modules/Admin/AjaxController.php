@@ -82,7 +82,7 @@ class AjaxController {
 	public function calculate_item(): void {
 		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
 		}
 
@@ -116,7 +116,7 @@ class AjaxController {
 	public function calculate_document(): void {
 		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
 		}
 
@@ -167,7 +167,7 @@ class AjaxController {
 	public function preview_number(): void {
 		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
 		}
 
@@ -238,7 +238,7 @@ class AjaxController {
 	public function fetch_order_data(): void {
 		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
 		}
 
@@ -282,7 +282,7 @@ class AjaxController {
 	public function fetch_invoice_data(): void {
 		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
 		}
 
@@ -347,7 +347,7 @@ class AjaxController {
 	public function fetch_refund_data(): void {
 		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
 
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
 		}
 

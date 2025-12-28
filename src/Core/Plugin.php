@@ -18,6 +18,7 @@ use IHumbak\Invoices\Modules\PDF\PdfGenerator;
 use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Modules\PDF\TemplateLoader;
 use IHumbak\Invoices\Modules\PDF\TemplateRegistry;
+use IHumbak\Invoices\Modules\Invoice\PermissionService;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 
@@ -53,6 +54,13 @@ final class Plugin {
 	 * @var ReportController|null
 	 */
 	private ?ReportController $report_controller = null;
+
+	/**
+	 * Permission service.
+	 *
+	 * @var PermissionService|null
+	 */
+	private ?PermissionService $permission_service = null;
 
 	/**
 	 * Plugin instance.
@@ -160,6 +168,10 @@ final class Plugin {
 		// Register core services.
 		$this->container->register( 'installer', fn() => new Installer() );
 
+		// Register permission service.
+		$this->permission_service = new PermissionService();
+		$this->container->register( 'permission.service', fn() => $this->permission_service );
+
 		// Register PDF services.
 		$this->container->register(
 			'pdf.cache_manager',
@@ -239,29 +251,34 @@ final class Plugin {
 	 * @return void
 	 */
 	public function register_admin_menu(): void {
+		$documents_capability = $this->permission_service->getMinimumCapability();
+
+		// Documents page - configurable capability.
 		add_submenu_page(
 			'woocommerce',
 			__( 'Invoices', 'ihumbak-invoices' ),
 			__( 'Invoices', 'ihumbak-invoices' ),
-			'manage_woocommerce',
+			$documents_capability,
 			'ihumbak-invoices',
 			array( $this, 'render_admin_page' )
 		);
 
+		// Settings page - always administrators only.
 		add_submenu_page(
 			'woocommerce',
 			__( 'Invoice Settings', 'ihumbak-invoices' ),
 			__( 'Invoice Settings', 'ihumbak-invoices' ),
-			'manage_woocommerce',
+			PermissionService::SETTINGS_CAPABILITY,
 			'ihumbak-invoices-settings',
 			array( $this, 'render_settings_page' )
 		);
 
+		// Reports page - configurable capability.
 		add_submenu_page(
 			'woocommerce',
 			__( 'Invoice Reports', 'ihumbak-invoices' ),
 			__( 'Invoice Reports', 'ihumbak-invoices' ),
-			'manage_woocommerce',
+			$documents_capability,
 			'ihumbak-invoices-reports',
 			array( $this, 'render_reports_page' )
 		);
@@ -382,7 +399,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function render_admin_page(): void {
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->permission_service->canManageDocuments() ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'ihumbak-invoices' ) );
 		}
 
@@ -433,9 +450,13 @@ final class Plugin {
 	 * @return void
 	 */
 	public function render_settings_page(): void {
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->permission_service->canAccessSettings() ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'ihumbak-invoices' ) );
 		}
+
+		// Prepare permission-related variables for the template.
+		$permission_default_role    = PermissionService::DEFAULT_ROLE;
+		$permission_available_roles = PermissionService::getAvailableRoles();
 
 		include IHUMBAK_INVOICES_PATH . 'templates/admin/settings.php';
 	}
@@ -446,7 +467,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public function render_reports_page(): void {
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->permission_service->canManageDocuments() ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', 'ihumbak-invoices' ) );
 		}
 
@@ -486,7 +507,7 @@ final class Plugin {
 	 */
 	private function handle_pdf_download( ?int $id ): void {
 		// Check user permissions.
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! $this->permission_service->canManageDocuments() ) {
 			wp_die( esc_html__( 'You do not have permission to download this document.', 'ihumbak-invoices' ) );
 		}
 
@@ -587,30 +608,33 @@ final class Plugin {
 	 */
 	public function get_default_settings(): array {
 		return array(
-			'seller'     => array(
+			'seller'      => array(
 				'name'    => '',
 				'details' => '',
 			),
-			'numbering'  => array(
+			'numbering'   => array(
 				'invoice_pattern'     => 'FV/{YYYY}/{MM}/{NNNN}',
 				'receipt_pattern'     => 'PAR/{YYYY}/{MM}/{NNNN}',
 				'credit_note_pattern' => 'CN/{YYYY}/{MM}/{NNNN}',
 				'correction_pattern'  => 'FK/{YYYY}/{MM}/{NNNN}', // Legacy - kept for backward compatibility.
 				'reset_monthly'       => true,
 			),
-			'pdf'        => array(
+			'pdf'         => array(
 				'template'    => 'default',
 				'logo_id'     => 0,
 				'footer_text' => '',
 			),
-			'automation' => array(
+			'automation'  => array(
 				'auto_generate_invoice' => false,
 				'auto_generate_receipt' => false,
 				'trigger_status'        => 'completed',
 				'nip_meta_key'          => '_billing_nip',
 			),
-			'display'    => array(
+			'display'     => array(
 				'show_order_column' => true,
+			),
+			'permissions' => array(
+				'minimum_role' => PermissionService::DEFAULT_ROLE,
 			),
 		);
 	}
@@ -671,6 +695,17 @@ final class Plugin {
 			);
 		}
 
+		// Sanitize permissions settings.
+		if ( isset( $input['permissions'] ) && is_array( $input['permissions'] ) ) {
+			$minimum_role = sanitize_text_field( $input['permissions']['minimum_role'] ?? PermissionService::DEFAULT_ROLE );
+
+			$sanitized['permissions'] = array(
+				'minimum_role' => PermissionService::isValidRole( $minimum_role )
+					? $minimum_role
+					: PermissionService::DEFAULT_ROLE,
+			);
+		}
+
 		return $sanitized;
 	}
 
@@ -681,6 +716,15 @@ final class Plugin {
 	 */
 	public function container(): Container {
 		return $this->container;
+	}
+
+	/**
+	 * Get the permission service.
+	 *
+	 * @return PermissionService
+	 */
+	public function getPermissionService(): PermissionService {
+		return $this->permission_service;
 	}
 
 	/**

@@ -11,6 +11,7 @@ namespace IHumbak\Invoices\Modules\Admin;
 
 use IHumbak\Invoices\Modules\Report\ReportService;
 use IHumbak\Invoices\Modules\Report\CsvExporter;
+use IHumbak\Invoices\Core\Plugin;
 
 /**
  * Controller for monthly reports admin page.
@@ -90,7 +91,7 @@ class ReportController {
 	 */
 	public function handle_csv_export(): void {
 		// Check permissions.
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_die( esc_html__( 'You do not have permission to export reports.', 'ihumbak-invoices' ) );
 		}
 

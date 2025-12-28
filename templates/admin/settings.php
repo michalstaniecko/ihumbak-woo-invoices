@@ -35,6 +35,10 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
            class="nav-tab <?php echo 'display' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Display', 'ihumbak-invoices' ); ?>
         </a>
+        <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices-settings&tab=permissions' ) ); ?>"
+           class="nav-tab <?php echo 'permissions' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e( 'Permissions', 'ihumbak-invoices' ); ?>
+        </a>
     </nav>
 
     <form method="post" action="options.php">
@@ -267,6 +271,34 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                     </td>
                 </tr>
             </table>
+
+        <?php elseif ( 'permissions' === $active_tab ) : ?>
+            <?php $current_role = $settings['permissions']['minimum_role'] ?? $permission_default_role; ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="minimum_role"><?php esc_html_e( 'Minimum Role for Documents', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <select id="minimum_role" name="ihumbak_invoices_settings[permissions][minimum_role]">
+                            <?php foreach ( $permission_available_roles as $role => $label ) : ?>
+                                <option value="<?php echo esc_attr( $role ); ?>" <?php selected( $current_role, $role ); ?>>
+                                    <?php echo esc_html( $label ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description">
+                            <?php esc_html_e( 'Select the minimum role required to create, edit, and manage invoices, receipts, and credit notes.', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <div class="notice notice-info inline" style="margin: 20px 0;">
+                <p>
+                    <strong><?php esc_html_e( 'Note:', 'ihumbak-invoices' ); ?></strong>
+                    <?php esc_html_e( 'Plugin settings (this page) are always restricted to Administrators only.', 'ihumbak-invoices' ); ?>
+                </p>
+            </div>
         <?php endif; ?>
 
         <?php submit_button(); ?>

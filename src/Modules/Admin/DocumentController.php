@@ -334,7 +334,7 @@ class DocumentController {
 		}
 
 		// Check permissions.
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'ihumbak-invoices' ) );
 		}
 
@@ -681,7 +681,7 @@ class DocumentController {
 		}
 
 		// Check basic permissions.
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			wp_die( esc_html__( 'You do not have permission to perform this action.', 'ihumbak-invoices' ) );
 		}
 

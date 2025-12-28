@@ -13,6 +13,7 @@ namespace IHumbak\Invoices\Modules\Admin;
 
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Models\Document;
+use IHumbak\Invoices\Core\Plugin;
 
 /**
  * Order MetaBox class.
@@ -54,7 +55,7 @@ class OrderMetaBox {
 	 * @return void
 	 */
 	public function register_meta_box(): void {
-		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
 			return;
 		}
 

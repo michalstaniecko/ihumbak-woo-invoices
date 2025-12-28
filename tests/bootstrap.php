@@ -79,6 +79,18 @@ if ( ! function_exists( '__' ) ) {
     }
 }
 
+if ( ! function_exists( '__return_true' ) ) {
+    function __return_true(): bool {
+        return true;
+    }
+}
+
+if ( ! function_exists( '__return_false' ) ) {
+    function __return_false(): bool {
+        return false;
+    }
+}
+
 if ( ! function_exists( 'esc_html__' ) ) {
     function esc_html__( string $text, string $domain = 'default' ): string {
         return htmlspecialchars( $text, ENT_QUOTES, 'UTF-8' );
@@ -195,8 +207,62 @@ if ( ! function_exists( 'wp_delete_file' ) ) {
     }
 }
 
+// Mock WordPress filter system for unit tests.
+global $mock_wp_filters;
+$mock_wp_filters = array();
+
+if ( ! function_exists( 'add_filter' ) ) {
+    function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
+        global $mock_wp_filters;
+        if ( ! isset( $mock_wp_filters[ $hook ] ) ) {
+            $mock_wp_filters[ $hook ] = array();
+        }
+        if ( ! isset( $mock_wp_filters[ $hook ][ $priority ] ) ) {
+            $mock_wp_filters[ $hook ][ $priority ] = array();
+        }
+        $mock_wp_filters[ $hook ][ $priority ][] = array(
+            'callback'      => $callback,
+            'accepted_args' => $accepted_args,
+        );
+        return true;
+    }
+}
+
+if ( ! function_exists( 'remove_filter' ) ) {
+    function remove_filter( string $hook, $callback, int $priority = 10 ): bool {
+        global $mock_wp_filters;
+        if ( ! isset( $mock_wp_filters[ $hook ][ $priority ] ) ) {
+            return false;
+        }
+        foreach ( $mock_wp_filters[ $hook ][ $priority ] as $key => $filter ) {
+            if ( $filter['callback'] === $callback ) {
+                unset( $mock_wp_filters[ $hook ][ $priority ][ $key ] );
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
 if ( ! function_exists( 'apply_filters' ) ) {
     function apply_filters( string $tag, $value, ...$args ) {
+        global $mock_wp_filters;
+        if ( ! isset( $mock_wp_filters[ $tag ] ) ) {
+            return $value;
+        }
+        // Sort by priority.
+        ksort( $mock_wp_filters[ $tag ] );
+        foreach ( $mock_wp_filters[ $tag ] as $priority => $filters ) {
+            foreach ( $filters as $filter ) {
+                $callback      = $filter['callback'];
+                $accepted_args = $filter['accepted_args'];
+                // Prepend $value to args.
+                $all_args = array_merge( array( $value ), $args );
+                // Slice to accepted_args count.
+                $call_args = array_slice( $all_args, 0, $accepted_args );
+                $value     = call_user_func_array( $callback, $call_args );
+            }
+        }
         return $value;
     }
 }
@@ -239,6 +305,26 @@ if ( ! function_exists( 'get_current_user_id' ) ) {
             return (int) IHUMBAK_TEST_CURRENT_USER_ID;
         }
         return 0;
+    }
+}
+
+// Mock WordPress user capabilities storage for unit tests.
+global $mock_wp_user_capabilities;
+$mock_wp_user_capabilities = array();
+
+if ( ! function_exists( 'current_user_can' ) ) {
+    /**
+     * Mock current_user_can function.
+     *
+     * Returns false by default (no capabilities).
+     * Use global $mock_wp_user_capabilities array to set capabilities for testing.
+     *
+     * @param string $capability Capability to check.
+     * @return bool Whether current user has the capability.
+     */
+    function current_user_can( string $capability ): bool {
+        global $mock_wp_user_capabilities;
+        return in_array( $capability, $mock_wp_user_capabilities, true );
     }
 }
 
@@ -654,12 +740,6 @@ if ( ! function_exists( 'is_admin' ) ) {
 
 if ( ! function_exists( 'add_action' ) ) {
     function add_action( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
-        return true;
-    }
-}
-
-if ( ! function_exists( 'add_filter' ) ) {
-    function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): bool {
         return true;
     }
 }
