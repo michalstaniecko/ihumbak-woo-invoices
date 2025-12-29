@@ -220,6 +220,25 @@ class DocumentListTable extends \WP_List_Table {
 				esc_url( $regenerate_url ),
 				esc_html__( 'Regenerate PDF', 'ihumbak-invoices' )
 			);
+
+			// Add send email action for issued documents with linked order.
+			if ( $item->getOrderId() ) {
+				$email_url = add_query_arg(
+					array(
+						'page'   => 'ihumbak-invoices',
+						'action' => 'send_email',
+						'id'     => $item->getId(),
+						'nonce'  => wp_create_nonce( 'send_email_' . $item->getId() ),
+					),
+					admin_url( 'admin.php' )
+				);
+
+				$actions['email'] = sprintf(
+					'<a href="%s">%s</a>',
+					esc_url( $email_url ),
+					esc_html__( 'Send Email', 'ihumbak-invoices' )
+				);
+			}
 		}
 
 		if ( $item->isDraft() ) {

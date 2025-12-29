@@ -45,17 +45,55 @@ do_action('ihumbak_before_pdf_render', Invoice $invoice);
 
 ### Email
 
-#### `ihumbak_email_sent`
-Fired after an email with invoice is sent.
+#### `ihumbak_before_email_send`
+Fired before sending a document email.
 
 ```php
-do_action('ihumbak_email_sent', Invoice $invoice, string $email);
+do_action('ihumbak_before_email_send', Document $document, string $recipient);
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| $invoice | Invoice | The sent document |
-| $email | string | Recipient email address |
+| $document | Document | The document to be sent |
+| $recipient | string | Recipient email address |
+
+#### `ihumbak_email_sent`
+Fired after a document email is sent successfully.
+
+```php
+do_action('ihumbak_email_sent', Document $document, string $recipient);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $document | Document | The sent document |
+| $recipient | string | Recipient email address |
+
+#### `ihumbak_email_failed`
+Fired when email sending fails.
+
+```php
+do_action('ihumbak_email_failed', Document $document, string $error);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $document | Document | The document |
+| $error | string | Error message |
+
+#### `ihumbak_send_{type}_email`
+Fired to trigger sending email for specific document type. Replace `{type}` with `invoice`, `receipt`, or `credit_note`.
+
+```php
+do_action('ihumbak_send_invoice_email', int $document_id, Document $document);
+do_action('ihumbak_send_receipt_email', int $document_id, Document $document);
+do_action('ihumbak_send_credit_note_email', int $document_id, Document $document);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $document_id | int | Document ID |
+| $document | Document | The document (optional) |
 
 ---
 
@@ -108,19 +146,65 @@ add_filter('ihumbak_pdf_data', function($data, $invoice) {
 }, 10, 2);
 ```
 
-### Email Template
+### Email
+
+#### `ihumbak_email_recipient`
+Modify the recipient email address for document emails.
+
+```php
+apply_filters('ihumbak_email_recipient', string $email, Document $document, WC_Order $order);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $email | string | Recipient email address |
+| $document | Document | The document |
+| $order | WC_Order | Associated WooCommerce order |
+
+**Example:**
+```php
+add_filter('ihumbak_email_recipient', function($email, $document, $order) {
+    // Send invoices to accounting department
+    if ($document->getDocumentType() === 'invoice') {
+        return 'accounting@example.com';
+    }
+    return $email;
+}, 10, 3);
+```
+
+#### `ihumbak_email_attachments`
+Modify email attachments.
+
+```php
+apply_filters('ihumbak_email_attachments', array $attachments, Document $document, WC_Email $email);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $attachments | array | Attachment file paths |
+| $document | Document | The document |
+| $email | WC_Email | Email instance |
+
+**Example:**
+```php
+add_filter('ihumbak_email_attachments', function($attachments, $document, $email) {
+    // Add additional terms and conditions PDF
+    $attachments[] = '/path/to/terms.pdf';
+    return $attachments;
+}, 10, 3);
+```
 
 #### `ihumbak_email_template`
 Modify email template path.
 
 ```php
-apply_filters('ihumbak_email_template', string $template, Invoice $invoice);
+apply_filters('ihumbak_email_template', string $template, Document $document);
 ```
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | $template | string | Template file path |
-| $invoice | Invoice | The document |
+| $document | Document | The document |
 
 ### Document Items
 
@@ -241,3 +325,5 @@ add_filter('ihumbak_is_user_super_admin', function($is_super_admin, $user_id) {
 - `src/Modules/Invoice/OrderDataExtractor.php` - Payment method hooks
 - `src/Modules/Admin/SuperAdminService.php` - Super-admin hooks
 - `src/Modules/PDF/PdfGenerator.php` - PDF hooks
+- `src/Modules/Email/EmailService.php` - Email hooks
+- `src/Modules/Email/AbstractDocumentEmail.php` - Email template hooks

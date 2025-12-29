@@ -39,6 +39,10 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
            class="nav-tab <?php echo 'permissions' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Permissions', 'ihumbak-invoices' ); ?>
         </a>
+        <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices-settings&tab=email' ) ); ?>"
+           class="nav-tab <?php echo 'email' === $active_tab ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e( 'Email', 'ihumbak-invoices' ); ?>
+        </a>
     </nav>
 
     <form method="post" action="options.php">
@@ -299,6 +303,69 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                     <?php esc_html_e( 'Plugin settings (this page) are always restricted to Administrators only.', 'ihumbak-invoices' ); ?>
                 </p>
             </div>
+
+        <?php elseif ( 'email' === $active_tab ) : ?>
+            <h2><?php esc_html_e( 'Auto-Send Settings', 'ihumbak-invoices' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Configure automatic email sending when documents are issued. Emails include the document PDF as an attachment.', 'ihumbak-invoices' ); ?>
+            </p>
+
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Auto-Send Invoice', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   name="ihumbak_invoices_settings[email][auto_send_invoice]"
+                                   value="1"
+                                   <?php checked( ! empty( $settings['email']['auto_send_invoice'] ) ); ?>>
+                            <?php esc_html_e( 'Automatically send email when an invoice is issued', 'ihumbak-invoices' ); ?>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Auto-Send Receipt', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   name="ihumbak_invoices_settings[email][auto_send_receipt]"
+                                   value="1"
+                                   <?php checked( ! empty( $settings['email']['auto_send_receipt'] ) ); ?>>
+                            <?php esc_html_e( 'Automatically send email when a receipt is issued', 'ihumbak-invoices' ); ?>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Auto-Send Credit Note', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   name="ihumbak_invoices_settings[email][auto_send_credit_note]"
+                                   value="1"
+                                   <?php checked( ! empty( $settings['email']['auto_send_credit_note'] ) ); ?>>
+                            <?php esc_html_e( 'Automatically send email when a credit note is issued', 'ihumbak-invoices' ); ?>
+                        </label>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="notice notice-info inline" style="margin: 20px 0;">
+                <p>
+                    <strong><?php esc_html_e( 'Note:', 'ihumbak-invoices' ); ?></strong>
+                    <?php esc_html_e( 'Emails are sent to the billing email address from the linked WooCommerce order. Documents without a linked order cannot be sent automatically.', 'ihumbak-invoices' ); ?>
+                </p>
+            </div>
+
+            <h2><?php esc_html_e( 'Email Templates', 'ihumbak-invoices' ); ?></h2>
+            <p>
+                <?php
+                printf(
+                    /* translators: %s: Link to WooCommerce email settings */
+                    esc_html__( 'Email templates can be customized in %s. Look for "Invoice", "Receipt", and "Credit Note" emails.', 'ihumbak-invoices' ),
+                    '<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=email' ) ) . '">' . esc_html__( 'WooCommerce > Settings > Emails', 'ihumbak-invoices' ) . '</a>'
+                );
+                ?>
+            </p>
         <?php endif; ?>
 
         <?php submit_button(); ?>

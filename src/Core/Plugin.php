@@ -19,6 +19,10 @@ use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Modules\PDF\TemplateLoader;
 use IHumbak\Invoices\Modules\PDF\TemplateRegistry;
 use IHumbak\Invoices\Modules\Invoice\PermissionService;
+use IHumbak\Invoices\Modules\Email\EmailService;
+use IHumbak\Invoices\Modules\Email\InvoiceEmail;
+use IHumbak\Invoices\Modules\Email\ReceiptEmail;
+use IHumbak\Invoices\Modules\Email\CreditNoteEmail;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 
@@ -61,6 +65,13 @@ final class Plugin {
 	 * @var PermissionService|null
 	 */
 	private ?PermissionService $permission_service = null;
+
+	/**
+	 * Email service.
+	 *
+	 * @var EmailService|null
+	 */
+	private ?EmailService $email_service = null;
 
 	/**
 	 * Plugin instance.
@@ -197,6 +208,10 @@ final class Plugin {
 			)
 		);
 
+		// Register email service.
+		$this->email_service = new EmailService();
+		$this->container->register( 'email.service', fn() => $this->email_service );
+
 		// Initialize admin-only features.
 		if ( is_admin() ) {
 			// Check for database updates.
@@ -243,6 +258,12 @@ final class Plugin {
 
 		// WooCommerce hooks.
 		add_action( 'woocommerce_order_status_changed', array( $this, 'handle_order_status_change' ), 10, 4 );
+
+		// Register WooCommerce email classes.
+		add_filter( 'woocommerce_email_classes', array( $this, 'register_email_classes' ) );
+
+		// Auto-send email on document issue.
+		add_action( 'ihumbak_document_issued', array( $this, 'handle_document_issued' ) );
 	}
 
 	/**
@@ -427,6 +448,10 @@ final class Plugin {
 				wp_safe_redirect( admin_url( 'admin.php?page=ihumbak-invoices' ) );
 				exit;
 
+			case 'send_email':
+				$this->handle_send_email( $id );
+				break;
+
 			case 'delete':
 				// Verify nonce for delete action.
 				if ( $id && isset( $_GET['nonce'] ) ) {
@@ -563,6 +588,101 @@ final class Plugin {
 	}
 
 	/**
+	 * Register WooCommerce email classes.
+	 *
+	 * @param array $emails Existing email classes.
+	 * @return array Modified email classes.
+	 */
+	public function register_email_classes( array $emails ): array {
+		$emails['IHumbak_Invoice_Email']     = new InvoiceEmail();
+		$emails['IHumbak_Receipt_Email']     = new ReceiptEmail();
+		$emails['IHumbak_Credit_Note_Email'] = new CreditNoteEmail();
+
+		return $emails;
+	}
+
+	/**
+	 * Handle document issued action for auto-send email.
+	 *
+	 * @param \IHumbak\Invoices\Models\Document $document The issued document.
+	 * @return void
+	 */
+	public function handle_document_issued( $document ): void {
+		if ( $this->email_service ) {
+			$this->email_service->maybeSendOnIssue( $document );
+		}
+	}
+
+	/**
+	 * Handle manual send email action.
+	 *
+	 * @param int|null $id Document ID.
+	 * @return void
+	 */
+	private function handle_send_email( ?int $id ): void {
+		// Check permissions.
+		if ( ! $this->permission_service->canManageDocuments() ) {
+			wp_die( esc_html__( 'You do not have permission to send emails.', 'ihumbak-invoices' ) );
+		}
+
+		if ( ! $id ) {
+			wp_die( esc_html__( 'Invalid document ID.', 'ihumbak-invoices' ) );
+		}
+
+		// Verify nonce.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$nonce = isset( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'send_email_' . $id ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'ihumbak-invoices' ) );
+		}
+
+		// Get document.
+		$repository = new DocumentRepository();
+		$document   = $repository->find( $id );
+
+		if ( ! $document ) {
+			wp_die( esc_html__( 'Document not found.', 'ihumbak-invoices' ) );
+		}
+
+		// Check if document can be sent.
+		if ( ! $this->email_service || ! $this->email_service->canSend( $document ) ) {
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'    => 'ihumbak-invoices',
+						'message' => 'email_error',
+						'reason'  => 'cannot_send',
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+			exit;
+		}
+
+		// Load document items.
+		$item_repository = new DocumentItemRepository();
+		$items           = $item_repository->findByDocumentId( $id );
+		$document->setItems( $items );
+
+		// Send email.
+		$result = $this->email_service->send( $document );
+
+		// Redirect with result.
+		$message = $result ? 'email_sent' : 'email_error';
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'ihumbak-invoices',
+					'message' => $message,
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
 	 * Handle order status change.
 	 *
 	 * @param int       $order_id   Order ID.
@@ -636,6 +756,11 @@ final class Plugin {
 			'permissions' => array(
 				'minimum_role' => PermissionService::DEFAULT_ROLE,
 			),
+			'email'       => array(
+				'auto_send_invoice'     => false,
+				'auto_send_receipt'     => false,
+				'auto_send_credit_note' => false,
+			),
 		);
 	}
 
@@ -706,6 +831,15 @@ final class Plugin {
 			);
 		}
 
+		// Sanitize email settings.
+		if ( isset( $input['email'] ) && is_array( $input['email'] ) ) {
+			$sanitized['email'] = array(
+				'auto_send_invoice'     => ! empty( $input['email']['auto_send_invoice'] ),
+				'auto_send_receipt'     => ! empty( $input['email']['auto_send_receipt'] ),
+				'auto_send_credit_note' => ! empty( $input['email']['auto_send_credit_note'] ),
+			);
+		}
+
 		return $sanitized;
 	}
 
@@ -725,6 +859,15 @@ final class Plugin {
 	 */
 	public function getPermissionService(): PermissionService {
 		return $this->permission_service;
+	}
+
+	/**
+	 * Get the email service.
+	 *
+	 * @return EmailService|null
+	 */
+	public function getEmailService(): ?EmailService {
+		return $this->email_service;
 	}
 
 	/**

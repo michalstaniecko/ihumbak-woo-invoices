@@ -34,15 +34,26 @@ defined( 'ABSPATH' ) || exit;
     // phpcs:disable WordPress.Security.NonceVerification.Recommended
     if ( isset( $_GET['message'] ) ) {
         $message = sanitize_text_field( wp_unslash( $_GET['message'] ) );
-        $messages = [
-            'saved'   => __( 'Document saved successfully.', 'ihumbak-invoices' ),
-            'deleted' => __( 'Document deleted successfully.', 'ihumbak-invoices' ),
+
+        $success_messages = [
+            'saved'      => __( 'Document saved successfully.', 'ihumbak-invoices' ),
+            'deleted'    => __( 'Document deleted successfully.', 'ihumbak-invoices' ),
+            'email_sent' => __( 'Email sent successfully.', 'ihumbak-invoices' ),
         ];
 
-        if ( isset( $messages[ $message ] ) ) {
+        $error_messages = [
+            'email_error' => __( 'Failed to send email. Please check the document has a linked order with a billing email.', 'ihumbak-invoices' ),
+        ];
+
+        if ( isset( $success_messages[ $message ] ) ) {
             printf(
                 '<div class="notice notice-success is-dismissible"><p>%s</p></div>',
-                esc_html( $messages[ $message ] )
+                esc_html( $success_messages[ $message ] )
+            );
+        } elseif ( isset( $error_messages[ $message ] ) ) {
+            printf(
+                '<div class="notice notice-error is-dismissible"><p>%s</p></div>',
+                esc_html( $error_messages[ $message ] )
             );
         }
     }
