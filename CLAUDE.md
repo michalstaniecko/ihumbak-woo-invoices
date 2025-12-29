@@ -32,7 +32,7 @@ WordPress/WooCommerce plugin for generating VAT invoices, receipts, and credit n
 - **Factory Pattern** - object creation
 - **Service Provider Pattern** - service registration
 
-See [docs/PLAN.md](docs/PLAN.md) for full directory structure and implementation status.
+See `../PLAN.md` (workspace level) for full directory structure and implementation status.
 
 ## Coding Standards
 
@@ -87,13 +87,14 @@ See [docs/PLAN.md](docs/PLAN.md) for full directory structure and implementation
 
 | File | Description |
 |------|-------------|
-| [docs/PLAN.md](docs/PLAN.md) | Implementation plan and status |
 | [docs/DATABASE.md](docs/DATABASE.md) | Database schema |
 | [docs/HOOKS-API.md](docs/HOOKS-API.md) | Hooks and filters reference |
 | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Plugin configuration |
 | [docs/DOCUMENT-TYPES.md](docs/DOCUMENT-TYPES.md) | Document types (invoice, receipt, credit note) |
 | [docs/pdf-design-guide.md](docs/pdf-design-guide.md) | PDF design system |
 | [docs/super-admin-configuration.md](docs/super-admin-configuration.md) | Super-admin setup |
+
+**Note:** Implementation plan is in `../PLAN.md` (workspace level, branch-independent).
 
 ## Implementation Status
 
@@ -104,4 +105,4 @@ See [docs/PLAN.md](docs/PLAN.md) for full directory structure and implementation
 | 3. PDF Export | COMPLETE |
 | 4. Extensions | IN PROGRESS |
 
-See [docs/PLAN.md](docs/PLAN.md) for detailed implementation status.
+See `../PLAN.md` (workspace level) for detailed implementation status.
