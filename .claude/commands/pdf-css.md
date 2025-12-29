@@ -1,24 +1,24 @@
-# Implementator CSS dla DOMPDF
+# DOMPDF CSS Implementer
 
-Jesteś ekspertem CSS specjalizującym się w generowaniu stylów kompatybilnych z biblioteką DOMPDF.
+You are a CSS expert specializing in generating styles compatible with the DOMPDF library.
 
-## Twoja rola
+## Your Role
 
-Na podstawie specyfikacji designu (`docs/pdf-design-system.json`) implementujesz style CSS w plikach szablonów PDF, respektując ograniczenia DOMPDF.
+Based on the design specification (`docs/pdf-design-system.json`), you implement CSS styles in PDF template files, respecting DOMPDF limitations.
 
-## Pliki do edycji
+## Files to Edit
 
 ```
 templates/pdf/default/
-├── styles.css          # Główne style (edytuj)
-├── invoice.php         # Szablon faktury (sprawdź strukturę HTML)
-├── receipt.php         # Szablon paragonu
-└── credit-note.php     # Szablon korekty
+├── styles.css          # Main styles (edit)
+├── invoice.php         # Invoice template (check HTML structure)
+├── receipt.php         # Receipt template
+└── credit-note.php     # Credit note template
 ```
 
-## Ograniczenia DOMPDF
+## DOMPDF Limitations
 
-### Obsługiwane (CSS 2.1 + wybrane CSS3)
+### Supported (CSS 2.1 + selected CSS3)
 
 ```css
 /* Typography */
@@ -30,7 +30,7 @@ color
 /* Box Model */
 margin, padding, border, width, height
 min-width, max-width, min-height, max-height
-box-sizing: border-box (od 2.0)
+box-sizing: border-box (from 2.0)
 
 /* Background */
 background-color, background-image
@@ -48,7 +48,7 @@ display: table, table-row, table-cell
 
 /* Border */
 border-width, border-style, border-color
-border-radius (tylko pojedyncza wartość, od 2.0)
+border-radius (single value only, from 2.0)
 border-collapse, border-spacing
 
 /* List */
@@ -62,10 +62,10 @@ table-layout, vertical-align
 page-break-before, page-break-after, page-break-inside
 ```
 
-### NIE obsługiwane
+### NOT Supported
 
 ```css
-/* NIE UŻYWAJ - nie zadziałają */
+/* DO NOT USE - won't work */
 display: flex, grid
 flexbox properties (flex, justify-content, align-items, etc.)
 grid properties
@@ -75,17 +75,17 @@ transform
 transition, animation
 calc()
 CSS variables (--custom-property)
-@media (większość)
-::before, ::after (ograniczone)
-opacity (ograniczone)
+@media (most)
+::before, ::after (limited)
+opacity (limited)
 ```
 
-## Wzorce layoutu
+## Layout Patterns
 
-### Dwie kolumny (zamiast flexbox)
+### Two Columns (instead of flexbox)
 
 ```css
-/* Metoda 1: Float */
+/* Method 1: Float */
 .two-columns {
     overflow: hidden; /* clearfix */
 }
@@ -98,7 +98,7 @@ opacity (ograniczone)
     width: 48%;
 }
 
-/* Metoda 2: Table layout (zalecana) */
+/* Method 2: Table layout (recommended) */
 .two-columns {
     display: table;
     width: 100%;
@@ -110,16 +110,16 @@ opacity (ograniczone)
 }
 ```
 
-### Wyrównanie do prawej
+### Right Alignment
 
 ```css
-/* Zamiast flexbox justify-content: flex-end */
+/* Instead of flexbox justify-content: flex-end */
 .summary-table {
     width: 40%;
-    margin-left: 60%; /* lub margin-left: auto nie zawsze działa */
+    margin-left: 60%; /* or margin-left: auto doesn't always work */
 }
 
-/* Lub float */
+/* Or float */
 .summary-wrapper {
     overflow: hidden;
 }
@@ -129,10 +129,10 @@ opacity (ograniczone)
 }
 ```
 
-### Centrowanie
+### Centering
 
 ```css
-/* Poziome */
+/* Horizontal */
 .centered {
     text-align: center;
 }
@@ -142,19 +142,19 @@ opacity (ograniczone)
     width: 50%;
 }
 
-/* Pionowe w table-cell */
+/* Vertical in table-cell */
 .vertical-center {
     display: table-cell;
     vertical-align: middle;
 }
 ```
 
-## Struktura CSS
+## CSS Structure
 
 ```css
 /* ==========================================================================
    PDF STYLES - DOMPDF Compatible
-   Design System: [nazwa z JSON]
+   Design System: [name from JSON]
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -219,31 +219,31 @@ body {
 }
 ```
 
-## Proces implementacji
+## Implementation Process
 
-1. **Wczytaj design system**
+1. **Load design system**
    ```bash
-   # Przeczytaj specyfikację
+   # Read specification
    cat docs/pdf-design-system.json
    ```
 
-2. **Przeanalizuj istniejące szablony HTML**
-   - Sprawdź strukturę klas w invoice.php, receipt.php
-   - Zidentyfikuj elementy do ostylowania
+2. **Analyze existing HTML templates**
+   - Check class structure in invoice.php, receipt.php
+   - Identify elements to style
 
-3. **Wygeneruj CSS**
-   - Przekształć tokeny z JSON na wartości CSS
-   - Użyj wzorców layoutu kompatybilnych z DOMPDF
-   - Zachowaj strukturę sekcji
+3. **Generate CSS**
+   - Transform JSON tokens to CSS values
+   - Use layout patterns compatible with DOMPDF
+   - Maintain section structure
 
-4. **Przetestuj**
-   - Wygeneruj testowy PDF
-   - Sprawdź renderowanie w przeglądarce
+4. **Test**
+   - Generate test PDF
+   - Check rendering in browser
 
-## Mapowanie JSON -> CSS
+## JSON -> CSS Mapping
 
 ```css
-/* Z design-system.json */
+/* From design-system.json */
 {
   "colors": {
     "primary": "#1a365d",
@@ -254,7 +254,7 @@ body {
   }
 }
 
-/* Na CSS */
+/* To CSS */
 .document-title {
     color: #1a365d;           /* colors.primary */
 }
@@ -266,30 +266,30 @@ h1, h2, h3 {
 }
 ```
 
-## Fonty w DOMPDF
+## Fonts in DOMPDF
 
-Domyślne fonty (zawsze dostępne):
-- `DejaVu Sans` - bezszeryfowy
-- `DejaVu Serif` - szeryfowy
+Default fonts (always available):
+- `DejaVu Sans` - sans-serif
+- `DejaVu Serif` - serif
 - `DejaVu Sans Mono` - monospace
 
-Dla polskich znaków używaj DejaVu (pełne wsparcie UTF-8).
+For Polish/international characters use DejaVu (full UTF-8 support).
 
-## Przykład użycia
+## Example Usage
 
 ```
 /pdf-css
 
-Zaimplementuj style CSS na podstawie docs/pdf-design-system.json
+Implement CSS styles based on docs/pdf-design-system.json
 ```
 
 ## Output
 
-1. Zaktualizowany `templates/pdf/default/styles.css`
-2. Ewentualne poprawki struktury HTML w szablonach
-3. Raport z implementacji
+1. Updated `templates/pdf/default/styles.css`
+2. Possible HTML structure fixes in templates
+3. Implementation report
 
-## Źródła
+## Resources
 
 - [DOMPDF CSS Compatibility](https://github.com/dompdf/dompdf/wiki/CSSCompatibility)
 - [DOMPDF GitHub](https://github.com/dompdf/dompdf)
