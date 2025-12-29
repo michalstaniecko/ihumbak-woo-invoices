@@ -7,7 +7,6 @@ WordPress/WooCommerce plugin for generating VAT invoices, receipts, and credit n
 - [Quick Info](#quick-info)
 - [Architecture](#architecture)
 - [Coding Standards](#coding-standards)
-- [Git Workflow](#git-workflow)
 - [Commands](#commands)
 - [Documentation](#documentation)
 
@@ -71,26 +70,6 @@ See [docs/PLAN.md](docs/PLAN.md) for full directory structure and implementation
 - [ ] Permissions are checked
 - [ ] Strings use text domain `ihumbak-invoices`
 
-## Git Workflow (GitFlow)
-
-### Branches
-
-| Branch | Purpose |
-|--------|---------|
-| main | Stable production |
-| develop | Integration |
-| feature/* | New features |
-| release/* | Release preparation |
-| hotfix/* | Urgent fixes |
-
-### Commit Convention
-
-```
-<type>(<scope>): <description>
-
-Types: feat, fix, docs, refactor, test, chore
-```
-
 ## Commands
 
 ### Composer Scripts
@@ -103,17 +82,6 @@ Types: feat, fix, docs, refactor, test, chore
 | `composer phpcbf` | Fix code style |
 | `composer phpstan` | Static analysis |
 | `composer check` | Run all checks |
-
-### Slash Commands (Agents)
-
-| Command | Description |
-|---------|-------------|
-| `/coordinator` | Project Coordinator |
-| `/php-dev` | PHP Developer |
-| `/code-review` | Code Review |
-| `/devops` | CI/CD and automation |
-| `/docs` | Documentation |
-| `/qa` | Tests and QA |
 
 ## Documentation
 
