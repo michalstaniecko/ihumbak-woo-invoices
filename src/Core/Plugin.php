@@ -395,7 +395,8 @@ final class Plugin {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$document_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 			if ( $document_id > 0 ) {
-				$document = $this->container->get( \IHumbak\Invoices\Infrastructure\Database\DocumentRepository::class )->find( $document_id );
+				$repository = new DocumentRepository();
+				$document   = $repository->find( $document_id );
 				if ( $document && ! $document->isDraft() ) {
 					$is_readonly = true;
 				}
