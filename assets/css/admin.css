@@ -521,3 +521,58 @@
     margin-top: 8px;
     color: #856404;
 }
+
+/* ==========================================================================
+   Readonly Mode Styles
+   ========================================================================== */
+
+/* Readonly notice */
+.ihumbak-readonly-notice {
+    background: #f0f6fc;
+    border: 1px solid #c5d9ed;
+    border-radius: 4px;
+    color: #1d2327;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ihumbak-readonly-notice .dashicons {
+    color: #2271b1;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Readonly card styling */
+.ihumbak-items-card.ihumbak-readonly {
+    background: #f9f9f9;
+}
+
+/* Readonly inputs styling */
+.ihumbak-readonly input[readonly],
+.ihumbak-readonly textarea[readonly],
+.ihumbak-items-table input[readonly]:not(.item-price-gross),
+.ihumbak-form-field input[readonly],
+.ihumbak-form-field textarea[readonly] {
+    background-color: #f6f7f7;
+    border-color: #dcdcde;
+    color: #50575e;
+    cursor: not-allowed;
+}
+
+/* Disabled select styling */
+select:disabled,
+input:disabled {
+    background-color: #f6f7f7;
+    border-color: #dcdcde;
+    color: #50575e;
+    cursor: not-allowed;
+}
+
+/* Hide action column content when readonly */
+.ihumbak-readonly .column-actions {
+    color: #dcdcde;
+}

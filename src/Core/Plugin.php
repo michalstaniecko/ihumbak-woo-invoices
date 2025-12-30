@@ -376,7 +376,7 @@ final class Plugin {
 		);
 
 		// Check if we're on edit page.
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : '';
 
 		if ( in_array( $action, array( 'new', 'edit' ), true ) ) {
@@ -389,6 +389,19 @@ final class Plugin {
 			);
 		}
 
+		// Determine if document is readonly (issued, not draft).
+		$is_readonly = false;
+		if ( 'edit' === $action ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$document_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+			if ( $document_id > 0 ) {
+				$document = $this->container->get( \IHumbak\Invoices\Repositories\DocumentRepository::class )->find( $document_id );
+				if ( $document && ! $document->isDraft() ) {
+					$is_readonly = true;
+				}
+			}
+		}
+
 		wp_localize_script(
 			'ihumbak-invoices-admin',
 			'ihumbakInvoices',
@@ -397,6 +410,7 @@ final class Plugin {
 				'nonce'      => wp_create_nonce( 'ihumbak_invoices_nonce' ),
 				'selectLogo' => __( 'Select Logo', 'ihumbak-invoices' ),
 				'useLogo'    => __( 'Use this logo', 'ihumbak-invoices' ),
+				'isReadonly' => $is_readonly,
 				'i18n'       => array(
 					'confirmDelete'       => __( 'Are you sure you want to delete this item?', 'ihumbak-invoices' ),
 					'calculating'         => __( 'Calculating...', 'ihumbak-invoices' ),

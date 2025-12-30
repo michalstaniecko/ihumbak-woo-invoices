@@ -30,10 +30,18 @@
         calculateTimer: null,
 
         /**
+         * Whether the document is in readonly mode (issued, not draft).
+         */
+        isReadonly: false,
+
+        /**
          * Initialize the module.
          */
         init: function() {
             var self = this;
+
+            // Check if document is in readonly mode.
+            this.isReadonly = ihumbakInvoices.isReadonly || false;
 
             this.itemIndex = this.getMaxItemIndex() + 1;
             this.bindEvents();
@@ -61,6 +69,11 @@
          */
         bindEvents: function() {
             var self = this;
+
+            // Skip binding edit events if in readonly mode.
+            if (this.isReadonly) {
+                return;
+            }
 
             // Add item button.
             $('#ihumbak-add-item').on('click', function(e) {
@@ -136,6 +149,12 @@
          */
         recalculateDocument: function() {
             var self = this;
+
+            // Skip recalculation in readonly mode - values are already set server-side.
+            if (this.isReadonly) {
+                return;
+            }
+
             var items = this.collectItemsData();
 
             if (items.length === 0) {

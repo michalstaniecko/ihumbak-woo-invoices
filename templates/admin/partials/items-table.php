@@ -6,17 +6,29 @@
  *
  * @var array<int, array<string, mixed>> $items                   Document items.
  * @var bool                             $allow_negative_quantity Allow negative quantities (for credit notes).
+ * @var bool                             $can_edit                Whether document can be edited.
  */
 
 defined( 'ABSPATH' ) || exit;
 
 $items                   = $items ?? [];
 $allow_negative_quantity = $allow_negative_quantity ?? false;
+$can_edit                = $can_edit ?? true;
 $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
+$readonly_attr           = $can_edit ? '' : ' readonly';
+$disabled_attr           = $can_edit ? '' : ' disabled';
+$readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 ?>
 
-<div class="ihumbak-card ihumbak-items-card">
+<div class="ihumbak-card ihumbak-items-card<?php echo esc_attr( $readonly_class ); ?>">
     <h3><?php esc_html_e( 'Items', 'ihumbak-invoices' ); ?></h3>
+
+    <?php if ( ! $can_edit ) : ?>
+        <div class="ihumbak-readonly-notice">
+            <span class="dashicons dashicons-lock"></span>
+            <?php esc_html_e( 'This document has been issued. Item fields are read-only.', 'ihumbak-invoices' ); ?>
+        </div>
+    <?php endif; ?>
 
     <table class="widefat ihumbak-items-table" id="ihumbak-items-table">
         <thead>
@@ -41,32 +53,32 @@ $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
                         <td class="column-name">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
                                    value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
-                                   class="item-name" required>
+                                   class="item-name" required<?php echo esc_attr( $readonly_attr ); ?>>
                         </td>
                         <td class="column-sku">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][sku]"
                                    value="<?php echo esc_attr( $item['sku'] ?? '' ); ?>"
-                                   class="item-sku">
+                                   class="item-sku"<?php echo esc_attr( $readonly_attr ); ?>>
                         </td>
                         <td class="column-quantity">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][quantity]"
                                    value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>"
-                                   class="item-quantity" step="0.001"<?php echo esc_attr( $quantity_min_attr ); ?> required>
+                                   class="item-quantity" step="0.001"<?php echo esc_attr( $quantity_min_attr ); ?> required<?php echo esc_attr( $readonly_attr ); ?>>
                         </td>
                         <td class="column-unit">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][unit]"
                                    value="<?php echo esc_attr( $item['unit'] ?? 'szt.' ); ?>"
-                                   class="item-unit">
+                                   class="item-unit"<?php echo esc_attr( $readonly_attr ); ?>>
                         </td>
                         <td class="column-price-net">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_net]"
                                    value="<?php echo esc_attr( $item['unit_price_net'] ?? '' ); ?>"
-                                   class="item-price-net" step="0.01" min="0">
+                                   class="item-price-net" step="0.01" min="0"<?php echo esc_attr( $readonly_attr ); ?>>
                         </td>
                         <td class="column-tax-rate">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][tax_rate]"
                                    value="<?php echo esc_attr( $item['tax_rate'] ?? 23 ); ?>"
-                                   class="item-tax-rate" step="0.01" min="0" max="100">
+                                   class="item-tax-rate" step="0.01" min="0" max="100"<?php echo esc_attr( $readonly_attr ); ?>>
                         </td>
                         <td class="column-price-gross">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_gross]"
@@ -92,9 +104,11 @@ $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
                                    class="item-total-gross">
                         </td>
                         <td class="column-actions">
+                            <?php if ( $can_edit ) : ?>
                             <button type="button" class="button button-small ihumbak-remove-item" title="<?php esc_attr_e( 'Remove', 'ihumbak-invoices' ); ?>">
                                 <span class="dashicons dashicons-trash"></span>
                             </button>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -120,12 +134,14 @@ $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
         </tfoot>
     </table>
 
+    <?php if ( $can_edit ) : ?>
     <p>
         <button type="button" class="button" id="ihumbak-add-item">
             <span class="dashicons dashicons-plus-alt2"></span>
             <?php esc_html_e( 'Add Item', 'ihumbak-invoices' ); ?>
         </button>
     </p>
+    <?php endif; ?>
 </div>
 
 <!-- Item row template for JS -->
