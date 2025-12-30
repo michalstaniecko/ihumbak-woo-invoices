@@ -839,6 +839,24 @@ if ( ! function_exists( 'wc_get_account_endpoint_url' ) ) {
     }
 }
 
+if ( ! function_exists( 'wc_get_page_permalink' ) ) {
+    /**
+     * Mock wc_get_page_permalink function.
+     *
+     * @param string $page Page slug (e.g., 'myaccount', 'shop', 'cart').
+     * @return string Page permalink.
+     */
+    function wc_get_page_permalink( string $page ): string {
+        $pages = array(
+            'myaccount' => 'http://localhost/my-account/',
+            'shop'      => 'http://localhost/shop/',
+            'cart'      => 'http://localhost/cart/',
+            'checkout'  => 'http://localhost/checkout/',
+        );
+        return $pages[ $page ] ?? 'http://localhost/' . $page . '/';
+    }
+}
+
 // =============================================================================
 // Mock WordPress database class for unit tests.
 // =============================================================================
