@@ -16,7 +16,6 @@ $allow_negative_quantity = $allow_negative_quantity ?? false;
 $can_edit                = $can_edit ?? true;
 $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
 $readonly_attr           = $can_edit ? '' : ' readonly';
-$disabled_attr           = $can_edit ? '' : ' disabled';
 $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 ?>
 
