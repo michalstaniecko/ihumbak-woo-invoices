@@ -51,32 +51,32 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
                         <td class="column-name">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
                                    value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
-                                   class="item-name" required <?php readonly( ! $can_edit ); ?>>
+                                   class="item-name" required <?php wp_readonly( ! $can_edit ); ?>>
                         </td>
                         <td class="column-sku">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][sku]"
                                    value="<?php echo esc_attr( $item['sku'] ?? '' ); ?>"
-                                   class="item-sku" <?php readonly( ! $can_edit ); ?>>
+                                   class="item-sku" <?php wp_readonly( ! $can_edit ); ?>>
                         </td>
                         <td class="column-quantity">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][quantity]"
                                    value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>"
-                                   class="item-quantity" step="0.001"<?php echo esc_attr( $quantity_min_attr ); ?> required <?php readonly( ! $can_edit ); ?>>
+                                   class="item-quantity" step="0.001"<?php echo esc_attr( $quantity_min_attr ); ?> required <?php wp_readonly( ! $can_edit ); ?>>
                         </td>
                         <td class="column-unit">
                             <input type="text" name="items[<?php echo esc_attr( $index ); ?>][unit]"
                                    value="<?php echo esc_attr( $item['unit'] ?? 'szt.' ); ?>"
-                                   class="item-unit" <?php readonly( ! $can_edit ); ?>>
+                                   class="item-unit" <?php wp_readonly( ! $can_edit ); ?>>
                         </td>
                         <td class="column-price-net">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_net]"
                                    value="<?php echo esc_attr( $item['unit_price_net'] ?? '' ); ?>"
-                                   class="item-price-net" step="0.01" min="0" <?php readonly( ! $can_edit ); ?>>
+                                   class="item-price-net" step="0.01" min="0" <?php wp_readonly( ! $can_edit ); ?>>
                         </td>
                         <td class="column-tax-rate">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][tax_rate]"
                                    value="<?php echo esc_attr( $item['tax_rate'] ?? 23 ); ?>"
-                                   class="item-tax-rate" step="0.01" min="0" max="100" <?php readonly( ! $can_edit ); ?>>
+                                   class="item-tax-rate" step="0.01" min="0" max="100" <?php wp_readonly( ! $can_edit ); ?>>
                         </td>
                         <td class="column-price-gross">
                             <input type="number" name="items[<?php echo esc_attr( $index ); ?>][unit_price_gross]"

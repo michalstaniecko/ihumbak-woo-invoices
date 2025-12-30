@@ -996,3 +996,87 @@ global $wpdb;
 if ( ! isset( $wpdb ) ) {
     $wpdb = new wpdb();
 }
+
+// =============================================================================
+// Mock WordPress locale functions for PDF locale switching tests.
+// =============================================================================
+
+if ( ! defined( 'WP_LANG_DIR' ) ) {
+    define( 'WP_LANG_DIR', '/tmp/wordpress/wp-content/languages' );
+}
+
+// Mock locale stack for switch_to_locale/restore_previous_locale.
+global $mock_locale_stack;
+$mock_locale_stack = array();
+
+// Mock current locale value.
+global $mock_current_locale;
+$mock_current_locale = 'en_US';
+
+if ( ! function_exists( 'determine_locale' ) ) {
+    /**
+     * Mock determine_locale function.
+     *
+     * @return string Current locale.
+     */
+    function determine_locale(): string {
+        global $mock_current_locale;
+        return $mock_current_locale ?? 'en_US';
+    }
+}
+
+if ( ! function_exists( 'switch_to_locale' ) ) {
+    /**
+     * Mock switch_to_locale function.
+     *
+     * @param string $locale Locale to switch to.
+     * @return bool True if switched.
+     */
+    function switch_to_locale( string $locale ): bool {
+        global $mock_locale_stack, $mock_current_locale;
+        $mock_locale_stack[] = $mock_current_locale;
+        $mock_current_locale = $locale;
+        return true;
+    }
+}
+
+if ( ! function_exists( 'restore_previous_locale' ) ) {
+    /**
+     * Mock restore_previous_locale function.
+     *
+     * @return string|false Previous locale or false.
+     */
+    function restore_previous_locale() {
+        global $mock_locale_stack, $mock_current_locale;
+        if ( empty( $mock_locale_stack ) ) {
+            return false;
+        }
+        $mock_current_locale = array_pop( $mock_locale_stack );
+        return $mock_current_locale;
+    }
+}
+
+if ( ! function_exists( 'unload_textdomain' ) ) {
+    /**
+     * Mock unload_textdomain function.
+     *
+     * @param string $domain Text domain.
+     * @return bool True.
+     */
+    function unload_textdomain( string $domain ): bool {
+        return true;
+    }
+}
+
+if ( ! function_exists( 'load_textdomain' ) ) {
+    /**
+     * Mock load_textdomain function.
+     *
+     * @param string $domain Text domain.
+     * @param string $mofile Path to .mo file.
+     * @return bool True if file exists.
+     */
+    function load_textdomain( string $domain, string $mofile ): bool {
+        return file_exists( $mofile );
+    }
+}

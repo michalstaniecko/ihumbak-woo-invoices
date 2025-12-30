@@ -20,12 +20,12 @@ $can_edit = $can_edit ?? true;
         <div class="ihumbak-form-field">
             <label for="seller_name"><?php esc_html_e( 'Company Name', 'ihumbak-invoices' ); ?> <span class="required">*</span></label>
             <input type="text" id="seller_name" name="seller[name]"
-                   value="<?php echo esc_attr( $seller['name'] ?? '' ); ?>" required <?php readonly( ! $can_edit ); ?>>
+                   value="<?php echo esc_attr( $seller['name'] ?? '' ); ?>" required <?php wp_readonly( ! $can_edit ); ?>>
         </div>
         <div class="ihumbak-form-field">
             <label for="seller_details"><?php esc_html_e( 'Details', 'ihumbak-invoices' ); ?></label>
             <textarea id="seller_details" name="seller[details]" rows="6"
-                      placeholder="<?php esc_attr_e( 'Address, VAT ID, bank, phone...', 'ihumbak-invoices' ); ?>" <?php readonly( ! $can_edit ); ?>><?php echo esc_textarea( $seller['details'] ?? '' ); ?></textarea>
+                      placeholder="<?php esc_attr_e( 'Address, VAT ID, bank, phone...', 'ihumbak-invoices' ); ?>" <?php wp_readonly( ! $can_edit ); ?>><?php echo esc_textarea( $seller['details'] ?? '' ); ?></textarea>
         </div>
     </div>
 </div>
