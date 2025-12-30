@@ -60,6 +60,20 @@ class PdfGenerator {
 	private DocumentItemRepository $item_repository;
 
 	/**
+	 * Current PDF locale for textdomain loading.
+	 *
+	 * @var string|null
+	 */
+	private ?string $pdf_locale = null;
+
+	/**
+	 * Original locale before switching for PDF generation.
+	 *
+	 * @var string|null
+	 */
+	private ?string $original_locale = null;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param TemplateLoader|null         $template_loader      Template loader instance.
@@ -133,27 +147,56 @@ class PdfGenerator {
 	 * @return bool True if locale was switched, false otherwise.
 	 */
 	private function switchToSiteLocale(): bool {
+		// Save original locale for restoration later.
+		$this->original_locale = determine_locale();
+
+		// Get site locale from WordPress options (not affected by admin user's language preference).
+		// In admin context, get_locale() may return the admin user's language, not the site language.
+		$site_locale = $this->getSiteLocale();
+
 		/**
 		 * Filter the locale used for PDF generation.
 		 *
 		 * @param string $locale The locale to use for PDF. Default is site locale.
 		 */
-		$pdf_locale = apply_filters( 'ihumbak_pdf_locale', get_locale() );
+		$this->pdf_locale = apply_filters( 'ihumbak_pdf_locale', $site_locale );
 
 		// Check if we need to switch locale.
-		$current_locale = determine_locale();
-		if ( $pdf_locale === $current_locale ) {
+		if ( $this->pdf_locale === $this->original_locale ) {
+			// Even if locale matches, reload textdomains to ensure correct translations.
+			// This handles edge cases where textdomains may be cached with wrong translations.
+			$this->reloadTextdomains();
 			return false;
 		}
 
 		// Switch to the PDF locale.
-		$switched = switch_to_locale( $pdf_locale );
+		$switched = switch_to_locale( $this->pdf_locale );
 
-		if ( $switched ) {
-			$this->reloadTextdomains();
-		}
+		// Always reload textdomains, even if switch_to_locale() returns false.
+		// This ensures we load correct translation files for the PDF locale.
+		$this->reloadTextdomains();
 
 		return $switched;
+	}
+
+	/**
+	 * Get the site locale regardless of admin user's language preference.
+	 *
+	 * WordPress may switch locale in admin context based on user's profile language setting.
+	 * This method returns the actual site locale from the WPLANG option.
+	 *
+	 * @return string Site locale (e.g., 'nb_NO', 'en_US').
+	 */
+	private function getSiteLocale(): string {
+		// WPLANG option stores the site language setting.
+		// Empty value means English (en_US).
+		$site_locale = get_option( 'WPLANG' );
+
+		if ( empty( $site_locale ) ) {
+			return 'en_US';
+		}
+
+		return $site_locale;
 	}
 
 	/**
@@ -163,33 +206,60 @@ class PdfGenerator {
 	 */
 	private function restoreLocale(): void {
 		restore_previous_locale();
+
+		// Set pdf_locale to original locale for textdomain restoration.
+		$this->pdf_locale = $this->original_locale;
 		$this->reloadTextdomains();
+
+		// Clear locale state.
+		$this->pdf_locale      = null;
+		$this->original_locale = null;
 	}
 
 	/**
-	 * Reload textdomains after locale switch.
+	 * Reload textdomains for PDF locale.
 	 *
-	 * This ensures translations are properly loaded for the current locale.
+	 * Uses direct load_textdomain() with explicit locale to bypass WordPress
+	 * determine_locale() which may return admin user's locale in admin context.
 	 *
 	 * @return void
 	 */
 	private function reloadTextdomains(): void {
-		// Reload plugin textdomain.
+		$locale = $this->pdf_locale;
+
+		if ( empty( $locale ) ) {
+			return;
+		}
+
+		// Reload plugin textdomain with explicit locale path.
 		unload_textdomain( 'ihumbak-invoices' );
-		load_plugin_textdomain(
-			'ihumbak-invoices',
-			false,
-			dirname( IHUMBAK_INVOICES_BASENAME ) . '/languages'
-		);
+
+		// Try plugin languages directory first.
+		$plugin_mo_file = IHUMBAK_INVOICES_PATH . 'languages/ihumbak-invoices-' . $locale . '.mo';
+
+		if ( file_exists( $plugin_mo_file ) ) {
+			load_textdomain( 'ihumbak-invoices', $plugin_mo_file );
+		} else {
+			// Fallback to global WordPress languages directory.
+			$global_mo_file = WP_LANG_DIR . '/plugins/ihumbak-invoices-' . $locale . '.mo';
+			if ( file_exists( $global_mo_file ) ) {
+				load_textdomain( 'ihumbak-invoices', $global_mo_file );
+			}
+		}
 
 		// Also reload WooCommerce textdomain for currency/payment translations.
 		if ( defined( 'WC_PLUGIN_FILE' ) ) {
 			unload_textdomain( 'woocommerce' );
-			load_plugin_textdomain(
-				'woocommerce',
-				false,
-				dirname( plugin_basename( WC_PLUGIN_FILE ) ) . '/i18n/languages'
-			);
+
+			// WooCommerce translation file paths.
+			$wc_plugin_mo = dirname( WC_PLUGIN_FILE ) . '/i18n/languages/woocommerce-' . $locale . '.mo';
+			$wc_global_mo = WP_LANG_DIR . '/plugins/woocommerce-' . $locale . '.mo';
+
+			if ( file_exists( $wc_global_mo ) ) {
+				load_textdomain( 'woocommerce', $wc_global_mo );
+			} elseif ( file_exists( $wc_plugin_mo ) ) {
+				load_textdomain( 'woocommerce', $wc_plugin_mo );
+			}
 		}
 	}
 
