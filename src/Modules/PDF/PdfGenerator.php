@@ -108,6 +108,101 @@ class PdfGenerator {
 	 * @throws \RuntimeException If PDF generation fails.
 	 */
 	public function generateContent( Document $document ): string {
+		// Switch to site locale before generating PDF.
+		// This ensures PDF uses site language instead of admin user language.
+		$locale_switched = $this->switchToSiteLocale();
+
+		try {
+			$pdf_content = $this->generatePdfContent( $document );
+		} finally {
+			// Always restore locale, even if an exception occurs.
+			if ( $locale_switched ) {
+				$this->restoreLocale();
+			}
+		}
+
+		return $pdf_content;
+	}
+
+	/**
+	 * Switch to site locale for PDF generation.
+	 *
+	 * When admin has a different language than the site (e.g., admin: EN, site: NO),
+	 * PDFs should be generated in the site's language, not the admin's.
+	 *
+	 * @return bool True if locale was switched, false otherwise.
+	 */
+	private function switchToSiteLocale(): bool {
+		/**
+		 * Filter the locale used for PDF generation.
+		 *
+		 * @param string $locale The locale to use for PDF. Default is site locale.
+		 */
+		$pdf_locale = apply_filters( 'ihumbak_pdf_locale', get_locale() );
+
+		// Check if we need to switch locale.
+		$current_locale = determine_locale();
+		if ( $pdf_locale === $current_locale ) {
+			return false;
+		}
+
+		// Switch to the PDF locale.
+		$switched = switch_to_locale( $pdf_locale );
+
+		if ( $switched ) {
+			$this->reloadTextdomains();
+		}
+
+		return $switched;
+	}
+
+	/**
+	 * Restore the previous locale after PDF generation.
+	 *
+	 * @return void
+	 */
+	private function restoreLocale(): void {
+		restore_previous_locale();
+		$this->reloadTextdomains();
+	}
+
+	/**
+	 * Reload textdomains after locale switch.
+	 *
+	 * This ensures translations are properly loaded for the current locale.
+	 *
+	 * @return void
+	 */
+	private function reloadTextdomains(): void {
+		// Reload plugin textdomain.
+		unload_textdomain( 'ihumbak-invoices' );
+		load_plugin_textdomain(
+			'ihumbak-invoices',
+			false,
+			dirname( IHUMBAK_INVOICES_BASENAME ) . '/languages'
+		);
+
+		// Also reload WooCommerce textdomain for currency/payment translations.
+		if ( defined( 'WC_PLUGIN_FILE' ) ) {
+			unload_textdomain( 'woocommerce' );
+			load_plugin_textdomain(
+				'woocommerce',
+				false,
+				dirname( plugin_basename( WC_PLUGIN_FILE ) ) . '/i18n/languages'
+			);
+		}
+	}
+
+	/**
+	 * Internal method to generate PDF content.
+	 *
+	 * This is the actual PDF generation logic, extracted to allow locale switching wrapper.
+	 *
+	 * @param Document $document The document.
+	 * @return string PDF content.
+	 * @throws \RuntimeException If PDF generation fails.
+	 */
+	private function generatePdfContent( Document $document ): string {
 		/**
 		 * Fires before PDF generation starts.
 		 *
