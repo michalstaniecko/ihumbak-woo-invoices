@@ -25,21 +25,23 @@ use IHumbak\Invoices\Core\Plugin;
 class EmailService {
 
 	/**
-	 * PDF generator instance.
+	 * PDF generator instance (lazy loaded).
 	 *
-	 * @var PdfGenerator
+	 * @var PdfGenerator|null
 	 */
-	private PdfGenerator $pdf_generator;
+	private ?PdfGenerator $pdf_generator = null;
 
 	/**
 	 * Document repository instance.
 	 *
-	 * @var DocumentRepository
+	 * @var DocumentRepository|null
 	 */
-	private DocumentRepository $document_repository;
+	private ?DocumentRepository $document_repository = null;
 
 	/**
 	 * Constructor.
+	 *
+	 * Dependencies are lazy-loaded to avoid circular dependency during Plugin initialization.
 	 *
 	 * @param PdfGenerator|null       $pdf_generator       PDF generator instance.
 	 * @param DocumentRepository|null $document_repository Document repository instance.
@@ -48,8 +50,33 @@ class EmailService {
 		?PdfGenerator $pdf_generator = null,
 		?DocumentRepository $document_repository = null
 	) {
-		$this->pdf_generator       = $pdf_generator ?? Plugin::get_instance()->container()->get( 'pdf.generator' );
-		$this->document_repository = $document_repository ?? new DocumentRepository();
+		// Store injected dependencies if provided, otherwise lazy-load on first use.
+		$this->pdf_generator       = $pdf_generator;
+		$this->document_repository = $document_repository;
+	}
+
+	/**
+	 * Get PDF generator instance (lazy loaded).
+	 *
+	 * @return PdfGenerator
+	 */
+	private function getPdfGenerator(): PdfGenerator {
+		if ( null === $this->pdf_generator ) {
+			$this->pdf_generator = Plugin::get_instance()->container()->get( 'pdf.generator' );
+		}
+		return $this->pdf_generator;
+	}
+
+	/**
+	 * Get document repository instance (lazy loaded).
+	 *
+	 * @return DocumentRepository
+	 */
+	private function getDocumentRepository(): DocumentRepository {
+		if ( null === $this->document_repository ) {
+			$this->document_repository = new DocumentRepository();
+		}
+		return $this->document_repository;
 	}
 
 	/**
@@ -190,19 +217,23 @@ class EmailService {
 	}
 
 	/**
-	 * Update document status to sent after successful email.
+	 * Update document after successful email send.
+	 *
+	 * Sets sent_at timestamp and updates status to 'sent' if currently 'issued'.
 	 *
 	 * @param Document $document The document.
 	 * @return void
 	 */
 	private function updateDocumentStatus( Document $document ): void {
-		// Only update if current status is 'issued'.
-		if ( Document::STATUS_ISSUED !== $document->getStatus() ) {
-			return;
+		// Always update sent_at timestamp.
+		$document->setSentAt( new \DateTimeImmutable() );
+
+		// Only update status if current status is 'issued'.
+		if ( Document::STATUS_ISSUED === $document->getStatus() ) {
+			$document->setStatus( Document::STATUS_SENT );
 		}
 
-		$document->setStatus( Document::STATUS_SENT );
-		$this->document_repository->save( $document );
+		$this->getDocumentRepository()->save( $document );
 	}
 
 	/**
@@ -215,7 +246,7 @@ class EmailService {
 	 */
 	public function generatePdfAttachment( Document $document ): ?string {
 		try {
-			$pdf_content = $this->pdf_generator->generateContent( $document );
+			$pdf_content = $this->getPdfGenerator()->generateContent( $document );
 
 			if ( empty( $pdf_content ) ) {
 				return null;

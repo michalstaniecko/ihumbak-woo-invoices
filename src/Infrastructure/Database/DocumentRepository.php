@@ -303,6 +303,7 @@ class DocumentRepository {
 			'status'                => $document->getStatus(),
 			'pdf_path'              => $document->getPdfPath(),
 			'notes'                 => $document->getNotes(),
+			'sent_at'               => $document->getSentAt()?->format( 'Y-m-d H:i:s' ),
 		);
 
 		// Add invoice specific fields.

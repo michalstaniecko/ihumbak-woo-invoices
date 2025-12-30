@@ -73,6 +73,18 @@ $page_title = $is_new
 			</p>
 		</div>
 		<?php
+	elseif ( 'email_sent' === $message ) :
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p><?php esc_html_e( 'Email sent successfully.', 'ihumbak-invoices' ); ?></p>
+		</div>
+		<?php
+	elseif ( 'email_error' === $message ) :
+		?>
+		<div class="notice notice-error is-dismissible">
+			<p><?php esc_html_e( 'Failed to send email. Please try again.', 'ihumbak-invoices' ); ?></p>
+		</div>
+		<?php
 	endif;
 	?>
 
@@ -331,6 +343,45 @@ $page_title = $is_new
 								<?php esc_html_e( 'Download PDF', 'ihumbak-invoices' ); ?>
 							</a>
 						</p>
+						<?php if ( $document->getOrderId() ) : ?>
+							<?php
+							$email_url = add_query_arg(
+								array(
+									'page'      => 'ihumbak-invoices',
+									'action'    => 'send_email',
+									'id'        => $document->getId(),
+									'return_to' => 'edit',
+									'nonce'     => wp_create_nonce( 'send_email_' . $document->getId() ),
+								),
+								admin_url( 'admin.php' )
+							);
+							$was_sent = $document->wasSent();
+							?>
+							<p>
+								<?php if ( $was_sent ) : ?>
+									<a href="<?php echo esc_url( $email_url ); ?>"
+									   class="button button-large ihumbak-resend-email"
+									   data-confirm="<?php esc_attr_e( 'This document has already been sent. Do you want to send it again?', 'ihumbak-invoices' ); ?>">
+										<?php esc_html_e( 'Resend Email', 'ihumbak-invoices' ); ?>
+									</a>
+								<?php else : ?>
+									<a href="<?php echo esc_url( $email_url ); ?>" class="button button-large">
+										<?php esc_html_e( 'Send Email', 'ihumbak-invoices' ); ?>
+									</a>
+								<?php endif; ?>
+							</p>
+							<?php if ( $was_sent ) : ?>
+								<p class="description" style="margin-top: -10px;">
+									<?php
+									printf(
+										/* translators: %s: Date and time when email was sent */
+										esc_html__( 'Last sent: %s', 'ihumbak-invoices' ),
+										esc_html( $document->getSentAt()->format( 'Y-m-d H:i' ) )
+									);
+									?>
+								</p>
+							<?php endif; ?>
+						<?php endif; ?>
 					<?php endif; ?>
 				</div>
 

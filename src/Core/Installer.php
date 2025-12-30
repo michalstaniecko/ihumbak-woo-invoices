@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.4.0';
+	private const DB_VERSION = '1.5.0';
 
 	/**
 	 * Option name for storing database version.
@@ -46,6 +46,7 @@ class Installer {
 		'credit_note_120'    => '1.2.0',
 		'payment_method_130' => '1.3.0',
 		'payment_date_140'   => '1.4.0',
+		'sent_at_150'        => '1.5.0',
 	);
 
 	/**
@@ -290,6 +291,28 @@ class Installer {
 
 			// phpcs:enable
 		}
+
+		// Migration to 1.5.0: Add sent_at column.
+		if ( version_compare( $from_version, '1.5.0', '<' ) ) {
+			$table = self::get_documents_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			// Add sent_at column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'sent_at'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN sent_at datetime DEFAULT NULL AFTER updated_at" );
+			}
+
+			// phpcs:enable
+		}
 	}
 
 	/**
@@ -456,6 +479,7 @@ class Installer {
             payment_method_title varchar(255) DEFAULT '',
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            sent_at datetime DEFAULT NULL,
             PRIMARY KEY (id),
             KEY order_id (order_id),
             KEY document_type (document_type),

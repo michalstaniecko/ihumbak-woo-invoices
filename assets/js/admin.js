@@ -93,6 +93,27 @@
     };
 
     /**
+     * Resend email confirmation handler.
+     */
+    var resendEmailHandler = {
+        init: function() {
+            $(document).on('click', '.ihumbak-resend-email', this.handleClick.bind(this));
+        },
+
+        handleClick: function(e) {
+            var $link = $(e.currentTarget);
+            var confirmMessage = $link.data('confirm');
+
+            if (confirmMessage && !confirm(confirmMessage)) {
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+    };
+
+    /**
      * Initialize on document ready.
      */
     $(document).ready(function() {
@@ -103,6 +124,9 @@
 
         // Initialize revert form handler.
         revertFormHandler.init();
+
+        // Initialize resend email handler.
+        resendEmailHandler.init();
     });
 
 })(jQuery);

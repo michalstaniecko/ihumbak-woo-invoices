@@ -83,6 +83,7 @@ class Invoice extends Document {
 			'payment_method'        => $this->payment_method,
 			'payment_method_id'     => $this->payment_method_id,
 			'payment_method_title'  => $this->payment_method_title,
+			'sent_at'               => $this->sent_at?->format( 'Y-m-d H:i:s' ),
 			'items'                 => array_map(
 				static fn( DocumentItem $item ): array => $item->toArray(),
 				$this->items

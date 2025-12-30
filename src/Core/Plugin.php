@@ -670,15 +670,36 @@ final class Plugin {
 		// Redirect with result.
 		$message = $result ? 'email_sent' : 'email_error';
 
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'    => 'ihumbak-invoices',
-					'message' => $message,
-				),
-				admin_url( 'admin.php' )
-			)
-		);
+		// Check if we should return to edit page.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$return_to = isset( $_GET['return_to'] ) ? sanitize_text_field( wp_unslash( $_GET['return_to'] ) ) : '';
+
+		if ( 'edit' === $return_to ) {
+			// Return to document edit page.
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'    => 'ihumbak-invoices',
+						'action'  => 'edit',
+						'type'    => $document->getDocumentType(),
+						'id'      => $id,
+						'message' => $message,
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+		} else {
+			// Return to document list (default).
+			wp_safe_redirect(
+				add_query_arg(
+					array(
+						'page'    => 'ihumbak-invoices',
+						'message' => $message,
+					),
+					admin_url( 'admin.php' )
+				)
+			);
+		}
 		exit;
 	}
 

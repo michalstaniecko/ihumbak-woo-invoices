@@ -77,6 +77,7 @@ class Receipt extends Document {
 			'payment_method'       => $this->payment_method,
 			'payment_method_id'    => $this->payment_method_id,
 			'payment_method_title' => $this->payment_method_title,
+			'sent_at'              => $this->sent_at?->format( 'Y-m-d H:i:s' ),
 		);
 	}
 }

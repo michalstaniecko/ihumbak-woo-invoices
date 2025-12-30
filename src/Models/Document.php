@@ -187,6 +187,13 @@ abstract class Document {
 	protected ?DateTimeImmutable $updated_at = null;
 
 	/**
+	 * Sent at timestamp (when email was last sent).
+	 *
+	 * @var DateTimeImmutable|null
+	 */
+	protected ?DateTimeImmutable $sent_at = null;
+
+	/**
 	 * Get document type.
 	 *
 	 * @return string
@@ -770,6 +777,35 @@ abstract class Document {
 	}
 
 	/**
+	 * Get sent at.
+	 *
+	 * @return DateTimeImmutable|null
+	 */
+	public function getSentAt(): ?DateTimeImmutable {
+		return $this->sent_at;
+	}
+
+	/**
+	 * Set sent at.
+	 *
+	 * @param DateTimeImmutable|null $date Sent at timestamp.
+	 * @return self
+	 */
+	public function setSentAt( ?DateTimeImmutable $date ): self {
+		$this->sent_at = $date;
+		return $this;
+	}
+
+	/**
+	 * Check if document was sent via email.
+	 *
+	 * @return bool
+	 */
+	public function wasSent(): bool {
+		return null !== $this->sent_at;
+	}
+
+	/**
 	 * Check if document is draft.
 	 *
 	 * @return bool
@@ -939,6 +975,12 @@ abstract class Document {
 			$date = self::parseDate( (string) $data['updated_at'] );
 			if ( $date ) {
 				$this->setUpdatedAt( $date );
+			}
+		}
+		if ( ! empty( $data['sent_at'] ) ) {
+			$date = self::parseDate( (string) $data['sent_at'] );
+			if ( $date ) {
+				$this->setSentAt( $date );
 			}
 		}
 

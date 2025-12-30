@@ -29,33 +29,33 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	protected ?Document $document = null;
 
 	/**
-	 * Document repository.
+	 * Document repository (lazy loaded).
 	 *
-	 * @var DocumentRepository
+	 * @var DocumentRepository|null
 	 */
-	protected DocumentRepository $document_repository;
+	protected ?DocumentRepository $document_repository = null;
 
 	/**
-	 * Document item repository.
+	 * Document item repository (lazy loaded).
 	 *
-	 * @var DocumentItemRepository
+	 * @var DocumentItemRepository|null
 	 */
-	protected DocumentItemRepository $item_repository;
+	protected ?DocumentItemRepository $item_repository = null;
 
 	/**
-	 * Email service.
+	 * Email service (lazy loaded).
 	 *
-	 * @var EmailService
+	 * @var EmailService|null
 	 */
-	protected EmailService $email_service;
+	protected ?EmailService $email_service = null;
 
 	/**
 	 * Constructor.
+	 *
+	 * Dependencies are lazy-loaded to avoid circular dependency during Plugin initialization.
 	 */
 	public function __construct() {
-		$this->document_repository = new DocumentRepository();
-		$this->item_repository     = new DocumentItemRepository();
-		$this->email_service       = new EmailService();
+		// Dependencies are lazy-loaded on first use to avoid circular dependencies.
 
 		// Email slug, used for saving settings.
 		$this->id = $this->get_email_id();
@@ -86,6 +86,42 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 
 		// Other settings.
 		$this->recipient = $this->get_option( 'recipient', '' );
+	}
+
+	/**
+	 * Get document repository (lazy loaded).
+	 *
+	 * @return DocumentRepository
+	 */
+	protected function getDocumentRepository(): DocumentRepository {
+		if ( null === $this->document_repository ) {
+			$this->document_repository = new DocumentRepository();
+		}
+		return $this->document_repository;
+	}
+
+	/**
+	 * Get document item repository (lazy loaded).
+	 *
+	 * @return DocumentItemRepository
+	 */
+	protected function getItemRepository(): DocumentItemRepository {
+		if ( null === $this->item_repository ) {
+			$this->item_repository = new DocumentItemRepository();
+		}
+		return $this->item_repository;
+	}
+
+	/**
+	 * Get email service (lazy loaded).
+	 *
+	 * @return EmailService
+	 */
+	protected function getEmailService(): EmailService {
+		if ( null === $this->email_service ) {
+			$this->email_service = Plugin::get_instance()->getEmailService() ?? new EmailService();
+		}
+		return $this->email_service;
 	}
 
 	/**
@@ -126,16 +162,24 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	/**
 	 * Get default subject.
 	 *
+	 * Override in child classes to provide document-specific subject.
+	 *
 	 * @return string
 	 */
-	abstract public function get_default_subject(): string;
+	public function get_default_subject(): string {
+		return __( 'Your document from {site_title}', 'ihumbak-invoices' );
+	}
 
 	/**
 	 * Get default heading.
 	 *
+	 * Override in child classes to provide document-specific heading.
+	 *
 	 * @return string
 	 */
-	abstract public function get_default_heading(): string;
+	public function get_default_heading(): string {
+		return __( 'Document', 'ihumbak-invoices' );
+	}
 
 	/**
 	 * Trigger the email.
@@ -150,7 +194,7 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 		if ( $document instanceof Document ) {
 			$this->document = $document;
 		} elseif ( $document_id ) {
-			$this->document = $this->document_repository->find( (int) $document_id );
+			$this->document = $this->getDocumentRepository()->find( (int) $document_id );
 		}
 
 		if ( ! $this->document ) {
@@ -160,7 +204,7 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 
 		// Load document items if not already loaded.
 		if ( empty( $this->document->getItems() ) ) {
-			$items = $this->item_repository->findByDocumentId( $this->document->getId() );
+			$items = $this->getItemRepository()->findByDocumentId( $this->document->getId() );
 			$this->document->setItems( $items );
 		}
 
@@ -175,7 +219,7 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 		}
 
 		// Get recipient.
-		$this->recipient = $this->email_service->getRecipientEmail( $this->document );
+		$this->recipient = $this->getEmailService()->getRecipientEmail( $this->document );
 
 		if ( ! $this->is_enabled() || ! $this->get_recipient() ) {
 			$this->restore_locale();
@@ -221,10 +265,13 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	 * @return string
 	 */
 	public function get_content_html(): string {
+		// Use sample document for preview if no real document is set.
+		$document = $this->document ?? $this->get_sample_document();
+
 		return wc_get_template_html(
 			$this->template_html,
 			array(
-				'document'      => $this->document,
+				'document'      => $document,
 				'email_heading' => $this->get_heading(),
 				'sent_to_admin' => false,
 				'plain_text'    => false,
@@ -241,10 +288,13 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	 * @return string
 	 */
 	public function get_content_plain(): string {
+		// Use sample document for preview if no real document is set.
+		$document = $this->document ?? $this->get_sample_document();
+
 		return wc_get_template_html(
 			$this->template_plain,
 			array(
-				'document'      => $this->document,
+				'document'      => $document,
 				'email_heading' => $this->get_heading(),
 				'sent_to_admin' => false,
 				'plain_text'    => true,
@@ -256,6 +306,45 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	}
 
 	/**
+	 * Get a sample document for email preview.
+	 *
+	 * Creates a mock document with sample data for WooCommerce email preview functionality.
+	 *
+	 * @return Document
+	 */
+	protected function get_sample_document(): Document {
+		$document_type = $this->get_document_type();
+
+		$sample_data = array(
+			'id'              => 0,
+			'document_number' => 'SAMPLE-2025/01/0001',
+			'status'          => Document::STATUS_ISSUED,
+			'issue_date'      => gmdate( 'Y-m-d' ),
+			'sale_date'       => gmdate( 'Y-m-d' ),
+			'due_date'        => gmdate( 'Y-m-d', strtotime( '+14 days' ) ),
+			'currency'        => get_woocommerce_currency(),
+			'total_net'       => 100.00,
+			'total_tax'       => 23.00,
+			'total'           => 123.00,
+			'buyer_name'      => __( 'Sample Customer', 'ihumbak-invoices' ),
+			'buyer_address'   => __( '123 Sample Street, Sample City', 'ihumbak-invoices' ),
+			'payment_method'  => 'transfer',
+		);
+
+		// Create document based on type.
+		switch ( $document_type ) {
+			case 'invoice':
+				return \IHumbak\Invoices\Models\Invoice::fromArray( $sample_data );
+			case 'receipt':
+				return \IHumbak\Invoices\Models\Receipt::fromArray( $sample_data );
+			case 'credit_note':
+				return \IHumbak\Invoices\Models\CreditNote::fromArray( $sample_data );
+			default:
+				return \IHumbak\Invoices\Models\Invoice::fromArray( $sample_data );
+		}
+	}
+
+	/**
 	 * Get email attachments.
 	 *
 	 * @return array Attachment file paths.
@@ -264,7 +353,7 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 		$attachments = parent::get_attachments();
 
 		if ( $this->document ) {
-			$pdf_path = $this->email_service->generatePdfAttachment( $this->document );
+			$pdf_path = $this->getEmailService()->generatePdfAttachment( $this->document );
 
 			if ( $pdf_path && file_exists( $pdf_path ) ) {
 				$attachments[] = $pdf_path;

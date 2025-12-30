@@ -241,6 +241,7 @@ class CreditNote extends Document {
 			'status'                => $this->status,
 			'pdf_path'              => $this->pdf_path,
 			'notes'                 => $this->notes,
+			'sent_at'               => $this->sent_at?->format( 'Y-m-d H:i:s' ),
 			'items'                 => array_map(
 				static fn( DocumentItem $item ): array => $item->toArray(),
 				$this->items
