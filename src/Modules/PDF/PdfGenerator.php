@@ -163,9 +163,8 @@ class PdfGenerator {
 
 		// Check if we need to switch locale.
 		if ( $this->pdf_locale === $this->original_locale ) {
-			// Even if locale matches, reload textdomains to ensure correct translations.
-			// This handles edge cases where textdomains may be cached with wrong translations.
-			$this->reloadTextdomains();
+			// No switch needed - already using the correct locale.
+			// Textdomains should already be loaded for this locale.
 			return false;
 		}
 
@@ -236,15 +235,23 @@ class PdfGenerator {
 
 		// Try plugin languages directory first.
 		$plugin_mo_file = IHUMBAK_INVOICES_PATH . 'languages/ihumbak-invoices-' . $locale . '.mo';
+		$global_mo_file = WP_LANG_DIR . '/plugins/ihumbak-invoices-' . $locale . '.mo';
 
 		if ( file_exists( $plugin_mo_file ) ) {
 			load_textdomain( 'ihumbak-invoices', $plugin_mo_file );
-		} else {
-			// Fallback to global WordPress languages directory.
-			$global_mo_file = WP_LANG_DIR . '/plugins/ihumbak-invoices-' . $locale . '.mo';
-			if ( file_exists( $global_mo_file ) ) {
-				load_textdomain( 'ihumbak-invoices', $global_mo_file );
-			}
+		} elseif ( file_exists( $global_mo_file ) ) {
+			load_textdomain( 'ihumbak-invoices', $global_mo_file );
+		} elseif ( 'en_US' !== $locale ) {
+			// Log warning only for non-English locales (English doesn't need .mo file).
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log(
+				sprintf(
+					'[iHumbak Invoices] Translation file not found for locale "%s". Checked: %s, %s',
+					$locale,
+					$plugin_mo_file,
+					$global_mo_file
+				)
+			);
 		}
 
 		// Also reload WooCommerce textdomain for currency/payment translations.
