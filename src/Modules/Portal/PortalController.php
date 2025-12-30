@@ -272,6 +272,8 @@ class PortalController {
 	/**
 	 * Get download URL for a document.
 	 *
+	 * Uses base My Account URL to avoid rewrite rules dependency.
+	 *
 	 * @param Document $document Document.
 	 * @return string
 	 */
@@ -284,7 +286,7 @@ class PortalController {
 				'document_id' => $document_id,
 				'_wpnonce'    => wp_create_nonce( self::NONCE_PREFIX . $document_id ),
 			),
-			wc_get_account_endpoint_url( self::ENDPOINT_SLUG )
+			wc_get_page_permalink( 'myaccount' )
 		);
 	}
 }
