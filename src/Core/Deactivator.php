@@ -26,6 +26,9 @@ class Deactivator {
 		// Clear transients.
 		self::clear_transients();
 
+		// Flush rewrite rules to remove portal endpoint.
+		flush_rewrite_rules();
+
 		// Clear cache.
 		wp_cache_flush();
 	}

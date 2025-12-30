@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace IHumbak\Invoices\Core;
 
+use IHumbak\Invoices\Modules\Portal\PortalController;
+
 /**
  * Handles plugin activation.
  */
@@ -37,6 +39,11 @@ class Activator {
 
 		// Set activation flag for redirect.
 		set_transient( 'ihumbak_invoices_activated', true, 30 );
+
+		// Register customer portal endpoint and flush rewrite rules.
+		$portal = new PortalController();
+		$portal->register_endpoint();
+		flush_rewrite_rules();
 
 		// Clear any cached data.
 		wp_cache_flush();

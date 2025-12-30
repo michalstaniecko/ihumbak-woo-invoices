@@ -780,3 +780,201 @@ if ( ! function_exists( 'sanitize_file_name' ) ) {
         return preg_replace( '/[^a-zA-Z0-9._-]/', '', $filename ) ?: $filename;
     }
 }
+
+// =============================================================================
+// Mock WordPress URL functions for Portal tests.
+// =============================================================================
+
+if ( ! function_exists( 'add_query_arg' ) ) {
+    /**
+     * Mock add_query_arg function.
+     *
+     * @param array|string $args Query args.
+     * @param string       $url  Base URL.
+     * @return string URL with query args.
+     */
+    function add_query_arg( $args, string $url = '' ): string {
+        if ( empty( $url ) ) {
+            $url = 'http://localhost/my-account/';
+        }
+        $query = http_build_query( $args );
+        return $url . ( strpos( $url, '?' ) !== false ? '&' : '?' ) . $query;
+    }
+}
+
+if ( ! function_exists( 'wp_create_nonce' ) ) {
+    /**
+     * Mock wp_create_nonce function.
+     *
+     * @param string $action Nonce action.
+     * @return string Nonce value.
+     */
+    function wp_create_nonce( string $action = '' ): string {
+        return 'mock_nonce_' . md5( $action );
+    }
+}
+
+if ( ! function_exists( 'wp_verify_nonce' ) ) {
+    /**
+     * Mock wp_verify_nonce function.
+     *
+     * @param string $nonce  Nonce to verify.
+     * @param string $action Nonce action.
+     * @return int|false
+     */
+    function wp_verify_nonce( string $nonce, string $action = '' ) {
+        return $nonce === 'mock_nonce_' . md5( $action ) ? 1 : false;
+    }
+}
+
+if ( ! function_exists( 'wc_get_account_endpoint_url' ) ) {
+    /**
+     * Mock wc_get_account_endpoint_url function.
+     *
+     * @param string $endpoint Endpoint slug.
+     * @return string Endpoint URL.
+     */
+    function wc_get_account_endpoint_url( string $endpoint ): string {
+        return 'http://localhost/my-account/' . $endpoint . '/';
+    }
+}
+
+// =============================================================================
+// Mock WordPress database class for unit tests.
+// =============================================================================
+
+if ( ! class_exists( 'wpdb' ) ) {
+    /**
+     * Mock wpdb class for unit tests.
+     */
+    class wpdb {
+        /**
+         * Table prefix.
+         *
+         * @var string
+         */
+        public string $prefix = 'wp_';
+
+        /**
+         * Last error message.
+         *
+         * @var string
+         */
+        public string $last_error = '';
+
+        /**
+         * Last insert ID.
+         *
+         * @var int
+         */
+        public int $insert_id = 0;
+
+        /**
+         * Prepare a SQL query.
+         *
+         * @param string $query  Query with placeholders.
+         * @param mixed  ...$args Values to replace placeholders.
+         * @return string Prepared query.
+         */
+        public function prepare( string $query, ...$args ): string {
+            return vsprintf( str_replace( array( '%s', '%d', '%f' ), "'%s'", $query ), $args );
+        }
+
+        /**
+         * Get a single row.
+         *
+         * @param string $query  SQL query.
+         * @param string $output Output type.
+         * @return array|object|null
+         */
+        public function get_row( string $query, $output = OBJECT ) {
+            return null;
+        }
+
+        /**
+         * Get multiple rows.
+         *
+         * @param string $query  SQL query.
+         * @param string $output Output type.
+         * @return array
+         */
+        public function get_results( string $query, $output = OBJECT ): array {
+            return array();
+        }
+
+        /**
+         * Get a single variable.
+         *
+         * @param string $query SQL query.
+         * @return string|null
+         */
+        public function get_var( string $query ): ?string {
+            return null;
+        }
+
+        /**
+         * Insert a row.
+         *
+         * @param string $table  Table name.
+         * @param array  $data   Data to insert.
+         * @param array  $format Format array.
+         * @return int|false
+         */
+        public function insert( string $table, array $data, array $format = array() ) {
+            $this->insert_id = 1;
+            return 1;
+        }
+
+        /**
+         * Update a row.
+         *
+         * @param string $table        Table name.
+         * @param array  $data         Data to update.
+         * @param array  $where        Where conditions.
+         * @param array  $format       Format array.
+         * @param array  $where_format Where format array.
+         * @return int|false
+         */
+        public function update( string $table, array $data, array $where, array $format = array(), array $where_format = array() ) {
+            return 1;
+        }
+
+        /**
+         * Delete a row.
+         *
+         * @param string $table        Table name.
+         * @param array  $where        Where conditions.
+         * @param array  $where_format Where format array.
+         * @return int|false
+         */
+        public function delete( string $table, array $where, array $where_format = array() ) {
+            return 1;
+        }
+
+        /**
+         * Execute a query.
+         *
+         * @param string $query SQL query.
+         * @return int|bool
+         */
+        public function query( string $query ) {
+            return true;
+        }
+
+        /**
+         * Escape like pattern.
+         *
+         * @param string $text Text to escape.
+         * @return string
+         */
+        public function esc_like( string $text ): string {
+            return addcslashes( $text, '_%\\' );
+        }
+    }
+}
+
+// Initialize global wpdb mock.
+global $wpdb;
+if ( ! isset( $wpdb ) ) {
+    $wpdb = new wpdb();
+}

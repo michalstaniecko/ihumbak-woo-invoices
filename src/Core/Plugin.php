@@ -23,6 +23,7 @@ use IHumbak\Invoices\Modules\Email\EmailService;
 use IHumbak\Invoices\Modules\Email\InvoiceEmail;
 use IHumbak\Invoices\Modules\Email\ReceiptEmail;
 use IHumbak\Invoices\Modules\Email\CreditNoteEmail;
+use IHumbak\Invoices\Modules\Portal\PortalController;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 
@@ -72,6 +73,13 @@ final class Plugin {
 	 * @var EmailService|null
 	 */
 	private ?EmailService $email_service = null;
+
+	/**
+	 * Portal controller.
+	 *
+	 * @var PortalController|null
+	 */
+	private ?PortalController $portal_controller = null;
 
 	/**
 	 * Plugin instance.
@@ -237,6 +245,11 @@ final class Plugin {
 			$this->report_controller = new ReportController();
 			$this->report_controller->init();
 		}
+
+		// Initialize frontend portal (customer My Account).
+		// Must run outside is_admin() to work on frontend.
+		$this->portal_controller = new PortalController();
+		$this->portal_controller->init();
 	}
 
 	/**

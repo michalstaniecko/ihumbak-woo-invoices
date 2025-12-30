@@ -25,6 +25,57 @@ function wc_get_order( int|WC_Order $order_id ): WC_Order|false {
 }
 
 /**
+ * Get orders.
+ *
+ * @param array<string, mixed> $args Query arguments.
+ * @return array<int, int|WC_Order>
+ */
+function wc_get_orders( array $args = array() ): array {
+    return array();
+}
+
+/**
+ * Print a notice.
+ *
+ * @param string $message    Message to display.
+ * @param string $notice_type Notice type (success, error, notice).
+ * @return void
+ */
+function wc_print_notice( string $message, string $notice_type = 'success' ): void {}
+
+/**
+ * Get endpoint URL.
+ *
+ * @param string $endpoint  Endpoint slug.
+ * @param string $value     Query value.
+ * @param string $permalink Base permalink.
+ * @return string
+ */
+function wc_get_endpoint_url( string $endpoint, string $value = '', string $permalink = '' ): string {
+    return '';
+}
+
+/**
+ * Get page permalink.
+ *
+ * @param string $page Page slug.
+ * @return string
+ */
+function wc_get_page_permalink( string $page ): string {
+    return '';
+}
+
+/**
+ * Get WooCommerce account endpoint URL.
+ *
+ * @param string $endpoint Endpoint slug.
+ * @return string
+ */
+function wc_get_account_endpoint_url( string $endpoint ): string {
+    return '';
+}
+
+/**
  * Get product by ID.
  *
  * @param int $product_id Product ID.
@@ -36,6 +87,7 @@ function wc_get_product( int $product_id ): WC_Product|false {
 
 class WC_Order {
     public function get_id(): int {}
+    public function get_customer_id(): int {}
     public function get_type(): string {}
     public function get_status(): string {}
     public function get_order_number(): string {}
