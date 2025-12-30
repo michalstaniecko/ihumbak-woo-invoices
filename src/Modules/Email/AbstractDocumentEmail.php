@@ -78,8 +78,15 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 			'{site_title}'      => $this->get_blogname(),
 		);
 
-		// Triggers.
-		add_action( 'ihumbak_send_' . $this->get_document_type() . '_email', array( $this, 'trigger' ), 10, 2 );
+		// Triggers - wrap trigger() to avoid PHPStan warning about returning bool from action callback.
+		add_action(
+			'ihumbak_send_' . $this->get_document_type() . '_email',
+			function ( $document_id, $document = null ): void {
+				$this->trigger( $document_id, $document );
+			},
+			10,
+			2
+		);
 
 		// Call parent constructor.
 		parent::__construct();
@@ -347,7 +354,7 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	/**
 	 * Get email attachments.
 	 *
-	 * @return array Attachment file paths.
+	 * @return array<string> Attachment file paths.
 	 */
 	public function get_attachments(): array {
 		$attachments = parent::get_attachments();
@@ -396,8 +403,8 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	 * @return void
 	 */
 	public function init_form_fields(): void {
-		/* translators: %s: list of placeholders */
 		$placeholder_text = sprintf(
+			/* translators: %s: list of available placeholders like {document_number}, {order_number}, {site_title} */
 			__( 'Available placeholders: %s', 'ihumbak-invoices' ),
 			'<code>{document_number}</code>, <code>{order_number}</code>, <code>{site_title}</code>'
 		);

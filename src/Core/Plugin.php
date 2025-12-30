@@ -590,8 +590,8 @@ final class Plugin {
 	/**
 	 * Register WooCommerce email classes.
 	 *
-	 * @param array $emails Existing email classes.
-	 * @return array Modified email classes.
+	 * @param array<string, \WC_Email> $emails Existing email classes.
+	 * @return array<string, \WC_Email> Modified email classes.
 	 */
 	public function register_email_classes( array $emails ): array {
 		$emails['IHumbak_Invoice_Email']     = new InvoiceEmail();

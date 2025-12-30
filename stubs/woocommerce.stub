@@ -38,6 +38,7 @@ class WC_Order {
     public function get_id(): int {}
     public function get_type(): string {}
     public function get_status(): string {}
+    public function get_order_number(): string {}
     public function get_billing_first_name(): string {}
     public function get_billing_last_name(): string {}
     public function get_billing_company(): string {}
@@ -108,3 +109,96 @@ class WC_Product {
     public function get_price(): string {}
     public function get_sku(): string {}
 }
+
+/**
+ * WooCommerce Email base class.
+ */
+class WC_Email {
+    /** @var string */
+    public $id;
+    /** @var string */
+    public $title;
+    /** @var string */
+    public $description;
+    /** @var string */
+    public $template_html;
+    /** @var string */
+    public $template_plain;
+    /** @var string */
+    public $template_base;
+    /** @var array<string, string> */
+    public $placeholders;
+    /** @var string */
+    public $recipient;
+    /** @var array<string, array<string, mixed>> */
+    public $form_fields;
+
+    public function __construct() {}
+    public function get_blogname(): string {}
+    /**
+     * @param string $key Option key.
+     * @param mixed $default Default value.
+     * @return mixed
+     */
+    public function get_option( string $key, $default = null ): mixed {}
+    public function setup_locale(): void {}
+    public function restore_locale(): void {}
+    public function is_enabled(): bool {}
+    public function get_recipient(): string {}
+    /**
+     * @param string $to Recipient.
+     * @param string $subject Subject.
+     * @param string $message Message.
+     * @param string $headers Headers.
+     * @param array<string> $attachments Attachments.
+     * @return bool
+     */
+    public function send( string $to, string $subject, string $message, string $headers = '', array $attachments = array() ): bool {}
+    public function get_content(): string {}
+    public function get_headers(): string {}
+    public function format_string( string $string ): string {}
+    /** @return array<string, string> */
+    public function get_email_type_options(): array {}
+    /** @return array<string> */
+    public function get_attachments(): array {}
+}
+
+/**
+ * WooCommerce Mailer class.
+ */
+class WC_Emails {
+    /** @return array<string, WC_Email> */
+    public function get_emails(): array {}
+}
+
+/**
+ * Main WooCommerce class.
+ */
+class WooCommerce {
+    public function mailer(): WC_Emails {}
+}
+
+/**
+ * Get WooCommerce instance.
+ *
+ * @return WooCommerce
+ */
+function WC(): WooCommerce {}
+
+/**
+ * Get template HTML.
+ *
+ * @param string $template_name Template name.
+ * @param array<string, mixed> $args Arguments.
+ * @param string $template_path Template path.
+ * @param string $default_path Default path.
+ * @return string
+ */
+function wc_get_template_html( string $template_name, array $args = array(), string $template_path = '', string $default_path = '' ): string {}
+
+/**
+ * Get WooCommerce currency.
+ *
+ * @return string
+ */
+function get_woocommerce_currency(): string {}

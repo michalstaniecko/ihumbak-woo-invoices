@@ -213,7 +213,14 @@ class EmailService {
 			return null;
 		}
 
-		return $emails[ $email_class ];
+		$email = $emails[ $email_class ];
+
+		// Verify the email is our custom type.
+		if ( ! $email instanceof AbstractDocumentEmail ) {
+			return null;
+		}
+
+		return $email;
 	}
 
 	/**
