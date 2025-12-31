@@ -19,7 +19,7 @@ class Installer {
 	 *
 	 * @var string
 	 */
-	private const DB_VERSION = '1.5.0';
+	private const DB_VERSION = '1.6.0';
 
 	/**
 	 * Option name for storing database version.
@@ -47,6 +47,7 @@ class Installer {
 		'payment_method_130' => '1.3.0',
 		'payment_date_140'   => '1.4.0',
 		'sent_at_150'        => '1.5.0',
+		'manual_entry_160'   => '1.6.0',
 	);
 
 	/**
@@ -313,6 +314,54 @@ class Installer {
 
 			// phpcs:enable
 		}
+
+		// Migration to 1.6.0: Add manual entry columns for credit notes.
+		if ( version_compare( $from_version, '1.6.0', '<' ) ) {
+			$table = self::get_documents_table();
+
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			// Add is_manual_entry column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'is_manual_entry'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN is_manual_entry tinyint(1) DEFAULT 0 AFTER refund_id" );
+			}
+
+			// Add original_document_number column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'original_document_number'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN original_document_number varchar(100) DEFAULT NULL AFTER is_manual_entry" );
+			}
+
+			// Add original_document_date column.
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s AND COLUMN_NAME = %s',
+					$wpdb->dbname,
+					$table,
+					'original_document_date'
+				)
+			);
+			if ( ! $column_exists ) {
+				$wpdb->query( "ALTER TABLE {$table} ADD COLUMN original_document_date date DEFAULT NULL AFTER original_document_number" );
+			}
+
+			// phpcs:enable
+		}
 	}
 
 	/**
@@ -465,6 +514,12 @@ class Installer {
             due_date date DEFAULT NULL,
             payment_date date DEFAULT NULL,
             corrected_document_id bigint(20) unsigned DEFAULT NULL,
+            correction_reason text DEFAULT NULL,
+            correction_type varchar(20) DEFAULT 'partial',
+            refund_id bigint(20) unsigned DEFAULT NULL,
+            is_manual_entry tinyint(1) DEFAULT 0,
+            original_document_number varchar(100) DEFAULT NULL,
+            original_document_date date DEFAULT NULL,
             buyer_data longtext DEFAULT NULL,
             seller_data longtext DEFAULT NULL,
             subtotal decimal(10,2) NOT NULL DEFAULT 0.00,
@@ -486,7 +541,8 @@ class Installer {
             KEY document_number (document_number),
             KEY status (status),
             KEY issue_date (issue_date),
-            KEY corrected_document_id (corrected_document_id)
+            KEY corrected_document_id (corrected_document_id),
+            KEY refund_id (refund_id)
         ) {$charset_collate};\n\n";
 	}
 

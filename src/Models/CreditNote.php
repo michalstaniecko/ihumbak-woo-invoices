@@ -53,6 +53,34 @@ class CreditNote extends Document {
 	private ?int $refund_id = null;
 
 	/**
+	 * Manual entry mode flag.
+	 *
+	 * When true, the credit note references an invoice from an external system
+	 * (not in the database) using original_document_number and original_document_date.
+	 *
+	 * @var bool
+	 */
+	private bool $is_manual_entry = false;
+
+	/**
+	 * Original document number (for manual entry mode).
+	 *
+	 * Stores the invoice number from an external system when is_manual_entry is true.
+	 *
+	 * @var string|null
+	 */
+	private ?string $original_document_number = null;
+
+	/**
+	 * Original document date (for manual entry mode).
+	 *
+	 * Stores the invoice date from an external system when is_manual_entry is true.
+	 *
+	 * @var \DateTimeImmutable|null
+	 */
+	private ?\DateTimeImmutable $original_document_date = null;
+
+	/**
 	 * Get document type.
 	 *
 	 * @return string
@@ -172,6 +200,81 @@ class CreditNote extends Document {
 	}
 
 	/**
+	 * Check if this is a manual entry credit note.
+	 *
+	 * @return bool
+	 */
+	public function isManualEntry(): bool {
+		return $this->is_manual_entry;
+	}
+
+	/**
+	 * Set manual entry mode.
+	 *
+	 * @param bool $is_manual_entry Manual entry flag.
+	 * @return self
+	 */
+	public function setManualEntry( bool $is_manual_entry ): self {
+		$this->is_manual_entry = $is_manual_entry;
+		return $this;
+	}
+
+	/**
+	 * Get original document number (for manual entry mode).
+	 *
+	 * @return string|null
+	 */
+	public function getOriginalDocumentNumber(): ?string {
+		return $this->original_document_number;
+	}
+
+	/**
+	 * Set original document number (for manual entry mode).
+	 *
+	 * @param string|null $number Original invoice number.
+	 * @return self
+	 */
+	public function setOriginalDocumentNumber( ?string $number ): self {
+		$this->original_document_number = $number;
+		return $this;
+	}
+
+	/**
+	 * Get original document date (for manual entry mode).
+	 *
+	 * @return \DateTimeImmutable|null
+	 */
+	public function getOriginalDocumentDate(): ?\DateTimeImmutable {
+		return $this->original_document_date;
+	}
+
+	/**
+	 * Set original document date (for manual entry mode).
+	 *
+	 * @param \DateTimeImmutable|null $date Original invoice date.
+	 * @return self
+	 */
+	public function setOriginalDocumentDate( ?\DateTimeImmutable $date ): self {
+		$this->original_document_date = $date;
+		return $this;
+	}
+
+	/**
+	 * Get the corrected document number for display purposes.
+	 *
+	 * Returns the original_document_number for manual entries,
+	 * or null if this is a system-linked credit note (caller should load the invoice).
+	 *
+	 * @return string|null The original document number for manual entries, null otherwise.
+	 */
+	public function getDisplayCorrectedDocumentNumber(): ?string {
+		if ( $this->is_manual_entry ) {
+			return $this->original_document_number;
+		}
+		return null;
+	}
+
+	/**
 	 * Get available correction types.
 	 *
 	 * @return array<string, string>
@@ -211,6 +314,24 @@ class CreditNote extends Document {
 			$credit_note->setRefundId( (int) $data['refund_id'] );
 		}
 
+		// Manual entry fields.
+		if ( isset( $data['is_manual_entry'] ) ) {
+			$credit_note->setManualEntry( (bool) $data['is_manual_entry'] );
+		}
+		if ( ! empty( $data['original_document_number'] ) ) {
+			$credit_note->setOriginalDocumentNumber( (string) $data['original_document_number'] );
+		}
+		if ( ! empty( $data['original_document_date'] ) ) {
+			$date = $data['original_document_date'];
+			if ( is_string( $date ) ) {
+				$credit_note->setOriginalDocumentDate( new \DateTimeImmutable( $date ) );
+			} elseif ( $date instanceof \DateTimeImmutable ) {
+				$credit_note->setOriginalDocumentDate( $date );
+			} elseif ( $date instanceof \DateTime ) {
+				$credit_note->setOriginalDocumentDate( \DateTimeImmutable::createFromMutable( $date ) );
+			}
+		}
+
 		return $credit_note;
 	}
 
@@ -221,28 +342,31 @@ class CreditNote extends Document {
 	 */
 	public function toArray(): array {
 		return array(
-			'id'                    => $this->id,
-			'order_id'              => $this->order_id,
-			'document_type'         => $this->getDocumentType(),
-			'document_number'       => $this->document_number,
-			'issue_date'            => $this->issue_date?->format( 'Y-m-d' ),
-			'sale_date'             => $this->sale_date?->format( 'Y-m-d' ),
-			'due_date'              => null, // Credit notes don't have due date.
-			'corrected_document_id' => $this->corrected_document_id,
-			'correction_reason'     => $this->correction_reason,
-			'correction_type'       => $this->correction_type,
-			'refund_id'             => $this->refund_id,
-			'buyer_data'            => $this->buyer?->toJson(),
-			'seller_data'           => $this->seller?->toJson(),
-			'subtotal'              => $this->subtotal,
-			'tax_total'             => $this->tax_total,
-			'total'                 => $this->total,
-			'currency'              => $this->currency,
-			'status'                => $this->status,
-			'pdf_path'              => $this->pdf_path,
-			'notes'                 => $this->notes,
-			'sent_at'               => $this->sent_at?->format( 'Y-m-d H:i:s' ),
-			'items'                 => array_map(
+			'id'                       => $this->id,
+			'order_id'                 => $this->order_id,
+			'document_type'            => $this->getDocumentType(),
+			'document_number'          => $this->document_number,
+			'issue_date'               => $this->issue_date?->format( 'Y-m-d' ),
+			'sale_date'                => $this->sale_date?->format( 'Y-m-d' ),
+			'due_date'                 => null, // Credit notes don't have due date.
+			'corrected_document_id'    => $this->corrected_document_id,
+			'correction_reason'        => $this->correction_reason,
+			'correction_type'          => $this->correction_type,
+			'refund_id'                => $this->refund_id,
+			'is_manual_entry'          => $this->is_manual_entry,
+			'original_document_number' => $this->original_document_number,
+			'original_document_date'   => $this->original_document_date?->format( 'Y-m-d' ),
+			'buyer_data'               => $this->buyer?->toJson(),
+			'seller_data'              => $this->seller?->toJson(),
+			'subtotal'                 => $this->subtotal,
+			'tax_total'                => $this->tax_total,
+			'total'                    => $this->total,
+			'currency'                 => $this->currency,
+			'status'                   => $this->status,
+			'pdf_path'                 => $this->pdf_path,
+			'notes'                    => $this->notes,
+			'sent_at'                  => $this->sent_at?->format( 'Y-m-d H:i:s' ),
+			'items'                    => array_map(
 				static fn( DocumentItem $item ): array => $item->toArray(),
 				$this->items
 			),

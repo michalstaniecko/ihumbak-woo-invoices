@@ -501,36 +501,68 @@ class DocumentController {
 
 		// Credit note specific fields.
 		if ( $document instanceof CreditNote ) {
-			// Corrected document ID (required).
-			if ( empty( $_POST['corrected_document_id'] ) ) {
-				throw new \InvalidArgumentException(
-					esc_html__( 'Please select a source invoice for the credit note.', 'ihumbak-invoices' )
-				);
+			// Check entry mode: manual or system.
+			$is_manual_entry = isset( $_POST['is_manual_entry'] ) && '1' === $_POST['is_manual_entry'];
+
+			if ( $is_manual_entry ) {
+				// Manual entry mode: original invoice from external system.
+				$document->setManualEntry( true );
+				$document->setCorrectedDocumentId( null );
+
+				// Original document number (required in manual mode).
+				if ( empty( $_POST['original_document_number'] ) ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Please provide the original invoice number.', 'ihumbak-invoices' )
+					);
+				}
+				$original_number = sanitize_text_field( wp_unslash( $_POST['original_document_number'] ) );
+				$document->setOriginalDocumentNumber( substr( $original_number, 0, 100 ) );
+
+				// Original document date (optional in manual mode).
+				if ( ! empty( $_POST['original_document_date'] ) ) {
+					$document->setOriginalDocumentDate(
+						new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['original_document_date'] ) ) )
+					);
+				} else {
+					$document->setOriginalDocumentDate( null );
+				}
+			} else {
+				// System mode: select invoice from database.
+				$document->setManualEntry( false );
+				$document->setOriginalDocumentNumber( null );
+				$document->setOriginalDocumentDate( null );
+
+				// Corrected document ID (required in system mode).
+				if ( empty( $_POST['corrected_document_id'] ) ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Please select a source invoice for the credit note.', 'ihumbak-invoices' )
+					);
+				}
+
+				$corrected_id = absint( $_POST['corrected_document_id'] );
+
+				// Validate that the corrected document exists and is an invoice.
+				$original_document = $this->document_repository->find( $corrected_id );
+				if ( ! $original_document ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
+					);
+				}
+				if ( 'invoice' !== $original_document->getDocumentType() ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
+					);
+				}
+
+				$document->setCorrectedDocumentId( $corrected_id );
+
+				// Propagate order_id from original invoice to credit note.
+				if ( $original_document->getOrderId() ) {
+					$document->setOrderId( $original_document->getOrderId() );
+				}
 			}
 
-			$corrected_id = absint( $_POST['corrected_document_id'] );
-
-			// Validate that the corrected document exists and is an invoice.
-			$original_document = $this->document_repository->find( $corrected_id );
-			if ( ! $original_document ) {
-				throw new \InvalidArgumentException(
-					esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
-				);
-			}
-			if ( 'invoice' !== $original_document->getDocumentType() ) {
-				throw new \InvalidArgumentException(
-					esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
-				);
-			}
-
-			$document->setCorrectedDocumentId( $corrected_id );
-
-			// Propagate order_id from original invoice to credit note.
-			if ( $original_document->getOrderId() ) {
-				$document->setOrderId( $original_document->getOrderId() );
-			}
-
-			// Correction reason (required).
+			// Correction reason (required in both modes).
 			if ( empty( $_POST['correction_reason'] ) ) {
 				throw new \InvalidArgumentException(
 					esc_html__( 'Please provide a correction reason.', 'ihumbak-invoices' )
@@ -548,9 +580,11 @@ class DocumentController {
 				}
 			}
 
-			// Refund ID (optional).
-			if ( ! empty( $_POST['refund_id'] ) ) {
+			// Refund ID (optional, only relevant in system mode).
+			if ( ! empty( $_POST['refund_id'] ) && ! $is_manual_entry ) {
 				$document->setRefundId( absint( $_POST['refund_id'] ) );
+			} else {
+				$document->setRefundId( null );
 			}
 		}
 

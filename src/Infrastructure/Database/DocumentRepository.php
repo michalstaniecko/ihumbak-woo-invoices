@@ -315,9 +315,12 @@ class DocumentRepository {
 
 		// Add credit note specific fields.
 		if ( $document instanceof CreditNote ) {
-			$data['correction_reason'] = $document->getCorrectionReason();
-			$data['correction_type']   = $document->getCorrectionType();
-			$data['refund_id']         = $document->getRefundId();
+			$data['correction_reason']        = $document->getCorrectionReason();
+			$data['correction_type']          = $document->getCorrectionType();
+			$data['refund_id']                = $document->getRefundId();
+			$data['is_manual_entry']          = $document->isManualEntry() ? 1 : 0;
+			$data['original_document_number'] = $document->getOriginalDocumentNumber();
+			$data['original_document_date']   = $document->getOriginalDocumentDate()?->format( 'Y-m-d' );
 		}
 
 		return $data;

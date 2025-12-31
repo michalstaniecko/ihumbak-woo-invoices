@@ -66,7 +66,23 @@ $currency = $document->getCurrency();
 		</div>
 
 		<!-- Correction Reference Box -->
-		<?php if ( $original_document ) : ?>
+		<?php if ( $document->isManualEntry() ) : ?>
+		<!-- Manual entry mode: show data from credit note fields -->
+		<div class="detail-box correction-details">
+			<div class="detail-box-title"><?php esc_html_e( 'Corrects Invoice', 'ihumbak-invoices' ); ?></div>
+			<div class="detail-row">
+				<span class="label"><?php esc_html_e( 'Original Invoice No:', 'ihumbak-invoices' ); ?></span>
+				<span class="value"><?php echo esc_html( $document->getOriginalDocumentNumber() ); ?></span>
+			</div>
+			<?php if ( $document->getOriginalDocumentDate() ) : ?>
+			<div class="detail-row">
+				<span class="label"><?php esc_html_e( 'Original Issue Date:', 'ihumbak-invoices' ); ?></span>
+				<span class="value"><?php echo esc_html( $document->getOriginalDocumentDate()->format( 'Y-m-d' ) ); ?></span>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php elseif ( $original_document ) : ?>
+		<!-- System mode: show data from original document -->
 		<div class="detail-box correction-details">
 			<div class="detail-box-title"><?php esc_html_e( 'Corrects Invoice', 'ihumbak-invoices' ); ?></div>
 			<div class="detail-row">
