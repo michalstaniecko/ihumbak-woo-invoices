@@ -271,12 +271,11 @@ $page_title = $is_new
 							<th>
 								<label for="correction_reason">
 									<?php esc_html_e( 'Correction Reason', 'ihumbak-invoices' ); ?>
-									<span class="required">*</span>
 								</label>
 							</th>
 							<td>
 								<textarea id="correction_reason" name="correction_reason" rows="3"
-										  class="large-text" required <?php disabled( ! $can_edit ); ?>><?php
+										  class="large-text" <?php disabled( ! $can_edit ); ?>><?php
 									echo esc_textarea( $document ? $document->getCorrectionReason() : '' );
 								?></textarea>
 							</td>
@@ -338,15 +337,7 @@ $page_title = $is_new
 									   required <?php disabled( ! $can_edit ); ?>>
 							</td>
 						</tr>
-						<tr>
-							<th><label for="sale_date"><?php esc_html_e( 'Sale Date', 'ihumbak-invoices' ); ?> <span class="required">*</span></label></th>
-							<td>
-								<input type="date" id="sale_date" name="sale_date"
-									   value="<?php echo esc_attr( $document ? $document->getSaleDate()?->format( 'Y-m-d' ) : gmdate( 'Y-m-d' ) ); ?>"
-									   required <?php disabled( ! $can_edit ); ?>>
-							</td>
-						</tr>
-					</table>
+						</table>
 				</div>
 
 				<!-- Items -->

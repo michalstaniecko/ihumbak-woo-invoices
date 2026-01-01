@@ -115,10 +115,6 @@ $currency = $document->getCurrency();
 							<span class="value"><?php echo $document->getIssueDate() ? esc_html( $document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 						</div>
 						<div class="detail-row">
-							<span class="label"><?php esc_html_e( 'Sale Date:', 'ihumbak-invoices' ); ?></span>
-							<span class="value"><?php echo $document->getSaleDate() ? esc_html( $document->getSaleDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
-						</div>
-						<div class="detail-row">
 							<span class="label"><?php esc_html_e( 'Correction Type:', 'ihumbak-invoices' ); ?></span>
 							<span class="value">
 								<?php echo $document->isFullCorrection() ? esc_html__( 'Full', 'ihumbak-invoices' ) : esc_html__( 'Partial', 'ihumbak-invoices' ); ?>

@@ -562,13 +562,10 @@ class DocumentController {
 				}
 			}
 
-			// Correction reason (required in both modes).
-			if ( empty( $_POST['correction_reason'] ) ) {
-				throw new \InvalidArgumentException(
-					esc_html__( 'Please provide a correction reason.', 'ihumbak-invoices' )
-				);
+			// Correction reason (optional).
+			if ( ! empty( $_POST['correction_reason'] ) ) {
+				$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
 			}
-			$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
 
 			// Correction type (full or partial).
 			if ( ! empty( $_POST['correction_type'] ) ) {
