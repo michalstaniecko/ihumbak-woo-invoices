@@ -2,6 +2,7 @@
     "name": "ihumbak/woo-invoices",
     "description": "WooCommerce plugin for generating invoices, receipts and corrections",
     "type": "wordpress-plugin",
+    "version": "0.3.0",
     "license": "GPL-2.0-or-later",
     "authors": [
         {
