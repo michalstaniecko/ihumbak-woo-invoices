@@ -625,176 +625,11 @@ class DocumentController {
 			$document->setPaymentMethodTitle( substr( $title, 0, 255 ) );
 		}
 
-		// Credit note specific fields.
+		// Correction document fields (CreditNote and ReceiptReturn).
 		if ( $document instanceof CreditNote ) {
-			// Check entry mode: manual or system.
-			$is_manual_entry = isset( $_POST['is_manual_entry'] ) && '1' === $_POST['is_manual_entry'];
-
-			if ( $is_manual_entry ) {
-				// Manual entry mode: original invoice from external system.
-				$document->setManualEntry( true );
-				$document->setCorrectedDocumentId( null );
-
-				// Original document number (required in manual mode).
-				if ( empty( $_POST['original_document_number'] ) ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Please provide the original invoice number.', 'ihumbak-invoices' )
-					);
-				}
-				$original_number = sanitize_text_field( wp_unslash( $_POST['original_document_number'] ) );
-				$document->setOriginalDocumentNumber( substr( $original_number, 0, 100 ) );
-
-				// Original document date (optional in manual mode).
-				if ( ! empty( $_POST['original_document_date'] ) ) {
-					$document->setOriginalDocumentDate(
-						new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['original_document_date'] ) ) )
-					);
-				} else {
-					$document->setOriginalDocumentDate( null );
-				}
-			} else {
-				// System mode: select invoice from database.
-				$document->setManualEntry( false );
-				$document->setOriginalDocumentNumber( null );
-				$document->setOriginalDocumentDate( null );
-
-				// Corrected document ID (required in system mode).
-				if ( empty( $_POST['corrected_document_id'] ) ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Please select a source invoice for the credit note.', 'ihumbak-invoices' )
-					);
-				}
-
-				$corrected_id = absint( $_POST['corrected_document_id'] );
-
-				// Validate that the corrected document exists and is an invoice.
-				$original_document = $this->document_repository->find( $corrected_id );
-				if ( ! $original_document ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
-					);
-				}
-				if ( 'invoice' !== $original_document->getDocumentType() ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
-					);
-				}
-
-				$document->setCorrectedDocumentId( $corrected_id );
-
-				// Propagate order_id from original invoice to credit note.
-				if ( $original_document->getOrderId() ) {
-					$document->setOrderId( $original_document->getOrderId() );
-				}
-			}
-
-			// Correction reason (optional).
-			if ( ! empty( $_POST['correction_reason'] ) ) {
-				$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
-			}
-
-			// Correction type (full or partial).
-			if ( ! empty( $_POST['correction_type'] ) ) {
-				try {
-					$document->setCorrectionType( sanitize_text_field( wp_unslash( $_POST['correction_type'] ) ) );
-				} catch ( \InvalidArgumentException $e ) {
-					// Use default type (partial) if invalid value provided.
-					unset( $e );
-				}
-			}
-
-			// Refund ID (optional, only relevant in system mode).
-			if ( ! empty( $_POST['refund_id'] ) && ! $is_manual_entry ) {
-				$document->setRefundId( absint( $_POST['refund_id'] ) );
-			} else {
-				$document->setRefundId( null );
-			}
-		}
-
-		// Receipt return specific fields.
-		if ( $document instanceof ReceiptReturn ) {
-			// Check entry mode: manual or system.
-			$is_manual_entry = isset( $_POST['is_manual_entry'] ) && '1' === $_POST['is_manual_entry'];
-
-			if ( $is_manual_entry ) {
-				// Manual entry mode: original receipt from external system.
-				$document->setManualEntry( true );
-				$document->setCorrectedDocumentId( null );
-
-				// Original document number (required in manual mode).
-				if ( empty( $_POST['original_document_number'] ) ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Please provide the original receipt number.', 'ihumbak-invoices' )
-					);
-				}
-				$original_number = sanitize_text_field( wp_unslash( $_POST['original_document_number'] ) );
-				$document->setOriginalDocumentNumber( substr( $original_number, 0, 100 ) );
-
-				// Original document date (optional in manual mode).
-				if ( ! empty( $_POST['original_document_date'] ) ) {
-					$document->setOriginalDocumentDate(
-						new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['original_document_date'] ) ) )
-					);
-				} else {
-					$document->setOriginalDocumentDate( null );
-				}
-			} else {
-				// System mode: select receipt from database.
-				$document->setManualEntry( false );
-				$document->setOriginalDocumentNumber( null );
-				$document->setOriginalDocumentDate( null );
-
-				// Corrected document ID (required in system mode).
-				if ( empty( $_POST['corrected_document_id'] ) ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Please select a source receipt for the receipt return.', 'ihumbak-invoices' )
-					);
-				}
-
-				$corrected_id = absint( $_POST['corrected_document_id'] );
-
-				// Validate that the corrected document exists and is a receipt.
-				$original_document = $this->document_repository->find( $corrected_id );
-				if ( ! $original_document ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'The selected source receipt does not exist.', 'ihumbak-invoices' )
-					);
-				}
-				if ( 'receipt' !== $original_document->getDocumentType() ) {
-					throw new \InvalidArgumentException(
-						esc_html__( 'Receipt returns can only be created for receipts.', 'ihumbak-invoices' )
-					);
-				}
-
-				$document->setCorrectedDocumentId( $corrected_id );
-
-				// Propagate order_id from original receipt to receipt return.
-				if ( $original_document->getOrderId() ) {
-					$document->setOrderId( $original_document->getOrderId() );
-				}
-			}
-
-			// Correction reason (optional).
-			if ( ! empty( $_POST['correction_reason'] ) ) {
-				$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
-			}
-
-			// Correction type (full or partial).
-			if ( ! empty( $_POST['correction_type'] ) ) {
-				try {
-					$document->setCorrectionType( sanitize_text_field( wp_unslash( $_POST['correction_type'] ) ) );
-				} catch ( \InvalidArgumentException $e ) {
-					// Use default type (partial) if invalid value provided.
-					unset( $e );
-				}
-			}
-
-			// Refund ID (optional, only relevant in system mode).
-			if ( ! empty( $_POST['refund_id'] ) && ! $is_manual_entry ) {
-				$document->setRefundId( absint( $_POST['refund_id'] ) );
-			} else {
-				$document->setRefundId( null );
-			}
+			$this->populate_correction_fields_from_request( $document, 'invoice' );
+		} elseif ( $document instanceof ReceiptReturn ) {
+			$this->populate_correction_fields_from_request( $document, 'receipt' );
 		}
 
 		// Seller.
@@ -824,6 +659,113 @@ class DocumentController {
 		$document->setCurrency( Document::getDefaultCurrency() );
 
         // phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Populate correction document fields from request.
+	 *
+	 * Common logic for CreditNote and ReceiptReturn documents.
+	 *
+	 * @param CreditNote|ReceiptReturn $document          Correction document.
+	 * @param string                   $source_type       Expected source document type ('invoice' or 'receipt').
+	 * @return void
+	 * @throws \InvalidArgumentException If validation fails.
+	 */
+	private function populate_correction_fields_from_request( CreditNote|ReceiptReturn $document, string $source_type ): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in calling method.
+
+		$is_credit_note  = $document instanceof CreditNote;
+		$is_manual_entry = isset( $_POST['is_manual_entry'] ) && '1' === $_POST['is_manual_entry'];
+
+		if ( $is_manual_entry ) {
+			// Manual entry mode: original document from external system.
+			$document->setManualEntry( true );
+			$document->setCorrectedDocumentId( null );
+
+			// Original document number (required in manual mode).
+			if ( empty( $_POST['original_document_number'] ) ) {
+				throw new \InvalidArgumentException(
+					$is_credit_note
+						? esc_html__( 'Please provide the original invoice number.', 'ihumbak-invoices' )
+						: esc_html__( 'Please provide the original receipt number.', 'ihumbak-invoices' )
+				);
+			}
+			$original_number = sanitize_text_field( wp_unslash( $_POST['original_document_number'] ) );
+			$document->setOriginalDocumentNumber( substr( $original_number, 0, 100 ) );
+
+			// Original document date (optional in manual mode).
+			if ( ! empty( $_POST['original_document_date'] ) ) {
+				$document->setOriginalDocumentDate(
+					new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['original_document_date'] ) ) )
+				);
+			} else {
+				$document->setOriginalDocumentDate( null );
+			}
+		} else {
+			// System mode: select document from database.
+			$document->setManualEntry( false );
+			$document->setOriginalDocumentNumber( null );
+			$document->setOriginalDocumentDate( null );
+
+			// Corrected document ID (required in system mode).
+			if ( empty( $_POST['corrected_document_id'] ) ) {
+				throw new \InvalidArgumentException(
+					$is_credit_note
+						? esc_html__( 'Please select a source invoice for the credit note.', 'ihumbak-invoices' )
+						: esc_html__( 'Please select a source receipt for the receipt return.', 'ihumbak-invoices' )
+				);
+			}
+
+			$corrected_id = absint( $_POST['corrected_document_id'] );
+
+			// Validate that the corrected document exists and is the expected type.
+			$original_document = $this->document_repository->find( $corrected_id );
+			if ( ! $original_document ) {
+				throw new \InvalidArgumentException(
+					$is_credit_note
+						? esc_html__( 'The selected source invoice does not exist.', 'ihumbak-invoices' )
+						: esc_html__( 'The selected source receipt does not exist.', 'ihumbak-invoices' )
+				);
+			}
+			if ( $source_type !== $original_document->getDocumentType() ) {
+				throw new \InvalidArgumentException(
+					$is_credit_note
+						? esc_html__( 'Credit notes can only be created for invoices.', 'ihumbak-invoices' )
+						: esc_html__( 'Receipt returns can only be created for receipts.', 'ihumbak-invoices' )
+				);
+			}
+
+			$document->setCorrectedDocumentId( $corrected_id );
+
+			// Propagate order_id from original document to correction document.
+			if ( $original_document->getOrderId() ) {
+				$document->setOrderId( $original_document->getOrderId() );
+			}
+		}
+
+		// Correction reason (optional).
+		if ( ! empty( $_POST['correction_reason'] ) ) {
+			$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
+		}
+
+		// Correction type (full or partial).
+		if ( ! empty( $_POST['correction_type'] ) ) {
+			try {
+				$document->setCorrectionType( sanitize_text_field( wp_unslash( $_POST['correction_type'] ) ) );
+			} catch ( \InvalidArgumentException $e ) {
+				// Use default type (partial) if invalid value provided.
+				unset( $e );
+			}
+		}
+
+		// Refund ID (optional, only relevant in system mode).
+		if ( ! empty( $_POST['refund_id'] ) && ! $is_manual_entry ) {
+			$document->setRefundId( absint( $_POST['refund_id'] ) );
+		} else {
+			$document->setRefundId( null );
+		}
+
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 
 	/**

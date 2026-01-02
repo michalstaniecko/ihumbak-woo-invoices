@@ -721,7 +721,7 @@ final class Plugin {
 				)
 			);
 		} else {
-			// Return to document list (default).
+			// Redirect to the main documents list.
 			wp_safe_redirect(
 				add_query_arg(
 					array(
