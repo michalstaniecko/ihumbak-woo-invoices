@@ -171,12 +171,13 @@
     overflow-x: auto;
 }
 
-/* Items table */
+/* Items table - Two-row layout */
 .ihumbak-items-table {
     margin-top: 10px;
     table-layout: fixed;
     width: 100%;
-    min-width: 800px;
+    min-width: 700px;
+    border-collapse: collapse;
 }
 
 .ihumbak-items-table th,
@@ -193,18 +194,14 @@
     white-space: nowrap;
 }
 
-/* Column widths - optimized for 9 columns (Name/SKU, Qty, Unit, Price Net, VAT%, Total Net, VAT, Total Gross, Actions) */
-.ihumbak-items-table .column-name-sku {
-    width: 30%;
+/* Column widths - 8 columns (Name, Qty, Price Net, VAT%, Total Net, VAT, Total Gross, Actions) */
+.ihumbak-items-table-tworow .column-name {
+    width: 35%;
     min-width: 200px;
 }
 
 .ihumbak-items-table .column-quantity {
-    width: 60px;
-}
-
-.ihumbak-items-table .column-unit {
-    width: 50px;
+    width: 70px;
 }
 
 .ihumbak-items-table .column-price-net {
@@ -213,40 +210,66 @@
 }
 
 .ihumbak-items-table .column-tax-rate {
-    width: 60px;
+    width: 70px;
     text-align: right;
 }
 
-.ihumbak-items-table .column-total-net,
+.ihumbak-items-table .column-total-net {
+    width: 100px;
+    text-align: right;
+}
+
 .ihumbak-items-table .column-tax-amount {
     width: 90px;
     text-align: right;
 }
 
 .ihumbak-items-table .column-total-gross {
-    width: 100px;
+    width: 110px;
     text-align: right;
 }
 
 .ihumbak-items-table .column-actions {
-    width: 40px;
+    width: 50px;
     text-align: center;
+    vertical-align: middle;
+}
+
+/* Two-row item layout */
+.ihumbak-item-row-name td {
+    border-bottom: none;
+    padding-bottom: 4px;
+    background: #fafafa;
+}
+
+.ihumbak-item-row-values td {
+    border-top: none;
+    padding-top: 4px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.ihumbak-item-row-name .column-actions {
+    background: #fff;
+    border-left: 1px solid #e0e0e0;
 }
 
 /* Item Name/SKU wrapper */
 .item-name-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .item-name-wrapper .item-name {
     font-weight: 500;
+    font-size: 14px;
+    width: 100%;
 }
 
 .item-name-wrapper .item-sku {
     font-size: 12px;
     color: #646970;
+    max-width: 250px;
 }
 
 .item-name-wrapper .item-sku::placeholder {
@@ -258,7 +281,7 @@
 .ihumbak-items-table input[type="number"],
 .ihumbak-items-table select {
     width: 100%;
-    padding: 5px 8px;
+    padding: 6px 8px;
     font-size: 13px;
     box-sizing: border-box;
 }
@@ -278,6 +301,16 @@
 .ihumbak-items-table input::placeholder {
     color: #a0a5aa;
     font-style: italic;
+}
+
+/* Total display values */
+.ihumbak-items-table .item-total-net-display,
+.ihumbak-items-table .item-tax-amount-display,
+.ihumbak-items-table .item-total-gross-display {
+    display: block;
+    text-align: right;
+    font-weight: 500;
+    padding: 6px 0;
 }
 
 /* Totals row */

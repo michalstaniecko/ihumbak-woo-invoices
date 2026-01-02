@@ -82,10 +82,13 @@
                 self.addItemRow();
             });
 
-            // Remove item button (delegated).
+            // Remove item button (delegated) - removes both rows with same data-index.
             $('#ihumbak-items-body').on('click', '.ihumbak-remove-item', function(e) {
                 e.preventDefault();
-                $(this).closest('tr').remove();
+                var $row = $(this).closest('tr');
+                var index = $row.data('index');
+                // Remove both rows with same data-index (two-row layout).
+                $('#ihumbak-items-body tr[data-index="' + index + '"]').remove();
                 self.recalculateDocument();
             });
 
@@ -117,7 +120,7 @@
         },
 
         /**
-         * Add a new item row.
+         * Add a new item row (two-row layout).
          */
         addItemRow: function() {
             var template = $('#ihumbak-item-row-template').html();
@@ -126,8 +129,8 @@
             $('#ihumbak-items-body').append(html);
             this.itemIndex++;
 
-            // Focus on the new row's name field.
-            $('#ihumbak-items-body tr:last .item-name').focus();
+            // Focus on the new row's name field (in the name row).
+            $('#ihumbak-items-body .ihumbak-item-row-name:last .item-name').focus();
         },
 
         /**
@@ -448,7 +451,7 @@
         },
 
         /**
-         * Add item row with pre-filled data.
+         * Add item row with pre-filled data (two-row layout).
          *
          * @param {Object} itemData Item data.
          */
@@ -456,33 +459,35 @@
             var template = $('#ihumbak-item-row-template').html();
             var html = template.replace(/\{\{index\}\}/g, this.itemIndex);
 
-            var $row = $(html);
+            var $rows = $(html);
 
-            // Fill in the data.
-            $row.find('.item-name').val(itemData.name || '');
-            $row.find('.item-sku').val(itemData.sku || '');
-            $row.find('.item-quantity').val(itemData.quantity || 1);
-            $row.find('.item-unit').val(itemData.unit || 'szt.');
-            $row.find('.item-price-net').val((itemData.unit_price_net || 0).toFixed(2));
-            $row.find('.item-tax-rate').val(itemData.tax_rate || 23);
-            $row.find('.item-price-gross').val((itemData.unit_price_gross || 0).toFixed(2));
-            $row.find('.item-total-net').val((itemData.line_total_net || 0).toFixed(2));
-            $row.find('.item-tax-amount').val((itemData.tax_amount || 0).toFixed(2));
-            $row.find('.item-total-gross').val((itemData.line_total_gross || 0).toFixed(2));
+            // Fill in the data (jQuery .find() searches across all elements in collection).
+            $rows.find('.item-name').val(itemData.name || '');
+            $rows.find('.item-sku').val(itemData.sku || '');
+            $rows.find('.item-quantity').val(itemData.quantity || 1);
+            $rows.find('.item-unit').val(itemData.unit || 'pcs');
+            $rows.find('.item-price-net').val((itemData.unit_price_net || 0).toFixed(2));
+            $rows.find('.item-tax-rate').val(itemData.tax_rate || 23);
+            $rows.find('.item-price-gross').val((itemData.unit_price_gross || 0).toFixed(2));
+            $rows.find('.item-total-net').val((itemData.line_total_net || 0).toFixed(2));
+            $rows.find('.item-tax-amount').val((itemData.tax_amount || 0).toFixed(2));
+            $rows.find('.item-total-gross').val((itemData.line_total_gross || 0).toFixed(2));
 
             // Update display values.
             if (itemData.formatted) {
-                $row.find('.item-total-net-display').text(itemData.formatted.line_total_net);
-                $row.find('.item-tax-amount-display').text(itemData.formatted.tax_amount);
-                $row.find('.item-total-gross-display').text(itemData.formatted.line_total_gross);
+                $rows.find('.item-total-net-display').text(itemData.formatted.line_total_net);
+                $rows.find('.item-tax-amount-display').text(itemData.formatted.tax_amount);
+                $rows.find('.item-total-gross-display').text(itemData.formatted.line_total_gross);
             }
 
-            // Add hidden product_id if available.
+            // Add hidden product_id if available (to the name row).
             if (itemData.product_id) {
-                $row.append('<input type="hidden" name="items[' + this.itemIndex + '][product_id]" value="' + itemData.product_id + '">');
+                $rows.filter('.ihumbak-item-row-name').find('.column-name').append(
+                    '<input type="hidden" name="items[' + this.itemIndex + '][product_id]" value="' + itemData.product_id + '">'
+                );
             }
 
-            $('#ihumbak-items-body').append($row);
+            $('#ihumbak-items-body').append($rows);
             this.itemIndex++;
         },
 
