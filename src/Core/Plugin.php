@@ -23,6 +23,7 @@ use IHumbak\Invoices\Modules\Email\EmailService;
 use IHumbak\Invoices\Modules\Email\InvoiceEmail;
 use IHumbak\Invoices\Modules\Email\ReceiptEmail;
 use IHumbak\Invoices\Modules\Email\CreditNoteEmail;
+use IHumbak\Invoices\Modules\Email\ReceiptReturnEmail;
 use IHumbak\Invoices\Modules\Portal\PortalController;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
@@ -622,9 +623,10 @@ final class Plugin {
 	 * @return array<string, \WC_Email> Modified email classes.
 	 */
 	public function register_email_classes( array $emails ): array {
-		$emails['IHumbak_Invoice_Email']     = new InvoiceEmail();
-		$emails['IHumbak_Receipt_Email']     = new ReceiptEmail();
-		$emails['IHumbak_Credit_Note_Email'] = new CreditNoteEmail();
+		$emails['IHumbak_Invoice_Email']        = new InvoiceEmail();
+		$emails['IHumbak_Receipt_Email']        = new ReceiptEmail();
+		$emails['IHumbak_Credit_Note_Email']    = new CreditNoteEmail();
+		$emails['IHumbak_Receipt_Return_Email'] = new ReceiptReturnEmail();
 
 		return $emails;
 	}

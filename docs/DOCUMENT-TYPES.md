@@ -9,6 +9,7 @@ This document describes the different document types supported by iHumbak WooCom
 | Invoice | `Invoice` | Full VAT invoice |
 | Receipt | `Receipt` | Simplified receipt |
 | Credit Note | `CreditNote` | Correction invoice |
+| Receipt Return | `ReceiptReturn` | Return document for receipts (informational) |
 
 ---
 
@@ -142,6 +143,68 @@ A document that corrects or cancels a previously issued invoice.
 
 ---
 
+## Receipt Return
+
+**Type identifier:** `receipt_return`
+**Class:** `IHumbak\Invoices\Models\ReceiptReturn`
+
+An informational document for tracking returns/refunds related to receipts. This is **NOT** an official accounting document.
+
+### Key Differences from Credit Note
+
+| Aspect | Credit Note | Receipt Return |
+|--------|-------------|----------------|
+| Source document | Invoice | Receipt |
+| Legal status | Official accounting document | Informational document |
+| Buyer NIP | Required | Optional |
+| Numbering pattern | `CN/{YYYY}/{MM}/{NNNN}` | `RR/{YYYY}/{MM}/{NNNN}` |
+
+### Characteristics
+
+- References original receipt (not invoice)
+- Return type: full or partial
+- Return reason optional
+- Negative line item values
+- Optional link to WooCommerce refund
+- Supports manual entry mode for external receipts
+- Informational document disclaimer on PDF
+
+### Required Fields
+
+| Field | Description |
+|-------|-------------|
+| document_number | Unique receipt return number |
+| issue_date | Date of issue |
+| corrected_document_id | ID of original receipt (or manual entry) |
+| correction_type | 'full' or 'partial' |
+| items | Return items (negative values) |
+
+### Optional Fields
+
+| Field | Description |
+|-------|-------------|
+| correction_reason | Reason for return |
+| refund_id | Link to WC_Order_Refund |
+| is_manual_entry | Manual entry mode flag |
+| original_document_number | Original receipt number (manual mode) |
+| original_document_date | Original receipt date (manual mode) |
+| notes | Additional notes |
+
+### Return Types
+
+| Type | Description |
+|------|-------------|
+| full | Complete cancellation of original receipt |
+| partial | Partial return (specific items/amounts) |
+
+### PDF Template
+
+- File: `templates/pdf/default/receipt-return.php`
+- Includes: "CORRECTS RECEIPT" section, return reason, negative totals
+- **Important:** Includes disclaimer: "This is an informational document, not an official accounting document."
+
+---
+
 ## Document Status Flow
 
 ```
@@ -174,6 +237,7 @@ draft → issued → sent → paid
 - `src/Models/Invoice.php` - Invoice implementation
 - `src/Models/Receipt.php` - Receipt implementation
 - `src/Models/CreditNote.php` - Credit note implementation
+- `src/Models/ReceiptReturn.php` - Receipt return implementation
 - `src/Models/DocumentItem.php` - Line item model
 - `src/Models/Buyer.php` - Buyer value object
 - `src/Models/Seller.php` - Seller value object
@@ -186,9 +250,11 @@ draft → issued → sent → paid
 - `templates/pdf/default/invoice.php`
 - `templates/pdf/default/receipt.php`
 - `templates/pdf/default/credit-note.php`
+- `templates/pdf/default/receipt-return.php`
 - `templates/pdf/default/styles.css`
 
 ### Admin Forms
 - `templates/admin/invoice-edit.php`
 - `templates/admin/receipt-edit.php`
 - `templates/admin/credit-note-edit.php`
+- `templates/admin/receipt-return-edit.php`

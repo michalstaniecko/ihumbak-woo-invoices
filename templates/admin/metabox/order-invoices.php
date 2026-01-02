@@ -4,13 +4,14 @@
  *
  * @package IHumbak\Invoices
  *
- * @var int                                   $order_id            Order ID.
- * @var \IHumbak\Invoices\Models\Document[]  $documents           Documents for this order.
- * @var string                                $create_invoice_url  URL to create invoice.
- * @var string                                $create_receipt_url  URL to create receipt.
- * @var array<int, string>                    $edit_urls           Edit URLs keyed by document ID.
- * @var array<int, string>                    $pdf_urls            PDF URLs keyed by document ID.
- * @var array<int, string>                    $credit_note_urls    Credit note URLs keyed by invoice ID.
+ * @var int                                   $order_id             Order ID.
+ * @var \IHumbak\Invoices\Models\Document[]  $documents            Documents for this order.
+ * @var string                                $create_invoice_url   URL to create invoice.
+ * @var string                                $create_receipt_url   URL to create receipt.
+ * @var array<int, string>                    $edit_urls            Edit URLs keyed by document ID.
+ * @var array<int, string>                    $pdf_urls             PDF URLs keyed by document ID.
+ * @var array<int, string>                    $credit_note_urls     Credit note URLs keyed by invoice ID.
+ * @var array<int, string>                    $receipt_return_urls  Receipt return URLs keyed by receipt ID.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -50,6 +51,13 @@ defined( 'ABSPATH' ) || exit;
 							<a href="<?php echo esc_url( $credit_note_urls[ $doc_id ] ); ?>"
 							   class="ihumbak-credit-note-link"
 							   title="<?php esc_attr_e( 'Create Credit Note', 'ihumbak-invoices' ); ?>">
+								<span class="dashicons dashicons-undo"></span>
+							</a>
+						<?php endif; ?>
+						<?php if ( isset( $receipt_return_urls[ $doc_id ] ) ) : ?>
+							<a href="<?php echo esc_url( $receipt_return_urls[ $doc_id ] ); ?>"
+							   class="ihumbak-receipt-return-link"
+							   title="<?php esc_attr_e( 'Create Receipt Return', 'ihumbak-invoices' ); ?>">
 								<span class="dashicons dashicons-undo"></span>
 							</a>
 						<?php endif; ?>

@@ -28,7 +28,7 @@ class ReportService {
 	 *
 	 * @var array<string>
 	 */
-	public const ALLOWED_DOCUMENT_TYPES = array( 'invoice', 'receipt', 'credit_note' );
+	public const ALLOWED_DOCUMENT_TYPES = array( 'invoice', 'receipt', 'credit_note', 'receipt_return' );
 
 	/**
 	 * WordPress database instance.
@@ -205,9 +205,10 @@ class ReportService {
 	 */
 	public function getDocumentTypeOptions(): array {
 		return array(
-			'invoice'     => __( 'Invoice', 'ihumbak-invoices' ),
-			'receipt'     => __( 'Receipt', 'ihumbak-invoices' ),
-			'credit_note' => __( 'Credit Note', 'ihumbak-invoices' ),
+			'invoice'        => __( 'Invoice', 'ihumbak-invoices' ),
+			'receipt'        => __( 'Receipt', 'ihumbak-invoices' ),
+			'credit_note'    => __( 'Credit Note', 'ihumbak-invoices' ),
+			'receipt_return' => __( 'Receipt Return', 'ihumbak-invoices' ),
 		);
 	}
 }

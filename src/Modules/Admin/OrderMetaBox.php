@@ -93,9 +93,10 @@ class OrderMetaBox {
 		$create_invoice_url = $this->build_create_url( $order_id, 'invoice' );
 		$create_receipt_url = $this->build_create_url( $order_id, 'receipt' );
 
-		$edit_urls        = array();
-		$pdf_urls         = array();
-		$credit_note_urls = array();
+		$edit_urls          = array();
+		$pdf_urls           = array();
+		$credit_note_urls   = array();
+		$receipt_return_urls = array();
 
 		foreach ( $documents as $document ) {
 			$doc_id               = $document->getId();
@@ -105,6 +106,11 @@ class OrderMetaBox {
 			// Build credit note URL for issued invoices only.
 			if ( 'invoice' === $document->getDocumentType() && ! $document->isDraft() ) {
 				$credit_note_urls[ $doc_id ] = $this->build_create_credit_note_url( $order_id, $doc_id );
+			}
+
+			// Build receipt return URL for issued receipts only.
+			if ( 'receipt' === $document->getDocumentType() && ! $document->isDraft() ) {
+				$receipt_return_urls[ $doc_id ] = $this->build_create_receipt_return_url( $order_id, $doc_id );
 			}
 		}
 
@@ -239,6 +245,29 @@ class OrderMetaBox {
 				'corrected_document_id' => $invoice_id,
 				'order_id'              => $order_id,
 				'_wpnonce'              => wp_create_nonce( 'ihumbak_create_credit_note_' . $invoice_id ),
+			),
+			admin_url( 'admin.php' )
+		);
+	}
+
+	/**
+	 * Build URL for creating a receipt return from a receipt.
+	 *
+	 * Uses nonce pattern: ihumbak_create_receipt_return_{receipt_id}
+	 *
+	 * @param int $order_id   Order ID (passed for refunds loading).
+	 * @param int $receipt_id Receipt ID to return.
+	 * @return string
+	 */
+	private function build_create_receipt_return_url( int $order_id, int $receipt_id ): string {
+		return add_query_arg(
+			array(
+				'page'                  => 'ihumbak-invoices',
+				'action'                => 'new',
+				'type'                  => 'receipt_return',
+				'corrected_document_id' => $receipt_id,
+				'order_id'              => $order_id,
+				'_wpnonce'              => wp_create_nonce( 'ihumbak_create_receipt_return_' . $receipt_id ),
 			),
 			admin_url( 'admin.php' )
 		);

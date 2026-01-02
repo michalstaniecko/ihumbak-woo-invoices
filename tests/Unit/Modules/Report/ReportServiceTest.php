@@ -242,9 +242,10 @@ class ReportServiceTest extends TestCase {
 		$service = new ReportService();
 		$types   = $service->getDocumentTypeOptions();
 
-		$this->assertCount( 3, $types );
+		$this->assertCount( 4, $types );
 		$this->assertArrayHasKey( 'invoice', $types );
 		$this->assertArrayHasKey( 'receipt', $types );
 		$this->assertArrayHasKey( 'credit_note', $types );
+		$this->assertArrayHasKey( 'receipt_return', $types );
 	}
 }

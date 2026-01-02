@@ -13,6 +13,7 @@ use IHumbak\Invoices\Models\Document;
 use IHumbak\Invoices\Models\Invoice;
 use IHumbak\Invoices\Models\Receipt;
 use IHumbak\Invoices\Models\CreditNote;
+use IHumbak\Invoices\Models\ReceiptReturn;
 use IHumbak\Invoices\Core\Installer;
 
 /**
@@ -263,6 +264,33 @@ class DocumentRepository {
 	}
 
 	/**
+	 * Find receipt returns by corrected document ID.
+	 *
+	 * @param int $corrected_document_id Original receipt ID.
+	 * @return ReceiptReturn[]
+	 */
+	public function findReceiptReturnsByCorrectedDocumentId( int $corrected_document_id ): array {
+		$rows = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT * FROM {$this->table} WHERE corrected_document_id = %d AND document_type = %s ORDER BY created_at DESC",
+				$corrected_document_id,
+				ReceiptReturn::TYPE
+			),
+			ARRAY_A
+		);
+
+		$documents = array_map( array( $this, 'hydrate' ), $rows ?: array() );
+
+		// Filter to ensure only ReceiptReturn instances are returned.
+		return array_values(
+			array_filter(
+				$documents,
+				static fn( Document $doc ): bool => $doc instanceof ReceiptReturn
+			)
+		);
+	}
+
+	/**
 	 * Hydrate document from database row.
 	 *
 	 * @param array<string, mixed> $row Database row.
@@ -272,9 +300,10 @@ class DocumentRepository {
 		$type = $row['document_type'] ?? Invoice::TYPE;
 
 		return match ( $type ) {
-			Receipt::TYPE    => Receipt::fromArray( $row ),
-			CreditNote::TYPE => CreditNote::fromArray( $row ),
-			default          => Invoice::fromArray( $row ),
+			Receipt::TYPE       => Receipt::fromArray( $row ),
+			CreditNote::TYPE    => CreditNote::fromArray( $row ),
+			ReceiptReturn::TYPE => ReceiptReturn::fromArray( $row ),
+			default             => Invoice::fromArray( $row ),
 		};
 	}
 
@@ -315,6 +344,16 @@ class DocumentRepository {
 
 		// Add credit note specific fields.
 		if ( $document instanceof CreditNote ) {
+			$data['correction_reason']        = $document->getCorrectionReason();
+			$data['correction_type']          = $document->getCorrectionType();
+			$data['refund_id']                = $document->getRefundId();
+			$data['is_manual_entry']          = $document->isManualEntry() ? 1 : 0;
+			$data['original_document_number'] = $document->getOriginalDocumentNumber();
+			$data['original_document_date']   = $document->getOriginalDocumentDate()?->format( 'Y-m-d' );
+		}
+
+		// Add receipt return specific fields.
+		if ( $document instanceof ReceiptReturn ) {
 			$data['correction_reason']        = $document->getCorrectionReason();
 			$data['correction_type']          = $document->getCorrectionType();
 			$data['refund_id']                = $document->getRefundId();

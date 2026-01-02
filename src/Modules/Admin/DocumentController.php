@@ -15,6 +15,7 @@ use IHumbak\Invoices\Models\Document;
 use IHumbak\Invoices\Models\Invoice;
 use IHumbak\Invoices\Models\Receipt;
 use IHumbak\Invoices\Models\CreditNote;
+use IHumbak\Invoices\Models\ReceiptReturn;
 use IHumbak\Invoices\Models\DocumentItem;
 use IHumbak\Invoices\Models\Buyer;
 use IHumbak\Invoices\Models\Seller;
@@ -90,6 +91,7 @@ class DocumentController {
 		add_action( 'admin_post_ihumbak_save_invoice', array( $this, 'handle_save_invoice' ) );
 		add_action( 'admin_post_ihumbak_save_receipt', array( $this, 'handle_save_receipt' ) );
 		add_action( 'admin_post_ihumbak_save_credit_note', array( $this, 'handle_save_credit_note' ) );
+		add_action( 'admin_post_ihumbak_save_receipt_return', array( $this, 'handle_save_receipt_return' ) );
 		add_action( 'admin_post_ihumbak_revert_to_draft', array( $this, 'handle_revert_to_draft' ) );
 	}
 
@@ -207,6 +209,15 @@ class DocumentController {
 	}
 
 	/**
+	 * Handle save receipt return action.
+	 *
+	 * @return void
+	 */
+	public function handle_save_receipt_return(): void {
+		$this->handle_save( 'receipt_return' );
+	}
+
+	/**
 	 * Render credit note edit page.
 	 *
 	 * @param int|null $id Document ID (null for new).
@@ -320,6 +331,119 @@ class DocumentController {
 	}
 
 	/**
+	 * Render receipt return edit page.
+	 *
+	 * @param int|null $id Document ID (null for new).
+	 * @return void
+	 */
+	public function render_receipt_return_edit( ?int $id = null ): void {
+		$document          = null;
+		$items             = array();
+		$original_document = null;
+		$original_items    = array();
+		$available_refunds = array();
+
+		if ( $id ) {
+			$document = $this->document_repository->find( $id );
+			if ( $document ) {
+				$items = $this->item_repository->findByDocumentId( $id );
+
+				// Load original document if set.
+				if ( $document->getCorrectedDocumentId() ) {
+					$original_document = $this->document_repository->find( $document->getCorrectedDocumentId() );
+					$original_items    = $this->item_repository->findByDocumentId( $document->getCorrectedDocumentId() );
+
+					// Load refunds if order is linked.
+					if ( $original_document && $original_document->getOrderId() ) {
+						$available_refunds = $this->refund_extractor->extractRefundsFromOrderId( $original_document->getOrderId() );
+					}
+				}
+			}
+		}
+
+		// Check for pre-selected receipt ID and order_id from receipt return creation links.
+		$pre_selected_receipt_id = null;
+		$pre_filled_order_id     = null;
+
+		if ( isset( $_GET['corrected_document_id'] ) ) {
+			$corrected_id = absint( $_GET['corrected_document_id'] );
+
+			// Verify nonce for receipt return creation (from receipt-edit.php or OrderMetaBox).
+			$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+			if ( wp_verify_nonce( $nonce, 'ihumbak_create_receipt_return_' . $corrected_id ) ) {
+				$pre_selected_receipt_id = $corrected_id;
+
+				// Also get order_id if provided (from OrderMetaBox).
+				if ( isset( $_GET['order_id'] ) ) {
+					$pre_filled_order_id = absint( $_GET['order_id'] );
+				}
+			}
+		}
+
+		// If order_id is provided and verified, load refunds for that order.
+		if ( $pre_filled_order_id && empty( $available_refunds ) ) {
+			$available_refunds = $this->refund_extractor->extractRefundsFromOrderId( $pre_filled_order_id );
+		}
+
+		$settings = Plugin::get_instance()->get_settings();
+		$seller   = $document ? $document->getSeller()?->toArray() : ( $settings['seller'] ?? array() );
+		$buyer    = $document ? $document->getBuyer()?->toArray() : array();
+		$items    = array_map( fn( $item ) => $item->toArray(), $items );
+
+		// Get available receipts for dropdown with existing receipt returns info.
+		$available_receipts        = $this->get_correctable_receipts();
+		$existing_receipt_returns  = $this->get_existing_receipt_returns_map( $available_receipts );
+
+		$next_number = $this->numbering_service->previewNextNumber(
+			'receipt_return',
+			$settings['numbering']['receipt_return_pattern'] ?? 'RR/{YYYY}/{MM}/{NNNN}',
+			$settings['numbering']['reset_monthly'] ?? true
+		);
+
+		$super_admin_service = $this->super_admin_service;
+
+		include IHUMBAK_INVOICES_PATH . 'templates/admin/receipt-return-edit.php';
+	}
+
+	/**
+	 * Get receipts that can have returns created.
+	 *
+	 * @return Document[]
+	 */
+	private function get_correctable_receipts(): array {
+		return $this->document_repository->findAll(
+			array(
+				'document_type' => 'receipt',
+				'status'        => Document::STATUS_ISSUED,
+			),
+			1000,
+			0
+		);
+	}
+
+	/**
+	 * Get map of existing receipt returns for receipts.
+	 *
+	 * @param Document[] $receipts Array of receipts.
+	 * @return array<int, ReceiptReturn[]> Map of receipt ID to array of receipt returns.
+	 */
+	private function get_existing_receipt_returns_map( array $receipts ): array {
+		$returns = array();
+
+		foreach ( $receipts as $receipt ) {
+			$receipt_id = $receipt->getId();
+			if ( $receipt_id ) {
+				$receipt_returns = $this->document_repository->findReceiptReturnsByCorrectedDocumentId( $receipt_id );
+				if ( ! empty( $receipt_returns ) ) {
+					$returns[ $receipt_id ] = $receipt_returns;
+				}
+			}
+		}
+
+		return $returns;
+	}
+
+	/**
 	 * Handle document save.
 	 *
 	 * @param string $type Document type.
@@ -352,9 +476,10 @@ class DocumentController {
 			}
 		} else {
 			$document = match ( $type ) {
-				'receipt'     => new Receipt(),
-				'credit_note' => new CreditNote(),
-				default       => new Invoice(),
+				'receipt'        => new Receipt(),
+				'credit_note'    => new CreditNote(),
+				'receipt_return' => new ReceiptReturn(),
+				default          => new Invoice(),
 			};
 		}
 
@@ -370,9 +495,10 @@ class DocumentController {
 				if ( ! $document->getDocumentNumber() ) {
 					$settings = Plugin::get_instance()->get_settings();
 					$pattern  = match ( $type ) {
-						'receipt'     => $settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}',
-						'credit_note' => $settings['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}',
-						default       => $settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}',
+						'receipt'        => $settings['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}',
+						'credit_note'    => $settings['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}',
+						'receipt_return' => $settings['numbering']['receipt_return_pattern'] ?? 'RR/{YYYY}/{MM}/{NNNN}',
+						default          => $settings['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}',
 					};
 
 					$document->setDocumentNumber(
@@ -557,6 +683,92 @@ class DocumentController {
 				$document->setCorrectedDocumentId( $corrected_id );
 
 				// Propagate order_id from original invoice to credit note.
+				if ( $original_document->getOrderId() ) {
+					$document->setOrderId( $original_document->getOrderId() );
+				}
+			}
+
+			// Correction reason (optional).
+			if ( ! empty( $_POST['correction_reason'] ) ) {
+				$document->setCorrectionReason( sanitize_textarea_field( wp_unslash( $_POST['correction_reason'] ) ) );
+			}
+
+			// Correction type (full or partial).
+			if ( ! empty( $_POST['correction_type'] ) ) {
+				try {
+					$document->setCorrectionType( sanitize_text_field( wp_unslash( $_POST['correction_type'] ) ) );
+				} catch ( \InvalidArgumentException $e ) {
+					// Use default type (partial) if invalid value provided.
+					unset( $e );
+				}
+			}
+
+			// Refund ID (optional, only relevant in system mode).
+			if ( ! empty( $_POST['refund_id'] ) && ! $is_manual_entry ) {
+				$document->setRefundId( absint( $_POST['refund_id'] ) );
+			} else {
+				$document->setRefundId( null );
+			}
+		}
+
+		// Receipt return specific fields.
+		if ( $document instanceof ReceiptReturn ) {
+			// Check entry mode: manual or system.
+			$is_manual_entry = isset( $_POST['is_manual_entry'] ) && '1' === $_POST['is_manual_entry'];
+
+			if ( $is_manual_entry ) {
+				// Manual entry mode: original receipt from external system.
+				$document->setManualEntry( true );
+				$document->setCorrectedDocumentId( null );
+
+				// Original document number (required in manual mode).
+				if ( empty( $_POST['original_document_number'] ) ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Please provide the original receipt number.', 'ihumbak-invoices' )
+					);
+				}
+				$original_number = sanitize_text_field( wp_unslash( $_POST['original_document_number'] ) );
+				$document->setOriginalDocumentNumber( substr( $original_number, 0, 100 ) );
+
+				// Original document date (optional in manual mode).
+				if ( ! empty( $_POST['original_document_date'] ) ) {
+					$document->setOriginalDocumentDate(
+						new \DateTimeImmutable( sanitize_text_field( wp_unslash( $_POST['original_document_date'] ) ) )
+					);
+				} else {
+					$document->setOriginalDocumentDate( null );
+				}
+			} else {
+				// System mode: select receipt from database.
+				$document->setManualEntry( false );
+				$document->setOriginalDocumentNumber( null );
+				$document->setOriginalDocumentDate( null );
+
+				// Corrected document ID (required in system mode).
+				if ( empty( $_POST['corrected_document_id'] ) ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Please select a source receipt for the receipt return.', 'ihumbak-invoices' )
+					);
+				}
+
+				$corrected_id = absint( $_POST['corrected_document_id'] );
+
+				// Validate that the corrected document exists and is a receipt.
+				$original_document = $this->document_repository->find( $corrected_id );
+				if ( ! $original_document ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'The selected source receipt does not exist.', 'ihumbak-invoices' )
+					);
+				}
+				if ( 'receipt' !== $original_document->getDocumentType() ) {
+					throw new \InvalidArgumentException(
+						esc_html__( 'Receipt returns can only be created for receipts.', 'ihumbak-invoices' )
+					);
+				}
+
+				$document->setCorrectedDocumentId( $corrected_id );
+
+				// Propagate order_id from original receipt to receipt return.
 				if ( $original_document->getOrderId() ) {
 					$document->setOrderId( $original_document->getOrderId() );
 				}
