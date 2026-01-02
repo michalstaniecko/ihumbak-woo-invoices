@@ -31,30 +31,25 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 	<table class="widefat ihumbak-items-table ihumbak-items-table-tworow" id="ihumbak-items-table">
 		<thead>
 			<tr>
-				<th class="column-name"><?php esc_html_e( 'Name', 'ihumbak-invoices' ); ?></th>
+				<th class="column-sku"><?php esc_html_e( 'SKU', 'ihumbak-invoices' ); ?></th>
 				<th class="column-quantity"><?php esc_html_e( 'Qty', 'ihumbak-invoices' ); ?></th>
 				<th class="column-price-net"><?php esc_html_e( 'Price Net', 'ihumbak-invoices' ); ?></th>
 				<th class="column-tax-rate"><?php esc_html_e( 'VAT %', 'ihumbak-invoices' ); ?></th>
 				<th class="column-total-net"><?php esc_html_e( 'Total Net', 'ihumbak-invoices' ); ?></th>
 				<th class="column-tax-amount"><?php esc_html_e( 'VAT', 'ihumbak-invoices' ); ?></th>
-				<th class="column-total-gross"><?php esc_html_e( 'Total Gross', 'ihumbak-invoices' ); ?></th>
+				<th class="column-total-gross"><?php esc_html_e( 'Total', 'ihumbak-invoices' ); ?></th>
 				<th class="column-actions"></th>
 			</tr>
 		</thead>
 		<tbody id="ihumbak-items-body">
 			<?php if ( ! empty( $items ) ) : ?>
 				<?php foreach ( $items as $index => $item ) : ?>
-					<!-- Row 1: Name spanning input columns -->
+					<!-- Row 1: Name spanning all columns except actions -->
 					<tr class="ihumbak-item-row ihumbak-item-row-name" data-index="<?php echo esc_attr( $index ); ?>">
-						<td class="column-name" colspan="6">
-							<div class="item-name-wrapper">
-								<input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
-										value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
-										class="item-name" placeholder="<?php esc_attr_e( 'Product name', 'ihumbak-invoices' ); ?>" required <?php wp_readonly( ! $can_edit ); ?>>
-								<input type="text" name="items[<?php echo esc_attr( $index ); ?>][sku]"
-										value="<?php echo esc_attr( $item['sku'] ?? '' ); ?>"
-										class="item-sku" placeholder="<?php esc_attr_e( 'SKU (optional)', 'ihumbak-invoices' ); ?>" <?php wp_readonly( ! $can_edit ); ?>>
-							</div>
+						<td class="column-name" colspan="7">
+							<input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
+									value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
+									class="item-name" placeholder="<?php esc_attr_e( 'Product name', 'ihumbak-invoices' ); ?>" required <?php wp_readonly( ! $can_edit ); ?>>
 							<!-- Hidden fields for data preservation -->
 							<input type="hidden" name="items[<?php echo esc_attr( $index ); ?>][unit_price_gross]"
 									value="<?php echo esc_attr( $item['unit_price_gross'] ?? '' ); ?>"
@@ -71,8 +66,13 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 							<?php endif; ?>
 						</td>
 					</tr>
-					<!-- Row 2: Numeric inputs -->
+					<!-- Row 2: SKU + Numeric inputs -->
 					<tr class="ihumbak-item-row ihumbak-item-row-values" data-index="<?php echo esc_attr( $index ); ?>">
+						<td class="column-sku">
+							<input type="text" name="items[<?php echo esc_attr( $index ); ?>][sku]"
+									value="<?php echo esc_attr( $item['sku'] ?? '' ); ?>"
+									class="item-sku" placeholder="<?php esc_attr_e( 'SKU', 'ihumbak-invoices' ); ?>" <?php wp_readonly( ! $can_edit ); ?>>
+						</td>
 						<td class="column-quantity">
 							<input type="number" name="items[<?php echo esc_attr( $index ); ?>][quantity]"
 									value="<?php echo esc_attr( $item['quantity'] ?? 1 ); ?>"
@@ -142,13 +142,10 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 
 <!-- Item row template for JS (two-row structure) -->
 <script type="text/template" id="ihumbak-item-row-template">
-	<!-- Row 1: Name spanning input columns -->
+	<!-- Row 1: Name spanning all columns except actions -->
 	<tr class="ihumbak-item-row ihumbak-item-row-name" data-index="{{index}}">
-		<td class="column-name" colspan="6">
-			<div class="item-name-wrapper">
-				<input type="text" name="items[{{index}}][name]" value="" class="item-name" placeholder="<?php esc_attr_e( 'Product name', 'ihumbak-invoices' ); ?>" required>
-				<input type="text" name="items[{{index}}][sku]" value="" class="item-sku" placeholder="<?php esc_attr_e( 'SKU (optional)', 'ihumbak-invoices' ); ?>">
-			</div>
+		<td class="column-name" colspan="7">
+			<input type="text" name="items[{{index}}][name]" value="" class="item-name" placeholder="<?php esc_attr_e( 'Product name', 'ihumbak-invoices' ); ?>" required>
 			<input type="hidden" name="items[{{index}}][unit_price_gross]" value="" class="item-price-gross">
 			<input type="hidden" name="items[{{index}}][unit]" value="pcs" class="item-unit">
 		</td>
@@ -158,8 +155,11 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 			</button>
 		</td>
 	</tr>
-	<!-- Row 2: Numeric inputs -->
+	<!-- Row 2: SKU + Numeric inputs -->
 	<tr class="ihumbak-item-row ihumbak-item-row-values" data-index="{{index}}">
+		<td class="column-sku">
+			<input type="text" name="items[{{index}}][sku]" value="" class="item-sku" placeholder="<?php esc_attr_e( 'SKU', 'ihumbak-invoices' ); ?>">
+		</td>
 		<td class="column-quantity">
 			<input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001" placeholder="1"<?php echo esc_attr( $quantity_min_attr ); ?> required>
 		</td>
