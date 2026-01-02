@@ -205,11 +205,15 @@
         collectItemsData: function() {
             var items = [];
 
-            $('#ihumbak-items-body .ihumbak-item-row').each(function() {
-                var $row = $(this);
-                var index = $row.data('index');
+            // Iterate only through name rows (one per item) to avoid duplicates.
+            $('#ihumbak-items-body .ihumbak-item-row-name').each(function() {
+                var $nameRow = $(this);
+                var index = $nameRow.data('index');
 
-                var name = $row.find('.item-name').val();
+                // Get the corresponding values row.
+                var $valuesRow = $('#ihumbak-items-body .ihumbak-item-row-values[data-index="' + index + '"]');
+
+                var name = $nameRow.find('.item-name').val();
                 if (!name) {
                     return; // Skip empty rows.
                 }
@@ -217,10 +221,10 @@
                 items.push({
                     index: index,
                     name: name,
-                    quantity: parseFloat($row.find('.item-quantity').val()) || 1,
-                    unit: $row.find('.item-unit').val() || 'szt.',
-                    unit_price_net: parseFloat($row.find('.item-price-net').val()) || 0,
-                    tax_rate: parseFloat($row.find('.item-tax-rate').val()) || 23,
+                    quantity: parseFloat($valuesRow.find('.item-quantity').val()) || 1,
+                    unit: $nameRow.find('.item-unit').val() || 'pcs',
+                    unit_price_net: parseFloat($valuesRow.find('.item-price-net').val()) || 0,
+                    tax_rate: parseFloat($valuesRow.find('.item-tax-rate').val()) || 23,
                     price_type: 'net'
                 });
             });
@@ -229,30 +233,31 @@
         },
 
         /**
-         * Update item rows from AJAX response.
+         * Update item rows from AJAX response (two-row layout).
          *
          * @param {Object} itemsData Calculated items data keyed by index.
          */
         updateItemsFromResponse: function(itemsData) {
-            var self = this;
-
             $.each(itemsData, function(index, item) {
-                var $row = $('#ihumbak-items-body .ihumbak-item-row[data-index="' + index + '"]');
+                var $nameRow = $('#ihumbak-items-body .ihumbak-item-row-name[data-index="' + index + '"]');
+                var $valuesRow = $('#ihumbak-items-body .ihumbak-item-row-values[data-index="' + index + '"]');
 
-                if ($row.length === 0) {
+                if ($nameRow.length === 0 || $valuesRow.length === 0) {
                     return;
                 }
 
-                // Update calculated values.
-                $row.find('.item-price-gross').val(item.unit_price_gross.toFixed(2));
-                $row.find('.item-total-net').val(item.line_total_net.toFixed(2));
-                $row.find('.item-tax-amount').val(item.tax_amount.toFixed(2));
-                $row.find('.item-total-gross').val(item.line_total_gross.toFixed(2));
+                // Update price gross in name row (hidden input).
+                $nameRow.find('.item-price-gross').val(item.unit_price_gross.toFixed(2));
 
-                // Update display values.
-                $row.find('.item-total-net-display').text(item.formatted.line_total_net);
-                $row.find('.item-tax-amount-display').text(item.formatted.tax_amount);
-                $row.find('.item-total-gross-display').text(item.formatted.line_total_gross);
+                // Update calculated values in values row.
+                $valuesRow.find('.item-total-net').val(item.line_total_net.toFixed(2));
+                $valuesRow.find('.item-tax-amount').val(item.tax_amount.toFixed(2));
+                $valuesRow.find('.item-total-gross').val(item.line_total_gross.toFixed(2));
+
+                // Update display values in values row.
+                $valuesRow.find('.item-total-net-display').text(item.formatted.line_total_net);
+                $valuesRow.find('.item-tax-amount-display').text(item.formatted.tax_amount);
+                $valuesRow.find('.item-total-gross-display').text(item.formatted.line_total_gross);
             });
         },
 
