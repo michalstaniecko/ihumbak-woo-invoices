@@ -66,7 +66,23 @@ $currency = $document->getCurrency();
 		</div>
 
 		<!-- Correction Reference Box -->
-		<?php if ( $original_document ) : ?>
+		<?php if ( $document->isManualEntry() ) : ?>
+		<!-- Manual entry mode: show data from credit note fields -->
+		<div class="detail-box correction-details">
+			<div class="detail-box-title"><?php esc_html_e( 'Corrects Invoice', 'ihumbak-invoices' ); ?></div>
+			<div class="detail-row">
+				<span class="label"><?php esc_html_e( 'Original Invoice No:', 'ihumbak-invoices' ); ?></span>
+				<span class="value"><?php echo esc_html( $document->getOriginalDocumentNumber() ); ?></span>
+			</div>
+			<?php if ( $document->getOriginalDocumentDate() ) : ?>
+			<div class="detail-row">
+				<span class="label"><?php esc_html_e( 'Original Issue Date:', 'ihumbak-invoices' ); ?></span>
+				<span class="value"><?php echo esc_html( $document->getOriginalDocumentDate()->format( 'Y-m-d' ) ); ?></span>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php elseif ( $original_document ) : ?>
+		<!-- System mode: show data from original document -->
 		<div class="detail-box correction-details">
 			<div class="detail-box-title"><?php esc_html_e( 'Corrects Invoice', 'ihumbak-invoices' ); ?></div>
 			<div class="detail-row">
@@ -97,10 +113,6 @@ $currency = $document->getCurrency();
 						<div class="detail-row">
 							<span class="label"><?php esc_html_e( 'Issue Date:', 'ihumbak-invoices' ); ?></span>
 							<span class="value"><?php echo $document->getIssueDate() ? esc_html( $document->getIssueDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
-						</div>
-						<div class="detail-row">
-							<span class="label"><?php esc_html_e( 'Sale Date:', 'ihumbak-invoices' ); ?></span>
-							<span class="value"><?php echo $document->getSaleDate() ? esc_html( $document->getSaleDate()->format( 'Y-m-d' ) ) : '-'; ?></span>
 						</div>
 						<div class="detail-row">
 							<span class="label"><?php esc_html_e( 'Correction Type:', 'ihumbak-invoices' ); ?></span>

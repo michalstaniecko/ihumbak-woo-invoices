@@ -22,9 +22,10 @@ defined( 'ABSPATH' ) || exit;
 
 use IHumbak\Invoices\Models\CreditNote;
 
-$is_new     = ! $document || ! $document->getId();
-$is_draft   = ! $document || $document->isDraft();
-$can_edit   = $is_new || $is_draft;
+$is_new         = ! $document || ! $document->getId();
+$is_draft       = ! $document || $document->isDraft();
+$can_edit       = $is_new || $is_draft;
+$is_manual_mode = $document && $document->isManualEntry();
 $page_title = $is_new
 	? __( 'New Credit Note', 'ihumbak-invoices' )
 	: sprintf(
@@ -111,8 +112,33 @@ $page_title = $is_new
 				<div class="ihumbak-card ihumbak-source-invoice-card">
 					<h3><?php esc_html_e( 'Source Invoice', 'ihumbak-invoices' ); ?></h3>
 
+					<input type="hidden" name="is_manual_entry" id="is_manual_entry" value="<?php echo $is_manual_mode ? '1' : '0'; ?>">
+
 					<table class="form-table">
+						<!-- Entry Mode Toggle -->
 						<tr>
+							<th><?php esc_html_e( 'Entry Mode', 'ihumbak-invoices' ); ?></th>
+							<td>
+								<label style="margin-right: 20px;">
+									<input type="radio" name="entry_mode" value="system"
+										   <?php checked( ! $is_manual_mode ); ?>
+										   <?php disabled( ! $can_edit ); ?>>
+									<?php esc_html_e( 'Select invoice from system', 'ihumbak-invoices' ); ?>
+								</label>
+								<label>
+									<input type="radio" name="entry_mode" value="manual"
+										   <?php checked( $is_manual_mode ); ?>
+										   <?php disabled( ! $can_edit ); ?>>
+									<?php esc_html_e( 'Enter original invoice data manually', 'ihumbak-invoices' ); ?>
+								</label>
+								<p class="description">
+									<?php esc_html_e( 'Use manual entry for invoices issued in a previous system.', 'ihumbak-invoices' ); ?>
+								</p>
+							</td>
+						</tr>
+
+						<!-- System Mode: Invoice Selection -->
+						<tr id="system-mode-row" <?php echo $is_manual_mode ? 'style="display: none;"' : ''; ?>>
 							<th>
 								<label for="corrected_document_id">
 									<?php esc_html_e( 'Select Invoice to Correct', 'ihumbak-invoices' ); ?>
@@ -121,8 +147,7 @@ $page_title = $is_new
 							</th>
 							<td>
 								<select id="corrected_document_id" name="corrected_document_id"
-										<?php disabled( ! $can_edit ); ?>
-										<?php echo $can_edit ? 'required' : ''; ?>>
+										<?php disabled( ! $can_edit ); ?>>
 									<option value=""><?php esc_html_e( '-- Select Invoice --', 'ihumbak-invoices' ); ?></option>
 									<?php foreach ( $available_invoices as $inv ) : ?>
 										<?php
@@ -165,6 +190,41 @@ $page_title = $is_new
 								</p>
 							</td>
 						</tr>
+
+						<!-- Manual Mode: Original Invoice Data -->
+						<tr id="manual-mode-number-row" <?php echo ! $is_manual_mode ? 'style="display: none;"' : ''; ?>>
+							<th>
+								<label for="original_document_number">
+									<?php esc_html_e( 'Original Invoice Number', 'ihumbak-invoices' ); ?>
+									<span class="required">*</span>
+								</label>
+							</th>
+							<td>
+								<input type="text" id="original_document_number" name="original_document_number"
+									   value="<?php echo esc_attr( $document ? $document->getOriginalDocumentNumber() : '' ); ?>"
+									   class="regular-text" <?php disabled( ! $can_edit ); ?>>
+								<p class="description">
+									<?php esc_html_e( 'Enter the number of the original invoice from the previous system.', 'ihumbak-invoices' ); ?>
+								</p>
+							</td>
+						</tr>
+						<tr id="manual-mode-date-row" <?php echo ! $is_manual_mode ? 'style="display: none;"' : ''; ?>>
+							<th>
+								<label for="original_document_date">
+									<?php esc_html_e( 'Original Invoice Date', 'ihumbak-invoices' ); ?>
+								</label>
+							</th>
+							<td>
+								<input type="date" id="original_document_date" name="original_document_date"
+									   value="<?php echo esc_attr( $document && $document->getOriginalDocumentDate() ? $document->getOriginalDocumentDate()->format( 'Y-m-d' ) : '' ); ?>"
+									   <?php disabled( ! $can_edit ); ?>>
+								<p class="description">
+									<?php esc_html_e( 'Optional: Enter the date of the original invoice.', 'ihumbak-invoices' ); ?>
+								</p>
+							</td>
+						</tr>
+
+						<!-- Original Invoice Info (shown when invoice is loaded) -->
 						<?php if ( $original_document ) : ?>
 						<tr id="original-invoice-info">
 							<th><?php esc_html_e( 'Original Invoice', 'ihumbak-invoices' ); ?></th>
@@ -211,12 +271,11 @@ $page_title = $is_new
 							<th>
 								<label for="correction_reason">
 									<?php esc_html_e( 'Correction Reason', 'ihumbak-invoices' ); ?>
-									<span class="required">*</span>
 								</label>
 							</th>
 							<td>
 								<textarea id="correction_reason" name="correction_reason" rows="3"
-										  class="large-text" required <?php disabled( ! $can_edit ); ?>><?php
+										  class="large-text" <?php disabled( ! $can_edit ); ?>><?php
 									echo esc_textarea( $document ? $document->getCorrectionReason() : '' );
 								?></textarea>
 							</td>
@@ -278,15 +337,7 @@ $page_title = $is_new
 									   required <?php disabled( ! $can_edit ); ?>>
 							</td>
 						</tr>
-						<tr>
-							<th><label for="sale_date"><?php esc_html_e( 'Sale Date', 'ihumbak-invoices' ); ?> <span class="required">*</span></label></th>
-							<td>
-								<input type="date" id="sale_date" name="sale_date"
-									   value="<?php echo esc_attr( $document ? $document->getSaleDate()?->format( 'Y-m-d' ) : gmdate( 'Y-m-d' ) ); ?>"
-									   required <?php disabled( ! $can_edit ); ?>>
-							</td>
-						</tr>
-					</table>
+						</table>
 				</div>
 
 				<!-- Items -->

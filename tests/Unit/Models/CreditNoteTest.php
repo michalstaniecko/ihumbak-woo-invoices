@@ -459,4 +459,198 @@ class CreditNoteTest extends TestCase {
 		$this->assertEquals( 'full', CreditNote::CORRECTION_TYPE_FULL );
 		$this->assertEquals( 'partial', CreditNote::CORRECTION_TYPE_PARTIAL );
 	}
+
+	/**
+	 * Test manual entry mode default is false.
+	 */
+	public function test_manual_entry_default(): void {
+		$credit_note = new CreditNote();
+
+		$this->assertFalse( $credit_note->isManualEntry() );
+	}
+
+	/**
+	 * Test set manual entry mode.
+	 */
+	public function test_set_manual_entry(): void {
+		$credit_note = new CreditNote();
+
+		$result = $credit_note->setManualEntry( true );
+
+		$this->assertSame( $credit_note, $result );
+		$this->assertTrue( $credit_note->isManualEntry() );
+
+		$credit_note->setManualEntry( false );
+		$this->assertFalse( $credit_note->isManualEntry() );
+	}
+
+	/**
+	 * Test original document number.
+	 */
+	public function test_original_document_number(): void {
+		$credit_note = new CreditNote();
+
+		$this->assertNull( $credit_note->getOriginalDocumentNumber() );
+
+		$result = $credit_note->setOriginalDocumentNumber( 'FV/2024/12/0001' );
+
+		$this->assertSame( $credit_note, $result );
+		$this->assertEquals( 'FV/2024/12/0001', $credit_note->getOriginalDocumentNumber() );
+
+		$credit_note->setOriginalDocumentNumber( null );
+		$this->assertNull( $credit_note->getOriginalDocumentNumber() );
+	}
+
+	/**
+	 * Test original document date.
+	 */
+	public function test_original_document_date(): void {
+		$credit_note = new CreditNote();
+
+		$this->assertNull( $credit_note->getOriginalDocumentDate() );
+
+		$date   = new \DateTimeImmutable( '2024-12-15' );
+		$result = $credit_note->setOriginalDocumentDate( $date );
+
+		$this->assertSame( $credit_note, $result );
+		$this->assertEquals( $date, $credit_note->getOriginalDocumentDate() );
+		$this->assertEquals( '2024-12-15', $credit_note->getOriginalDocumentDate()->format( 'Y-m-d' ) );
+
+		$credit_note->setOriginalDocumentDate( null );
+		$this->assertNull( $credit_note->getOriginalDocumentDate() );
+	}
+
+	/**
+	 * Test getDisplayCorrectedDocumentNumber for manual entry mode.
+	 */
+	public function test_display_corrected_document_number_manual_mode(): void {
+		$credit_note = new CreditNote();
+		$credit_note->setManualEntry( true );
+		$credit_note->setOriginalDocumentNumber( 'FV/2024/OLD/0099' );
+
+		$this->assertEquals( 'FV/2024/OLD/0099', $credit_note->getDisplayCorrectedDocumentNumber() );
+	}
+
+	/**
+	 * Test getDisplayCorrectedDocumentNumber for system mode returns null.
+	 */
+	public function test_display_corrected_document_number_system_mode(): void {
+		$credit_note = new CreditNote();
+		$credit_note->setManualEntry( false );
+		$credit_note->setCorrectedDocumentId( 5 );
+
+		$this->assertNull( $credit_note->getDisplayCorrectedDocumentNumber() );
+	}
+
+	/**
+	 * Test fromArray with manual entry fields.
+	 */
+	public function test_from_array_with_manual_entry(): void {
+		$data = array(
+			'id'                       => 15,
+			'is_manual_entry'          => true,
+			'original_document_number' => 'OLD/INV/2024/0001',
+			'original_document_date'   => '2024-06-15',
+			'correction_reason'        => 'Correction for external invoice',
+		);
+
+		$credit_note = CreditNote::fromArray( $data );
+
+		$this->assertEquals( 15, $credit_note->getId() );
+		$this->assertTrue( $credit_note->isManualEntry() );
+		$this->assertEquals( 'OLD/INV/2024/0001', $credit_note->getOriginalDocumentNumber() );
+		$this->assertEquals( '2024-06-15', $credit_note->getOriginalDocumentDate()->format( 'Y-m-d' ) );
+		$this->assertEquals( 'Correction for external invoice', $credit_note->getCorrectionReason() );
+	}
+
+	/**
+	 * Test fromArray with manual entry false.
+	 */
+	public function test_from_array_with_manual_entry_false(): void {
+		$data = array(
+			'is_manual_entry' => false,
+		);
+
+		$credit_note = CreditNote::fromArray( $data );
+
+		$this->assertFalse( $credit_note->isManualEntry() );
+	}
+
+	/**
+	 * Test fromArray with original_document_date as DateTimeImmutable.
+	 */
+	public function test_from_array_with_datetime_immutable_original_date(): void {
+		$date = new \DateTimeImmutable( '2024-03-20' );
+		$data = array(
+			'original_document_date' => $date,
+		);
+
+		$credit_note = CreditNote::fromArray( $data );
+
+		$this->assertEquals( $date, $credit_note->getOriginalDocumentDate() );
+	}
+
+	/**
+	 * Test fromArray with original_document_date as DateTime.
+	 */
+	public function test_from_array_with_datetime_original_date(): void {
+		$date = new \DateTime( '2024-03-21' );
+		$data = array(
+			'original_document_date' => $date,
+		);
+
+		$credit_note = CreditNote::fromArray( $data );
+
+		$this->assertEquals( '2024-03-21', $credit_note->getOriginalDocumentDate()->format( 'Y-m-d' ) );
+	}
+
+	/**
+	 * Test toArray includes manual entry fields.
+	 */
+	public function test_to_array_includes_manual_entry_fields(): void {
+		$credit_note = new CreditNote();
+		$credit_note->setId( 20 )
+			->setManualEntry( true )
+			->setOriginalDocumentNumber( 'EXT/2023/0050' )
+			->setOriginalDocumentDate( new \DateTimeImmutable( '2023-11-30' ) )
+			->setCorrectionReason( 'Manual correction' );
+
+		$array = $credit_note->toArray();
+
+		$this->assertTrue( $array['is_manual_entry'] );
+		$this->assertEquals( 'EXT/2023/0050', $array['original_document_number'] );
+		$this->assertEquals( '2023-11-30', $array['original_document_date'] );
+		$this->assertNull( $array['corrected_document_id'] );
+	}
+
+	/**
+	 * Test toArray with manual entry false has default values.
+	 */
+	public function test_to_array_manual_entry_default_values(): void {
+		$credit_note = new CreditNote();
+
+		$array = $credit_note->toArray();
+
+		$this->assertFalse( $array['is_manual_entry'] );
+		$this->assertNull( $array['original_document_number'] );
+		$this->assertNull( $array['original_document_date'] );
+	}
+
+	/**
+	 * Test fluent setters for manual entry fields.
+	 */
+	public function test_fluent_setters_manual_entry(): void {
+		$credit_note = new CreditNote();
+		$date        = new \DateTimeImmutable( '2024-08-10' );
+
+		$result = $credit_note
+			->setManualEntry( true )
+			->setOriginalDocumentNumber( 'LEGACY/2024/001' )
+			->setOriginalDocumentDate( $date );
+
+		$this->assertSame( $credit_note, $result );
+		$this->assertTrue( $credit_note->isManualEntry() );
+		$this->assertEquals( 'LEGACY/2024/001', $credit_note->getOriginalDocumentNumber() );
+		$this->assertEquals( $date, $credit_note->getOriginalDocumentDate() );
+	}
 }

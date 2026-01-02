@@ -538,9 +538,12 @@
             var $loadRefundButton = $('#ihumbak-load-refund');
             var $invoiceSelect = $('#corrected_document_id');
 
-            if (!$loadInvoiceButton.length) {
+            if (!$loadInvoiceButton.length && !$('#is_manual_entry').length) {
                 return; // Not on credit note page.
             }
+
+            // Entry mode toggle handler.
+            this.initEntryModeToggle();
 
             // Load invoice data button click.
             $loadInvoiceButton.on('click', function(e) {
@@ -585,6 +588,69 @@
 
             // Trigger on load.
             $invoiceSelect.trigger('change');
+        },
+
+        /**
+         * Initialize entry mode toggle for credit notes.
+         * Handles switching between system invoice selection and manual entry.
+         */
+        initEntryModeToggle: function() {
+            var $entryModeRadios = $('input[name="entry_mode"]');
+            var $isManualEntryField = $('#is_manual_entry');
+            var $systemModeRow = $('#system-mode-row');
+            var $manualModeNumberRow = $('#manual-mode-number-row');
+            var $manualModeDateRow = $('#manual-mode-date-row');
+            var $invoiceSelect = $('#corrected_document_id');
+            var $originalNumberInput = $('#original_document_number');
+
+            if (!$entryModeRadios.length) {
+                return;
+            }
+
+            /**
+             * Toggle visibility of entry mode sections.
+             *
+             * @param {string} mode 'system' or 'manual'.
+             */
+            function toggleEntryMode(mode) {
+                var isManual = mode === 'manual';
+
+                // Update hidden field.
+                $isManualEntryField.val(isManual ? '1' : '0');
+
+                // Toggle visibility.
+                if (isManual) {
+                    $systemModeRow.hide();
+                    $manualModeNumberRow.show();
+                    $manualModeDateRow.show();
+
+                    // Clear system mode selection.
+                    $invoiceSelect.val('');
+
+                    // Set required on manual field.
+                    $originalNumberInput.prop('required', true);
+                } else {
+                    $systemModeRow.show();
+                    $manualModeNumberRow.hide();
+                    $manualModeDateRow.hide();
+
+                    // Clear manual fields.
+                    $originalNumberInput.val('');
+                    $('#original_document_date').val('');
+
+                    // Remove required from manual field.
+                    $originalNumberInput.prop('required', false);
+                }
+            }
+
+            // Handle radio change.
+            $entryModeRadios.on('change', function() {
+                toggleEntryMode($(this).val());
+            });
+
+            // Set initial state based on current selection.
+            var currentMode = $entryModeRadios.filter(':checked').val() || 'system';
+            toggleEntryMode(currentMode);
         },
 
         /**
