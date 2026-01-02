@@ -16,6 +16,7 @@ use IHumbak\Invoices\Modules\Invoice\RefundDataExtractor;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 use IHumbak\Invoices\Core\Plugin;
+use IHumbak\Invoices\Models\Receipt;
 
 /**
  * Handles AJAX requests.
@@ -71,6 +72,7 @@ class AjaxController {
 		add_action( 'wp_ajax_ihumbak_preview_number', array( $this, 'preview_number' ) );
 		add_action( 'wp_ajax_ihumbak_fetch_order_data', array( $this, 'fetch_order_data' ) );
 		add_action( 'wp_ajax_ihumbak_fetch_invoice_data', array( $this, 'fetch_invoice_data' ) );
+		add_action( 'wp_ajax_ihumbak_fetch_receipt_data', array( $this, 'fetch_receipt_data' ) );
 		add_action( 'wp_ajax_ihumbak_fetch_refund_data', array( $this, 'fetch_refund_data' ) );
 	}
 
@@ -333,6 +335,71 @@ class AjaxController {
 					'subtotal'  => $invoice->getSubtotal(),
 					'tax_total' => $invoice->getTaxTotal(),
 					'total'     => $invoice->getTotal(),
+				),
+				'refunds' => $refunds,
+			)
+		);
+	}
+
+	/**
+	 * Fetch receipt data for receipt return creation.
+	 *
+	 * @return void
+	 */
+	public function fetch_receipt_data(): void {
+		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
+
+		if ( ! Plugin::get_instance()->getPermissionService()->canManageDocuments() ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
+		}
+
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- absint sanitizes.
+		$receipt_id = isset( $_POST['receipt_id'] ) ? absint( wp_unslash( $_POST['receipt_id'] ) ) : 0;
+
+		if ( ! $receipt_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid receipt ID.', 'ihumbak-invoices' ) ) );
+		}
+
+		$repository      = new DocumentRepository();
+		$item_repository = new DocumentItemRepository();
+
+		$receipt = $repository->find( $receipt_id );
+
+		if ( ! $receipt || $receipt->getDocumentType() !== Receipt::TYPE ) {
+			wp_send_json_error( array( 'message' => __( 'Receipt not found.', 'ihumbak-invoices' ) ) );
+		}
+
+		$items = $item_repository->findByDocumentId( $receipt_id );
+
+		// Format items for response.
+		$items_data = array();
+		foreach ( $items as $item ) {
+			$item_array              = $item->toArray();
+			$item_array['formatted'] = $this->format_item_values( $item_array );
+			$items_data[]            = $item_array;
+		}
+
+		// Get available refunds if order is linked.
+		$refunds = array();
+		if ( $receipt->getOrderId() ) {
+			$refunds = $this->refund_extractor->extractRefundsFromOrderId( $receipt->getOrderId() );
+		}
+
+		wp_send_json_success(
+			array(
+				'receipt' => array(
+					'id'              => $receipt->getId(),
+					'document_number' => $receipt->getDocumentNumber(),
+					'issue_date'      => $receipt->getIssueDate() ? $receipt->getIssueDate()->format( 'Y-m-d' ) : '',
+					'order_id'        => $receipt->getOrderId(),
+				),
+				'buyer'   => $receipt->getBuyer() ? $receipt->getBuyer()->toArray() : array(),
+				'seller'  => $receipt->getSeller() ? $receipt->getSeller()->toArray() : array(),
+				'items'   => $items_data,
+				'totals'  => array(
+					'subtotal'  => $receipt->getSubtotal(),
+					'tax_total' => $receipt->getTaxTotal(),
+					'total'     => $receipt->getTotal(),
 				),
 				'refunds' => $refunds,
 			)

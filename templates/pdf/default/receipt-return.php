@@ -65,13 +65,6 @@ $currency = $document->getCurrency();
 			<div class="document-number"><?php echo esc_html( $document->getDocumentNumber() ); ?></div>
 		</div>
 
-		<!-- Informational Document Notice -->
-		<div class="detail-box" style="background-color: #f0f0f0; border-left: 4px solid #666; padding: 10px; margin-bottom: 15px;">
-			<div style="font-size: 9pt; color: #666;">
-				<?php esc_html_e( 'This is an informational document, not an official accounting document.', 'ihumbak-invoices' ); ?>
-			</div>
-		</div>
-
 		<!-- Correction Reference Box -->
 		<?php if ( $document->isManualEntry() ) : ?>
 		<!-- Manual entry mode: show data from receipt return fields -->
@@ -231,9 +224,6 @@ $currency = $document->getCurrency();
 
 		<!-- Footer -->
 		<div class="document-footer">
-			<div style="margin-bottom: 10px; font-style: italic; color: #666;">
-				<?php esc_html_e( 'This is an informational document, not an official accounting document.', 'ihumbak-invoices' ); ?>
-			</div>
 			<?php if ( ! empty( $settings['pdf']['footer_text'] ) ) : ?>
 				<?php echo esc_html( $settings['pdf']['footer_text'] ); ?>
 			<?php else : ?>

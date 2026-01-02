@@ -47,6 +47,7 @@
             this.bindEvents();
             this.initFetchOrder();
             this.initCreditNote();
+            this.initReceiptReturn();
 
             // Check for pre-filled order ID (from WC order metabox).
             if (window.ihumbakPreFilledOrderId) {
@@ -591,6 +592,69 @@
         },
 
         /**
+         * Initialize receipt return functionality.
+         */
+        initReceiptReturn: function() {
+            var self = this;
+            var $loadReceiptButton = $('#ihumbak-load-receipt');
+            var $loadRefundButton = $('#ihumbak-load-refund');
+            var $receiptSelect = $('#corrected_document_id');
+
+            // Check if we're on receipt return page (has load-receipt button OR manual entry field).
+            // But NOT on credit note page (which has load-invoice button).
+            if (!$loadReceiptButton.length || $('#ihumbak-load-invoice').length) {
+                return; // Not on receipt return page.
+            }
+
+            // Entry mode toggle handler (shared with credit notes).
+            this.initEntryModeToggle();
+
+            // Load receipt data button click.
+            $loadReceiptButton.on('click', function(e) {
+                e.preventDefault();
+                var receiptId = parseInt($receiptSelect.val(), 10);
+                if (receiptId > 0) {
+                    self.fetchReceiptData(receiptId);
+                } else {
+                    self.showNotice('error', ihumbakInvoices.i18n.selectReceipt || 'Please select a receipt first.');
+                }
+            });
+
+            // Load refund data button click.
+            if ($loadRefundButton.length) {
+                $loadRefundButton.on('click', function(e) {
+                    e.preventDefault();
+                    var refundId = parseInt($('#refund_id').val(), 10);
+                    if (refundId > 0) {
+                        self.fetchRefundData(refundId);
+                    } else {
+                        self.showNotice('error', ihumbakInvoices.i18n.selectRefund || 'Please select a refund first.');
+                    }
+                });
+            }
+
+            // Enable/disable load button based on selection.
+            $receiptSelect.on('change', function() {
+                var receiptId = parseInt($(this).val(), 10);
+                $loadReceiptButton.prop('disabled', !receiptId || receiptId < 1);
+
+                // Show/hide return warning for receipts with existing returns.
+                var $selected = $(this).find('option:selected');
+                var hasReturns = $selected.data('has-returns') === 1 || $selected.data('has-returns') === '1';
+                var $warning = $('#return-warning');
+
+                if (hasReturns && $warning.length) {
+                    $warning.show();
+                } else if ($warning.length) {
+                    $warning.hide();
+                }
+            });
+
+            // Trigger on load.
+            $receiptSelect.trigger('change');
+        },
+
+        /**
          * Initialize entry mode toggle for credit notes.
          * Handles switching between system invoice selection and manual entry.
          */
@@ -781,6 +845,134 @@
 
             // Recalculate document totals.
             this.recalculateDocument();
+        },
+
+        /**
+         * Fetch receipt data via AJAX for receipt return.
+         *
+         * @param {number} receiptId Receipt ID.
+         */
+        fetchReceiptData: function(receiptId) {
+            var self = this;
+            var hasItems = $('#ihumbak-items-body .ihumbak-item-row').length > 0;
+            var mode = 'replace';
+
+            if (hasItems) {
+                var confirmMsg = ihumbakInvoices.i18n.replaceItemsConfirm ||
+                    'The form already contains items. Do you want to replace them with receipt data?';
+
+                if (!confirm(confirmMsg)) {
+                    mode = 'append';
+                }
+            }
+
+            var $button = $('#ihumbak-load-receipt');
+            var $spinner = $('#ihumbak-load-status');
+
+            // Show loading state.
+            $button.prop('disabled', true);
+            $spinner.addClass('is-active');
+
+            $.ajax({
+                url: ihumbakInvoices.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'ihumbak_fetch_receipt_data',
+                    nonce: ihumbakInvoices.nonce,
+                    receipt_id: receiptId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.populateFromReceiptData(response.data, mode);
+                        self.showNotice('success', ihumbakInvoices.i18n.receiptDataLoaded || 'Receipt data loaded successfully.');
+                    } else {
+                        self.showNotice('error', response.data.message || ihumbakInvoices.i18n.error);
+                        self.recalculateDocument();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', error);
+                    self.showNotice('error', ihumbakInvoices.i18n.error);
+                    self.recalculateDocument();
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                    $spinner.removeClass('is-active');
+                }
+            });
+        },
+
+        /**
+         * Populate receipt return form from receipt data.
+         *
+         * @param {Object} data Receipt data.
+         * @param {string} mode 'replace' or 'append'.
+         */
+        populateFromReceiptData: function(data, mode) {
+            var self = this;
+
+            if (mode === 'replace') {
+                // Clear existing items.
+                $('#ihumbak-items-body').empty();
+                this.itemIndex = 0;
+            }
+
+            // Add items (with negative quantities for receipt return).
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(function(item) {
+                    // Negate quantity for receipt return.
+                    item.quantity = -Math.abs(item.quantity || 1);
+                    self.addItemRowWithData(item);
+                });
+            }
+
+            // Populate buyer fields.
+            if (data.buyer) {
+                this.populateBuyerFields(data.buyer);
+            }
+
+            // Populate seller fields.
+            if (data.seller) {
+                this.populateSellerFields(data.seller);
+            }
+
+            // Update original receipt info display.
+            if (data.receipt) {
+                this.updateOriginalReceiptInfo(data.receipt);
+            }
+
+            // Update refunds dropdown if available.
+            if (data.refunds && data.refunds.length > 0) {
+                this.updateRefundsDropdown(data.refunds);
+            }
+
+            // Recalculate document totals.
+            this.recalculateDocument();
+        },
+
+        /**
+         * Update original receipt info display.
+         *
+         * @param {Object} receiptData Receipt data.
+         */
+        updateOriginalReceiptInfo: function(receiptData) {
+            var $infoRow = $('#original-receipt-info');
+            var $details = $('#original-receipt-details');
+
+            if (!$infoRow.length) {
+                // Create info row if it doesn't exist.
+                var html = '<tr id="original-receipt-info">' +
+                    '<th>' + (ihumbakInvoices.i18n.originalReceipt || 'Original Receipt') + '</th>' +
+                    '<td><div id="original-receipt-details"></div></td>' +
+                    '</tr>';
+                $('#corrected_document_id').closest('tr').after(html);
+                $details = $('#original-receipt-details');
+            }
+
+            $details.html(
+                '<strong>' + this.escapeHtml(receiptData.document_number) + '</strong><br>' +
+                (ihumbakInvoices.i18n.date || 'Date') + ': ' + this.escapeHtml(receiptData.issue_date)
+            );
         },
 
         /**

@@ -208,10 +208,11 @@ class TemplateLoader {
 		$type = $document->getDocumentType();
 
 		$template_map = array(
-			'invoice'     => 'invoice',
-			'receipt'     => 'receipt',
-			'credit_note' => 'credit-note',
-			'correction'  => 'correction', // Legacy - kept for backward compatibility.
+			'invoice'        => 'invoice',
+			'receipt'        => 'receipt',
+			'credit_note'    => 'credit-note',
+			'receipt_return' => 'receipt-return',
+			'correction'     => 'correction', // Legacy - kept for backward compatibility.
 		);
 
 		return $template_map[ $type ] ?? 'invoice';

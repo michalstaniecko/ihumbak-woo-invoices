@@ -391,8 +391,8 @@ class DocumentController {
 		$items    = array_map( fn( $item ) => $item->toArray(), $items );
 
 		// Get available receipts for dropdown with existing receipt returns info.
-		$available_receipts        = $this->get_correctable_receipts();
-		$existing_receipt_returns  = $this->get_existing_receipt_returns_map( $available_receipts );
+		$available_receipts       = $this->get_correctable_receipts();
+		$existing_receipt_returns = $this->get_existing_receipt_returns_map( $available_receipts );
 
 		$next_number = $this->numbering_service->previewNextNumber(
 			'receipt_return',

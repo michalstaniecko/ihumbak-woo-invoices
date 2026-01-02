@@ -15,6 +15,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use IHumbak\Invoices\Models\Document;
 use IHumbak\Invoices\Models\CreditNote;
+use IHumbak\Invoices\Models\ReceiptReturn;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 use IHumbak\Invoices\Core\Plugin;
@@ -424,8 +425,8 @@ class PdfGenerator {
 			'total'     => $this->formatMoney( $document->getTotal(), $document->getCurrency() ),
 		);
 
-		// Add original document data for credit notes.
-		if ( $document instanceof CreditNote && $document->getCorrectedDocumentId() ) {
+		// Add original document data for credit notes and receipt returns.
+		if ( ( $document instanceof CreditNote || $document instanceof ReceiptReturn ) && $document->getCorrectedDocumentId() ) {
 			$original_document = $this->document_repository->find( $document->getCorrectedDocumentId() );
 			$original_items    = $this->item_repository->findByDocumentId( $document->getCorrectedDocumentId() );
 

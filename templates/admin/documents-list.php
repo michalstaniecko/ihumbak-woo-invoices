@@ -27,6 +27,10 @@ defined( 'ABSPATH' ) || exit;
         <?php esc_html_e( 'Add Credit Note', 'ihumbak-invoices' ); ?>
     </a>
 
+    <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices&action=new&type=receipt_return' ) ); ?>" class="page-title-action">
+        <?php esc_html_e( 'Add Receipt Return', 'ihumbak-invoices' ); ?>
+    </a>
+
     <hr class="wp-header-end">
 
     <?php

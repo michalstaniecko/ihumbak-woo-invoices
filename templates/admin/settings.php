@@ -121,6 +121,18 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                     </td>
                 </tr>
                 <tr>
+                    <th scope="row">
+                        <label for="receipt_return_pattern"><?php esc_html_e( 'Receipt Return Pattern', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <input type="text"
+                               id="receipt_return_pattern"
+                               name="ihumbak_invoices_settings[numbering][receipt_return_pattern]"
+                               value="<?php echo esc_attr( $settings['numbering']['receipt_return_pattern'] ?? 'RR/{YYYY}/{MM}/{NNNN}' ); ?>"
+                               class="regular-text">
+                    </td>
+                </tr>
+                <tr>
                     <th scope="row"><?php esc_html_e( 'Reset Monthly', 'ihumbak-invoices' ); ?></th>
                     <td>
                         <label>
@@ -344,6 +356,18 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                                    value="1"
                                    <?php checked( ! empty( $settings['email']['auto_send_credit_note'] ) ); ?>>
                             <?php esc_html_e( 'Automatically send email when a credit note is issued', 'ihumbak-invoices' ); ?>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Auto-Send Receipt Return', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   name="ihumbak_invoices_settings[email][auto_send_receipt_return]"
+                                   value="1"
+                                   <?php checked( ! empty( $settings['email']['auto_send_receipt_return'] ) ); ?>>
+                            <?php esc_html_e( 'Automatically send email when a receipt return is issued', 'ihumbak-invoices' ); ?>
                         </label>
                     </td>
                 </tr>

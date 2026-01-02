@@ -295,6 +295,26 @@ $page_title = $is_new
                                 </p>
                             <?php endif; ?>
                         <?php endif; ?>
+                        <hr style="margin: 15px 0;">
+                        <p>
+                            <a href="<?php
+                            echo esc_url(
+                                add_query_arg(
+                                    array(
+                                        'page'                  => 'ihumbak-invoices',
+                                        'action'                => 'new',
+                                        'type'                  => 'receipt_return',
+                                        'corrected_document_id' => $document->getId(),
+                                        '_wpnonce'              => wp_create_nonce( 'ihumbak_create_receipt_return_' . $document->getId() ),
+                                    ),
+                                    admin_url( 'admin.php' )
+                                )
+                            );
+                            ?>"
+                               class="button button-large">
+                                <?php esc_html_e( 'Create Return', 'ihumbak-invoices' ); ?>
+                            </a>
+                        </p>
                     <?php endif; ?>
                 </div>
 

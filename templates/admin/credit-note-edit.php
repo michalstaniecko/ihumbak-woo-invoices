@@ -393,6 +393,10 @@ $page_title = $is_new
 							   class="button button-large" target="_blank">
 								<?php esc_html_e( 'Download PDF', 'ihumbak-invoices' ); ?>
 							</a>
+							<a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices&action=pdf&id=' . $document->getId() . '&force=1&nonce=' . wp_create_nonce( 'pdf_document_' . $document->getId() ) ) ); ?>"
+							   class="button button-large" target="_blank">
+								<?php esc_html_e( 'Regenerate PDF', 'ihumbak-invoices' ); ?>
+							</a>
 						</p>
 						<?php if ( $document->getOrderId() ) : ?>
 							<?php

@@ -93,9 +93,9 @@ class OrderMetaBox {
 		$create_invoice_url = $this->build_create_url( $order_id, 'invoice' );
 		$create_receipt_url = $this->build_create_url( $order_id, 'receipt' );
 
-		$edit_urls          = array();
-		$pdf_urls           = array();
-		$credit_note_urls   = array();
+		$edit_urls           = array();
+		$pdf_urls            = array();
+		$credit_note_urls    = array();
 		$receipt_return_urls = array();
 
 		foreach ( $documents as $document ) {

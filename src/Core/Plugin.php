@@ -466,6 +466,8 @@ final class Plugin {
 					$this->document_controller->render_receipt_edit( $id );
 				} elseif ( 'credit_note' === $type ) {
 					$this->document_controller->render_credit_note_edit( $id );
+				} elseif ( 'receipt_return' === $type ) {
+					$this->document_controller->render_receipt_return_edit( $id );
 				} else {
 					$this->document_controller->render_invoice_edit( $id );
 				}
@@ -784,11 +786,12 @@ final class Plugin {
 				'details' => '',
 			),
 			'numbering'   => array(
-				'invoice_pattern'     => 'FV/{YYYY}/{MM}/{NNNN}',
-				'receipt_pattern'     => 'PAR/{YYYY}/{MM}/{NNNN}',
-				'credit_note_pattern' => 'CN/{YYYY}/{MM}/{NNNN}',
-				'correction_pattern'  => 'FK/{YYYY}/{MM}/{NNNN}', // Legacy - kept for backward compatibility.
-				'reset_monthly'       => true,
+				'invoice_pattern'        => 'FV/{YYYY}/{MM}/{NNNN}',
+				'receipt_pattern'        => 'PAR/{YYYY}/{MM}/{NNNN}',
+				'credit_note_pattern'    => 'CN/{YYYY}/{MM}/{NNNN}',
+				'receipt_return_pattern' => 'RR/{YYYY}/{MM}/{NNNN}',
+				'correction_pattern'     => 'FK/{YYYY}/{MM}/{NNNN}', // Legacy - kept for backward compatibility.
+				'reset_monthly'          => true,
 			),
 			'pdf'         => array(
 				'template'    => 'default',
@@ -808,9 +811,10 @@ final class Plugin {
 				'minimum_role' => PermissionService::DEFAULT_ROLE,
 			),
 			'email'       => array(
-				'auto_send_invoice'     => false,
-				'auto_send_receipt'     => false,
-				'auto_send_credit_note' => false,
+				'auto_send_invoice'        => false,
+				'auto_send_receipt'        => false,
+				'auto_send_credit_note'    => false,
+				'auto_send_receipt_return' => false,
 			),
 		);
 	}
@@ -837,11 +841,12 @@ final class Plugin {
 		// Sanitize numbering settings.
 		if ( isset( $input['numbering'] ) && is_array( $input['numbering'] ) ) {
 			$sanitized['numbering'] = array(
-				'invoice_pattern'     => sanitize_text_field( $input['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' ),
-				'receipt_pattern'     => sanitize_text_field( $input['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' ),
-				'credit_note_pattern' => sanitize_text_field( $input['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}' ),
-				'correction_pattern'  => sanitize_text_field( $input['numbering']['correction_pattern'] ?? 'FK/{YYYY}/{MM}/{NNNN}' ),
-				'reset_monthly'       => ! empty( $input['numbering']['reset_monthly'] ),
+				'invoice_pattern'        => sanitize_text_field( $input['numbering']['invoice_pattern'] ?? 'FV/{YYYY}/{MM}/{NNNN}' ),
+				'receipt_pattern'        => sanitize_text_field( $input['numbering']['receipt_pattern'] ?? 'PAR/{YYYY}/{MM}/{NNNN}' ),
+				'credit_note_pattern'    => sanitize_text_field( $input['numbering']['credit_note_pattern'] ?? 'CN/{YYYY}/{MM}/{NNNN}' ),
+				'receipt_return_pattern' => sanitize_text_field( $input['numbering']['receipt_return_pattern'] ?? 'RR/{YYYY}/{MM}/{NNNN}' ),
+				'correction_pattern'     => sanitize_text_field( $input['numbering']['correction_pattern'] ?? 'FK/{YYYY}/{MM}/{NNNN}' ),
+				'reset_monthly'          => ! empty( $input['numbering']['reset_monthly'] ),
 			);
 		}
 
@@ -885,9 +890,10 @@ final class Plugin {
 		// Sanitize email settings.
 		if ( isset( $input['email'] ) && is_array( $input['email'] ) ) {
 			$sanitized['email'] = array(
-				'auto_send_invoice'     => ! empty( $input['email']['auto_send_invoice'] ),
-				'auto_send_receipt'     => ! empty( $input['email']['auto_send_receipt'] ),
-				'auto_send_credit_note' => ! empty( $input['email']['auto_send_credit_note'] ),
+				'auto_send_invoice'        => ! empty( $input['email']['auto_send_invoice'] ),
+				'auto_send_receipt'        => ! empty( $input['email']['auto_send_receipt'] ),
+				'auto_send_credit_note'    => ! empty( $input['email']['auto_send_credit_note'] ),
+				'auto_send_receipt_return' => ! empty( $input['email']['auto_send_receipt_return'] ),
 			);
 		}
 
