@@ -12,6 +12,7 @@ namespace IHumbak\Invoices\Modules\Admin;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Models\CreditNote;
 use IHumbak\Invoices\Models\Document;
+use IHumbak\Invoices\Models\ReceiptReturn;
 
 // Load WP_List_Table if not loaded.
 if ( ! class_exists( 'WP_List_Table' ) ) {
@@ -306,6 +307,41 @@ class DocumentListTable extends \WP_List_Table {
 						sprintf(
 							/* translators: %s: Original invoice number (with link) */
 							esc_html__( 'Corrects: %s', 'ihumbak-invoices' ),
+							'<a href="' . esc_url( $edit_url ) . '">' . esc_html( $original->getDocumentNumber() ) . '</a>'
+						) .
+						'</small>';
+				}
+			}
+		}
+
+		// For receipt returns, show which receipt is being returned.
+		if ( $item instanceof ReceiptReturn ) {
+			if ( $item->isManualEntry() && $item->getOriginalDocumentNumber() ) {
+				// Manual entry mode - show the manually entered receipt number.
+				$output .= '<br><small style="color: #666;">' .
+					sprintf(
+						/* translators: %s: Original receipt number */
+						esc_html__( 'Returns: %s', 'ihumbak-invoices' ),
+						esc_html( $item->getOriginalDocumentNumber() )
+					) .
+					' <em>(' . esc_html__( 'external', 'ihumbak-invoices' ) . ')</em></small>';
+			} elseif ( $item->getCorrectedDocumentId() ) {
+				// System mode - fetch and show the receipt number with link.
+				$original = $this->repository->find( $item->getCorrectedDocumentId() );
+				if ( $original ) {
+					$edit_url = add_query_arg(
+						array(
+							'page'   => 'ihumbak-invoices',
+							'action' => 'edit',
+							'type'   => 'receipt',
+							'id'     => $original->getId(),
+						),
+						admin_url( 'admin.php' )
+					);
+					$output  .= '<br><small style="color: #666;">' .
+						sprintf(
+							/* translators: %s: Original receipt number (with link) */
+							esc_html__( 'Returns: %s', 'ihumbak-invoices' ),
 							'<a href="' . esc_url( $edit_url ) . '">' . esc_html( $original->getDocumentNumber() ) . '</a>'
 						) .
 						'</small>';
