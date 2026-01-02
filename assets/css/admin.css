@@ -166,9 +166,17 @@
     color: #d63638;
 }
 
+/* Items table wrapper - responsive */
+.ihumbak-items-card {
+    overflow-x: auto;
+}
+
 /* Items table */
 .ihumbak-items-table {
     margin-top: 10px;
+    table-layout: fixed;
+    width: 100%;
+    min-width: 800px;
 }
 
 .ihumbak-items-table th,
@@ -182,40 +190,67 @@
     font-weight: 600;
     font-size: 12px;
     text-align: left;
+    white-space: nowrap;
 }
 
-.ihumbak-items-table .column-name {
-    width: 20%;
-}
-
-.ihumbak-items-table .column-sku {
-    width: 100px;
+/* Column widths - optimized for 9 columns (Name/SKU, Qty, Unit, Price Net, VAT%, Total Net, VAT, Total Gross, Actions) */
+.ihumbak-items-table .column-name-sku {
+    width: 30%;
+    min-width: 200px;
 }
 
 .ihumbak-items-table .column-quantity {
-    width: 70px;
-}
-
-.ihumbak-items-table .column-unit {
     width: 60px;
 }
 
-.ihumbak-items-table .column-price-net,
-.ihumbak-items-table .column-price-gross,
-.ihumbak-items-table .column-total-net,
-.ihumbak-items-table .column-tax-amount,
-.ihumbak-items-table .column-total-gross {
-    width: 90px;
+.ihumbak-items-table .column-unit {
+    width: 50px;
+}
+
+.ihumbak-items-table .column-price-net {
+    width: 100px;
     text-align: right;
 }
 
 .ihumbak-items-table .column-tax-rate {
-    width: 70px;
+    width: 60px;
+    text-align: right;
+}
+
+.ihumbak-items-table .column-total-net,
+.ihumbak-items-table .column-tax-amount {
+    width: 90px;
+    text-align: right;
+}
+
+.ihumbak-items-table .column-total-gross {
+    width: 100px;
+    text-align: right;
 }
 
 .ihumbak-items-table .column-actions {
     width: 40px;
     text-align: center;
+}
+
+/* Item Name/SKU wrapper */
+.item-name-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-name-wrapper .item-name {
+    font-weight: 500;
+}
+
+.item-name-wrapper .item-sku {
+    font-size: 12px;
+    color: #646970;
+}
+
+.item-name-wrapper .item-sku::placeholder {
+    font-style: italic;
 }
 
 /* Item inputs */
@@ -225,24 +260,24 @@
     width: 100%;
     padding: 5px 8px;
     font-size: 13px;
+    box-sizing: border-box;
 }
 
-.ihumbak-items-table .item-name {
-    min-width: 150px;
-}
-
-.ihumbak-items-table .item-quantity {
-    text-align: right;
-}
-
+.ihumbak-items-table .item-quantity,
 .ihumbak-items-table .item-price-net,
-.ihumbak-items-table .item-price-gross {
+.ihumbak-items-table .item-tax-rate {
     text-align: right;
 }
 
 .ihumbak-items-table input[readonly] {
     background: #f6f7f7;
     border-color: #dcdcde;
+}
+
+/* Placeholder styling */
+.ihumbak-items-table input::placeholder {
+    color: #a0a5aa;
+    font-style: italic;
 }
 
 /* Totals row */
