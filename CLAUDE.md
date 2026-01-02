@@ -15,7 +15,7 @@ WordPress/WooCommerce plugin for generating VAT invoices, receipts, and credit n
 | Item | Value |
 |------|-------|
 | Name | iHumbak WooCommerce Invoices |
-| Version | 0.1.0 (development) |
+| Version | 0.2.0 |
 | Namespace | IHumbak\Invoices |
 | Text Domain | ihumbak-invoices |
 | License | GPL-2.0-or-later |

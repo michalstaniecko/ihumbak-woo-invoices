@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'IHUMBAK_INVOICES_VERSION' ) ) {
-    define( 'IHUMBAK_INVOICES_VERSION', '0.1.0' );
+    define( 'IHUMBAK_INVOICES_VERSION', '0.2.0' );
 }
 
 if ( ! defined( 'IHUMBAK_INVOICES_FILE' ) ) {
