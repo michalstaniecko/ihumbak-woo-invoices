@@ -51,6 +51,12 @@
 
             // Form validation before submit.
             $('#ihumbak-document-form').on('submit', function(e) {
+                // Validate corrected document selection for credit notes and receipt returns.
+                if (!self.validateCorrectedDocument()) {
+                    e.preventDefault();
+                    return false;
+                }
+
                 if (!self.validateItems()) {
                     e.preventDefault();
                     return false;
@@ -67,6 +73,11 @@
                 // Auto-fetch invoice data when coming with pre-selected invoice.
                 setTimeout(function() {
                     self.fetchInvoiceDataAutomatic(window.ihumbakPreSelectedInvoiceId);
+                }, AUTO_FETCH_DELAY);
+            } else if (window.ihumbakPreSelectedReceiptId) {
+                // Auto-fetch receipt data when coming with pre-selected receipt.
+                setTimeout(function() {
+                    self.fetchReceiptDataAutomatic(window.ihumbakPreSelectedReceiptId);
                 }, AUTO_FETCH_DELAY);
             } else {
                 this.recalculateDocument();
@@ -154,6 +165,46 @@
             this.calculateTimer = setTimeout(function() {
                 self.recalculateDocument();
             }, 300);
+        },
+
+        /**
+         * Validate corrected document selection for credit notes and receipt returns.
+         * Checks that user has selected an original document to correct.
+         *
+         * @return {boolean} True if valid, false otherwise.
+         */
+        validateCorrectedDocument: function() {
+            var $select = $('#corrected_document_id');
+
+            // Skip validation if not on correction document page.
+            if (!$select.length) {
+                return true;
+            }
+
+            // Check if manual entry mode is enabled.
+            var isManualEntry = $('#is_manual_entry').val() === '1';
+
+            if (isManualEntry) {
+                // Validate manual entry fields.
+                var originalNumber = $.trim($('#original_document_number').val());
+                if (!originalNumber) {
+                    this.showNotice('error', ihumbakInvoices.i18n.selectOriginalDocument || 'Please enter the original document number.');
+                    $('#original_document_number').addClass('ihumbak-input-error').focus();
+                    return false;
+                }
+                $('#original_document_number').removeClass('ihumbak-input-error');
+            } else {
+                // Validate dropdown selection.
+                var selectedId = parseInt($select.val(), 10);
+                if (!selectedId || selectedId < 1) {
+                    this.showNotice('error', ihumbakInvoices.i18n.selectOriginalDocument || 'Please select the original document to correct.');
+                    $select.addClass('ihumbak-input-error').focus();
+                    return false;
+                }
+                $select.removeClass('ihumbak-input-error');
+            }
+
+            return true;
         },
 
         /**
@@ -897,7 +948,7 @@
         },
 
         /**
-         * Fetch receipt data via AJAX for receipt return.
+         * Fetch receipt data via AJAX for receipt return (manual trigger).
          *
          * @param {number} receiptId Receipt ID.
          */
@@ -915,6 +966,35 @@
                 }
             }
 
+            this._doFetchReceiptData(receiptId, function(data) {
+                self.populateFromReceiptData(data, mode);
+                self.showNotice('success', ihumbakInvoices.i18n.receiptDataLoaded || 'Receipt data loaded successfully.');
+            });
+        },
+
+        /**
+         * Fetch receipt data automatically (from pre-selected receipt).
+         * Does not ask for confirmation, always replaces.
+         *
+         * @param {number} receiptId Receipt ID.
+         */
+        fetchReceiptDataAutomatic: function(receiptId) {
+            var self = this;
+            this._doFetchReceiptData(receiptId, function(data) {
+                self.populateFromReceiptData(data, 'replace');
+                self.showNotice('success', ihumbakInvoices.i18n.receiptDataLoaded || 'Receipt data loaded successfully.');
+            });
+        },
+
+        /**
+         * Internal method to fetch receipt data via AJAX.
+         *
+         * @param {number}   receiptId  Receipt ID.
+         * @param {Function} onSuccess  Callback on successful fetch.
+         * @private
+         */
+        _doFetchReceiptData: function(receiptId, onSuccess) {
+            var self = this;
             var $button = $('#ihumbak-load-receipt');
             var $spinner = $('#ihumbak-load-status');
 
@@ -932,8 +1012,7 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        self.populateFromReceiptData(response.data, mode);
-                        self.showNotice('success', ihumbakInvoices.i18n.receiptDataLoaded || 'Receipt data loaded successfully.');
+                        onSuccess(response.data);
                     } else {
                         self.showNotice('error', response.data.message || ihumbakInvoices.i18n.error);
                         self.recalculateDocument();
@@ -1027,19 +1106,13 @@
         /**
          * Populate seller fields.
          *
+         * Seller uses simplified format with just name and details.
+         *
          * @param {Object} sellerData Seller data.
          */
         populateSellerFields: function(sellerData) {
             $('#seller_name').val(sellerData.name || '');
-            $('#seller_nip').val(sellerData.nip || '');
-            $('#seller_address').val(sellerData.address || '');
-            $('#seller_postcode').val(sellerData.postcode || '');
-            $('#seller_city').val(sellerData.city || '');
-            $('#seller_country').val(sellerData.country || 'PL');
-            $('#seller_email').val(sellerData.email || '');
-            $('#seller_phone').val(sellerData.phone || '');
-            $('#seller_bank_name').val(sellerData.bank_name || '');
-            $('#seller_bank_account').val(sellerData.bank_account || '');
+            $('#seller_details').val(sellerData.details || '');
         },
 
         /**

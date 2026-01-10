@@ -414,13 +414,14 @@ final class Plugin {
 				'useLogo'    => __( 'Use this logo', 'ihumbak-invoices' ),
 				'isReadonly' => $is_readonly,
 				'i18n'       => array(
-					'confirmDelete'       => __( 'Are you sure you want to delete this item?', 'ihumbak-invoices' ),
-					'calculating'         => __( 'Calculating...', 'ihumbak-invoices' ),
-					'error'               => __( 'An error occurred. Please try again.', 'ihumbak-invoices' ),
-					'orderDataLoaded'     => __( 'Order data loaded successfully.', 'ihumbak-invoices' ),
-					'orderNotFound'       => __( 'Order not found.', 'ihumbak-invoices' ),
-					'replaceItemsConfirm' => __( 'The form already contains items. Do you want to replace them with order data?', 'ihumbak-invoices' ),
-					'nameRequiredError'   => __( 'Please enter a product name for all items with values.', 'ihumbak-invoices' ),
+					'confirmDelete'          => __( 'Are you sure you want to delete this item?', 'ihumbak-invoices' ),
+					'calculating'            => __( 'Calculating...', 'ihumbak-invoices' ),
+					'error'                  => __( 'An error occurred. Please try again.', 'ihumbak-invoices' ),
+					'orderDataLoaded'        => __( 'Order data loaded successfully.', 'ihumbak-invoices' ),
+					'orderNotFound'          => __( 'Order not found.', 'ihumbak-invoices' ),
+					'replaceItemsConfirm'    => __( 'The form already contains items. Do you want to replace them with order data?', 'ihumbak-invoices' ),
+					'nameRequiredError'      => __( 'Please enter a product name for all items with values.', 'ihumbak-invoices' ),
+					'selectOriginalDocument' => __( 'Please select the original document to correct.', 'ihumbak-invoices' ),
 				),
 			)
 		);
