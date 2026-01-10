@@ -786,8 +786,12 @@ class DocumentController {
 		$raw_items = wp_unslash( $_POST['items'] );
 
 		foreach ( $raw_items as $item_data ) {
+			if ( ! is_array( $item_data ) ) {
+				continue;
+			}
+
 			$name = isset( $item_data['name'] ) ? trim( sanitize_text_field( $item_data['name'] ) ) : '';
-			if ( ! is_array( $item_data ) || $name === '' ) {
+			if ( $name === '' ) {
 				continue;
 			}
 

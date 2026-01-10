@@ -50,7 +50,6 @@
             this.initReceiptReturn();
 
             // Form validation before submit.
-            var self = this;
             $('#ihumbak-document-form').on('submit', function(e) {
                 if (!self.validateItems()) {
                     e.preventDefault();
