@@ -170,14 +170,8 @@
                 var $nameInput = $row.find('.item-name');
                 var name = $.trim($nameInput.val());
 
-                // Get the corresponding values row.
-                var index = $row.data('index');
-                var $valuesRow = $('#ihumbak-items-body .ihumbak-item-row-values[data-index="' + index + '"]');
-                var qty = parseFloat($valuesRow.find('.item-quantity').val()) || 1;
-                var price = parseFloat($valuesRow.find('.item-price-net').val()) || 0;
-
-                // If item has non-default values, name is required.
-                if ((qty !== 1 || price !== 0) && name === '') {
+                // Every item row must have a name (after trim).
+                if (name === '') {
                     hasError = true;
                     $nameInput.addClass('ihumbak-input-error');
                 } else {
@@ -186,7 +180,7 @@
             });
 
             if (hasError) {
-                alert(ihumbakInvoices.i18n.nameRequiredError || 'Please enter a product name for all items with values.');
+                alert(ihumbakInvoices.i18n.nameRequiredError || 'Please enter a product name for all items.');
                 return false;
             }
 
