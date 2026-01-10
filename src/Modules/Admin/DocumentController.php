@@ -791,7 +791,7 @@ class DocumentController {
 			}
 
 			$name = isset( $item_data['name'] ) ? trim( sanitize_text_field( $item_data['name'] ) ) : '';
-			if ( $name === '' ) {
+			if ( '' === $name ) {
 				continue;
 			}
 
