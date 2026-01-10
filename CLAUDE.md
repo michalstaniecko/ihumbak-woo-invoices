@@ -104,6 +104,8 @@ See `../PLAN.md` (workspace level) for full directory structure and implementati
 | 2. Admin Panel | COMPLETE |
 | 3. PDF Export | COMPLETE |
 | 4. Extensions | COMPLETE |
-| 5. Finalization & Release | IN PROGRESS |
+| 5. Finalization & Release | COMPLETE |
+| 6. Receipt Returns | COMPLETE |
+| 7. Items Table UI | PLANNED |
 
 See `../PLAN.md` (workspace level) for detailed implementation status.
