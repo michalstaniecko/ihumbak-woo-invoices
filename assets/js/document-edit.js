@@ -49,6 +49,15 @@
             this.initCreditNote();
             this.initReceiptReturn();
 
+            // Form validation before submit.
+            var self = this;
+            $('#ihumbak-document-form').on('submit', function(e) {
+                if (!self.validateItems()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
             // Check for pre-filled order ID (from WC order metabox).
             if (window.ihumbakPreFilledOrderId) {
                 // Auto-fetch order data when coming from WC order page.
@@ -146,6 +155,43 @@
             this.calculateTimer = setTimeout(function() {
                 self.recalculateDocument();
             }, 300);
+        },
+
+        /**
+         * Validate items before form submission.
+         * Checks that all items with values have a name.
+         *
+         * @return {boolean} True if valid, false otherwise.
+         */
+        validateItems: function() {
+            var hasError = false;
+
+            $('#ihumbak-items-body .ihumbak-item-row-name').each(function() {
+                var $row = $(this);
+                var $nameInput = $row.find('.item-name');
+                var name = $.trim($nameInput.val());
+
+                // Get the corresponding values row.
+                var index = $row.data('index');
+                var $valuesRow = $('#ihumbak-items-body .ihumbak-item-row-values[data-index="' + index + '"]');
+                var qty = parseFloat($valuesRow.find('.item-quantity').val()) || 1;
+                var price = parseFloat($valuesRow.find('.item-price-net').val()) || 0;
+
+                // If item has non-default values, name is required.
+                if ((qty !== 1 || price !== 0) && name === '') {
+                    hasError = true;
+                    $nameInput.addClass('ihumbak-input-error');
+                } else {
+                    $nameInput.removeClass('ihumbak-input-error');
+                }
+            });
+
+            if (hasError) {
+                alert(ihumbakInvoices.i18n.nameRequiredError || 'Please enter a product name for all items with values.');
+                return false;
+            }
+
+            return true;
         },
 
         /**

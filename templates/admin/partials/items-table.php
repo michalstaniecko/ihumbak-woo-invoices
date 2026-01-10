@@ -50,6 +50,7 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 							<input type="text" name="items[<?php echo esc_attr( $index ); ?>][name]"
 									value="<?php echo esc_attr( $item['name'] ?? '' ); ?>"
 									class="item-name" placeholder="<?php esc_attr_e( 'Product name', 'ihumbak-invoices' ); ?>" required <?php wp_readonly( ! $can_edit ); ?>>
+							<span class="ihumbak-name-hint"><?php esc_html_e( 'Required for calculation', 'ihumbak-invoices' ); ?></span>
 							<!-- Hidden fields for data preservation -->
 							<input type="hidden" name="items[<?php echo esc_attr( $index ); ?>][unit_price_gross]"
 									value="<?php echo esc_attr( $item['unit_price_gross'] ?? '' ); ?>"
@@ -146,6 +147,7 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 	<tr class="ihumbak-item-row ihumbak-item-row-name" data-index="{{index}}">
 		<td class="column-name" colspan="7">
 			<input type="text" name="items[{{index}}][name]" value="" class="item-name" placeholder="<?php esc_attr_e( 'Product name', 'ihumbak-invoices' ); ?>" required>
+			<span class="ihumbak-name-hint"><?php esc_html_e( 'Required for calculation', 'ihumbak-invoices' ); ?></span>
 			<input type="hidden" name="items[{{index}}][unit_price_gross]" value="" class="item-price-gross">
 			<input type="hidden" name="items[{{index}}][unit]" value="pcs" class="item-unit">
 		</td>

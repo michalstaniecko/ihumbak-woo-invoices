@@ -786,12 +786,13 @@ class DocumentController {
 		$raw_items = wp_unslash( $_POST['items'] );
 
 		foreach ( $raw_items as $item_data ) {
-			if ( ! is_array( $item_data ) || empty( $item_data['name'] ) ) {
+			$name = isset( $item_data['name'] ) ? trim( sanitize_text_field( $item_data['name'] ) ) : '';
+			if ( ! is_array( $item_data ) || $name === '' ) {
 				continue;
 			}
 
 			$item = new DocumentItem();
-			$item->setName( sanitize_text_field( $item_data['name'] ?? '' ) );
+			$item->setName( $name );
 			$item->setSku( sanitize_text_field( $item_data['sku'] ?? '' ) );
 			$item->setQuantity( (float) ( $item_data['quantity'] ?? 1 ) );
 			$item->setUnit( sanitize_text_field( $item_data['unit'] ?? 'szt.' ) );
