@@ -40,6 +40,9 @@ wp-content/uploads/
 .env.local
 .env.*.local
 
+# Claude Code local settings
+.claude/settings.local.json
+
 # Temporary files
 *.tmp
 *.temp
