@@ -41,6 +41,7 @@ EXCLUDE_FILES=(
     "phpunit.xml"
     "composer.lock"
     "CLAUDE.md"
+    "PLAN.md"
     "tests"
     "scripts"
     "stubs"
