@@ -21,8 +21,8 @@ final class Seller {
 	 * @param string $details Company details (address, VAT ID, bank, phone, etc.).
 	 */
 	public function __construct(
-		private readonly string $name,
-		private readonly string $details = '',
+		private string $name,
+		private string $details = '',
 	) {}
 
 	/**

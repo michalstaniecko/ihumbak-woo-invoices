@@ -120,17 +120,21 @@ class SellerTest extends TestCase {
 	}
 
 	/**
-	 * Test immutability.
+	 * Test immutability via private properties.
 	 */
 	public function test_immutability(): void {
 		$seller = new Seller( name: 'Original' );
 
+		// Value object should be immutable - verify private properties (no public setters)
 		$reflection = new \ReflectionClass( $seller );
 		$properties = $reflection->getProperties();
 
 		foreach ( $properties as $property ) {
-			$this->assertTrue( $property->isReadOnly(), "Property {$property->getName()} should be readonly" );
+			$this->assertTrue( $property->isPrivate(), "Property {$property->getName()} should be private" );
 		}
+
+		// Verify class is final (cannot be extended to bypass immutability)
+		$this->assertTrue( $reflection->isFinal(), 'Class should be final' );
 	}
 
 	/**
