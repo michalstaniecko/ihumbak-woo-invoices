@@ -201,7 +201,6 @@ Types: feat, fix, docs, refactor, test, chore
 | `/devops` | CI/CD and automation |
 | `/docs` | Documentation |
 | `/qa` | Tests and QA |
-| `/release` | Automated release (version bump, tag, build) |
 
 ---
 
