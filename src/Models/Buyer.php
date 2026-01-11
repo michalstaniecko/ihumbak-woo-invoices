@@ -27,14 +27,14 @@ final class Buyer {
 	 * @param string $phone    Phone number.
 	 */
 	public function __construct(
-		private readonly string $name,
-		private readonly string $address = '',
-		private readonly string $postcode = '',
-		private readonly string $city = '',
-		private readonly string $country = 'PL',
-		private readonly string $nip = '',
-		private readonly string $email = '',
-		private readonly string $phone = '',
+		private string $name,
+		private string $address = '',
+		private string $postcode = '',
+		private string $city = '',
+		private string $country = 'PL',
+		private string $nip = '',
+		private string $email = '',
+		private string $phone = '',
 	) {}
 
 	/**
