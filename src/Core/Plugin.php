@@ -421,6 +421,7 @@ final class Plugin {
 					'orderNotFound'          => __( 'Order not found.', 'ihumbak-invoices' ),
 					'replaceItemsConfirm'    => __( 'The form already contains items. Do you want to replace them with order data?', 'ihumbak-invoices' ),
 					'nameRequiredError'      => __( 'Please enter a product name for all items with values.', 'ihumbak-invoices' ),
+					'vatRequiredError'       => __( 'Please enter a VAT rate for all items.', 'ihumbak-invoices' ),
 					'selectOriginalDocument' => __( 'Please select the original document to correct.', 'ihumbak-invoices' ),
 				),
 			)

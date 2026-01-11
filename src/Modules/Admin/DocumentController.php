@@ -772,6 +772,7 @@ class DocumentController {
 	 * Get document items from request.
 	 *
 	 * @return DocumentItem[]
+	 * @throws \InvalidArgumentException When VAT rate is missing for any item.
 	 */
 	private function get_items_from_request(): array {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified in calling method.
@@ -795,6 +796,13 @@ class DocumentController {
 				continue;
 			}
 
+			// Validate that tax_rate is provided (0 is valid, but empty string is not).
+			if ( ! isset( $item_data['tax_rate'] ) || '' === trim( (string) $item_data['tax_rate'] ) ) {
+				throw new \InvalidArgumentException(
+					esc_html__( 'Please enter a VAT rate for all items.', 'ihumbak-invoices' )
+				);
+			}
+
 			$item = new DocumentItem();
 			$item->setName( $name );
 			$item->setSku( sanitize_text_field( $item_data['sku'] ?? '' ) );
@@ -802,7 +810,7 @@ class DocumentController {
 			$item->setUnit( sanitize_text_field( $item_data['unit'] ?? 'szt.' ) );
 			$item->setUnitPriceNet( (float) ( $item_data['unit_price_net'] ?? 0 ) );
 			$item->setUnitPriceGross( (float) ( $item_data['unit_price_gross'] ?? 0 ) );
-			$item->setTaxRate( (float) ( $item_data['tax_rate'] ?? 23 ) );
+			$item->setTaxRate( (float) $item_data['tax_rate'] );
 			$item->setTaxAmount( (float) ( $item_data['tax_amount'] ?? 0 ) );
 			$item->setLineTotalNet( (float) ( $item_data['line_total_net'] ?? 0 ) );
 			$item->setLineTotalGross( (float) ( $item_data['line_total_gross'] ?? 0 ) );
@@ -814,7 +822,7 @@ class DocumentController {
 			$items[] = $item;
 		}
 
-        // phpcs:enable WordPress.Security.NonceVerification.Missing
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		return $items;
 	}

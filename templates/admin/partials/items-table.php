@@ -87,8 +87,8 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 						</td>
 						<td class="column-tax-rate">
 							<input type="number" name="items[<?php echo esc_attr( $index ); ?>][tax_rate]"
-									value="<?php echo esc_attr( $item['tax_rate'] ?? 23 ); ?>"
-									class="item-tax-rate" step="0.01" min="0" max="100" placeholder="23" <?php wp_readonly( ! $can_edit ); ?>>
+									value="<?php echo esc_attr( $item['tax_rate'] ?? '' ); ?>"
+									class="item-tax-rate" step="0.01" min="0" max="100" placeholder="<?php esc_attr_e( 'VAT %', 'ihumbak-invoices' ); ?>" required <?php wp_readonly( ! $can_edit ); ?>>
 						</td>
 						<td class="column-total-net">
 							<span class="item-total-net-display"><?php echo esc_html( number_format( (float) ( $item['line_total_net'] ?? 0 ), 2, ',', ' ' ) ); ?></span>
@@ -170,7 +170,7 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 			<input type="number" name="items[{{index}}][unit_price_net]" value="" class="item-price-net" step="0.01" min="0" placeholder="0.00">
 		</td>
 		<td class="column-tax-rate">
-			<input type="number" name="items[{{index}}][tax_rate]" value="23" class="item-tax-rate" step="0.01" min="0" max="100" placeholder="23">
+			<input type="number" name="items[{{index}}][tax_rate]" value="" class="item-tax-rate" step="0.01" min="0" max="100" placeholder="<?php esc_attr_e( 'VAT %', 'ihumbak-invoices' ); ?>" required>
 		</td>
 		<td class="column-total-net">
 			<span class="item-total-net-display">0,00</span>
