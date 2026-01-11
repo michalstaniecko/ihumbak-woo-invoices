@@ -15,6 +15,7 @@ $items                   = $items ?? array();
 $allow_negative_quantity = $allow_negative_quantity ?? false;
 $can_edit                = $can_edit ?? true;
 $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
+$default_quantity        = $allow_negative_quantity ? -1 : 1;
 $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 ?>
 
@@ -163,7 +164,7 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 			<input type="text" name="items[{{index}}][sku]" value="" class="item-sku" placeholder="<?php esc_attr_e( 'SKU', 'ihumbak-invoices' ); ?>">
 		</td>
 		<td class="column-quantity">
-			<input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001" placeholder="1"<?php echo esc_attr( $quantity_min_attr ); ?> required>
+			<input type="number" name="items[{{index}}][quantity]" value="<?php echo esc_attr( $default_quantity ); ?>" class="item-quantity" step="0.001" placeholder="<?php echo esc_attr( $default_quantity ); ?>"<?php echo esc_attr( $quantity_min_attr ); ?> required>
 		</td>
 		<td class="column-price-net">
 			<input type="number" name="items[{{index}}][unit_price_net]" value="" class="item-price-net" step="0.01" min="0" placeholder="0.00">
