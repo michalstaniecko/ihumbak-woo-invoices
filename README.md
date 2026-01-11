@@ -43,9 +43,6 @@ git clone https://github.com/ihumbak/woo-invoices.git
 # Install dependencies
 cd woo-invoices
 composer install
-
-# For production build
-./scripts/build-release.sh 1.0.0
 ```
 
 ## Configuration
