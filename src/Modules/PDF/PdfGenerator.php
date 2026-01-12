@@ -385,6 +385,9 @@ class PdfGenerator {
 				$content = $this->generateContent( $document );
 				$this->cache_manager->savePdf( $document, $content );
 			}
+		} else {
+			// Save regenerated PDF to cache.
+			$this->cache_manager->savePdf( $document, $content );
 		}
 
 		// Set headers for download.
