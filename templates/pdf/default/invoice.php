@@ -163,7 +163,7 @@ $currency = $document->getCurrency();
 									<div class="item-sku"><?php esc_html_e( 'SKU:', 'ihumbak-invoices' ); ?> <?php echo esc_html( $item->getSku() ); ?></div>
 								<?php endif; ?>
 							</td>
-							<td class="text-right"><?php echo esc_html( number_format( $item->getQuantity(), 2, '.', '' ) ); ?></td>
+							<td class="text-right"><?php echo esc_html( rtrim( rtrim( number_format( $item->getQuantity(), 2, '.', '' ), '0' ), '.' ) ); ?></td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getLineTotalNet(), 2, '.', ' ' ) ); ?></td>
 							<td class="text-center"><?php echo esc_html( number_format( $item->getTaxRate(), 0 ) ); ?>%</td>
 							<td class="text-right"><?php echo esc_html( number_format( $item->getTaxAmount(), 2, '.', ' ' ) ); ?></td>
