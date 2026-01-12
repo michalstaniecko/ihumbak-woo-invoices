@@ -1266,3 +1266,50 @@ msgstr "Desember"
 #: src/Modules/Invoice/OrderDataExtractor.php:176
 msgid "Shipping"
 msgstr "Frakt"
+
+#: templates/pdf/default/receipt-return.php:34
+#, php-format
+msgid "Receipt Return %s"
+msgstr "Kvitteringsretur %s"
+
+#: templates/pdf/default/receipt-return.php:64
+msgid "Receipt Return"
+msgstr "Kvitteringsretur"
+
+#: templates/pdf/default/receipt-return.php:72
+#: templates/pdf/default/receipt-return.php:87
+msgid "Corrects Receipt"
+msgstr "Korrigerer kvittering"
+
+#: templates/pdf/default/receipt-return.php:74
+#: templates/pdf/default/receipt-return.php:89
+msgid "Original Receipt No:"
+msgstr "Opprinnelig kvitteringsnr.:"
+
+#: templates/pdf/default/receipt-return.php:108
+msgid "Receipt Return Details"
+msgstr "Kvitteringsreturdetaljer"
+
+#: templates/pdf/default/receipt-return.php:110
+msgid "Receipt Return No:"
+msgstr "Kvitteringsreturnr.:"
+
+#: templates/pdf/default/receipt-return.php:118
+msgid "Return Type:"
+msgstr "Returtype:"
+
+#: templates/pdf/default/receipt-return.php:124
+msgid "Refund Amount:"
+msgstr "Refusjonsbeløp:"
+
+#: templates/pdf/default/receipt-return.php:151
+msgid "Reason for Return"
+msgstr "Årsak til retur"
+
+#: templates/pdf/default/receipt-return.php:213
+msgid "REFUND AMOUNT:"
+msgstr "REFUSJONSBELØP:"
+
+#: templates/pdf/default/receipt-return.php:230
+msgid "This receipt return was generated electronically and is valid without a signature."
+msgstr "Denne kvitteringsreturen er generert elektronisk og er gyldig uten signatur."
