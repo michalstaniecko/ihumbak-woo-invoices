@@ -15,6 +15,7 @@ $items                   = $items ?? array();
 $allow_negative_quantity = $allow_negative_quantity ?? false;
 $can_edit                = $can_edit ?? true;
 $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
+$default_quantity        = $allow_negative_quantity ? -1 : 1;
 $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 ?>
 
@@ -86,8 +87,8 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 						</td>
 						<td class="column-tax-rate">
 							<input type="number" name="items[<?php echo esc_attr( $index ); ?>][tax_rate]"
-									value="<?php echo esc_attr( $item['tax_rate'] ?? 23 ); ?>"
-									class="item-tax-rate" step="0.01" min="0" max="100" placeholder="23" <?php wp_readonly( ! $can_edit ); ?>>
+									value="<?php echo esc_attr( $item['tax_rate'] ?? '' ); ?>"
+									class="item-tax-rate" step="0.01" min="0" max="100" placeholder="<?php esc_attr_e( 'VAT %', 'ihumbak-invoices' ); ?>" required <?php wp_readonly( ! $can_edit ); ?>>
 						</td>
 						<td class="column-total-net">
 							<span class="item-total-net-display"><?php echo esc_html( number_format( (float) ( $item['line_total_net'] ?? 0 ), 2, ',', ' ' ) ); ?></span>
@@ -163,13 +164,13 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 			<input type="text" name="items[{{index}}][sku]" value="" class="item-sku" placeholder="<?php esc_attr_e( 'SKU', 'ihumbak-invoices' ); ?>">
 		</td>
 		<td class="column-quantity">
-			<input type="number" name="items[{{index}}][quantity]" value="1" class="item-quantity" step="0.001" placeholder="1"<?php echo esc_attr( $quantity_min_attr ); ?> required>
+			<input type="number" name="items[{{index}}][quantity]" value="<?php echo esc_attr( $default_quantity ); ?>" class="item-quantity" step="0.001" placeholder="<?php echo esc_attr( $default_quantity ); ?>"<?php echo esc_attr( $quantity_min_attr ); ?> required>
 		</td>
 		<td class="column-price-net">
 			<input type="number" name="items[{{index}}][unit_price_net]" value="" class="item-price-net" step="0.01" min="0" placeholder="0.00">
 		</td>
 		<td class="column-tax-rate">
-			<input type="number" name="items[{{index}}][tax_rate]" value="23" class="item-tax-rate" step="0.01" min="0" max="100" placeholder="23">
+			<input type="number" name="items[{{index}}][tax_rate]" value="" class="item-tax-rate" step="0.01" min="0" max="100" placeholder="<?php esc_attr_e( 'VAT %', 'ihumbak-invoices' ); ?>" required>
 		</td>
 		<td class="column-total-net">
 			<span class="item-total-net-display">0,00</span>

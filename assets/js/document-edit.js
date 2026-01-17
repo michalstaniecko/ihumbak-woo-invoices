@@ -209,29 +209,49 @@
 
         /**
          * Validate items before form submission.
-         * Checks that all items with values have a name.
+         * Checks that all items have a name and VAT rate.
          *
          * @return {boolean} True if valid, false otherwise.
          */
         validateItems: function() {
-            var hasError = false;
+            var hasNameError = false;
+            var hasVatError = false;
 
             $('#ihumbak-items-body .ihumbak-item-row-name').each(function() {
                 var $row = $(this);
+                var index = $row.data('index');
                 var $nameInput = $row.find('.item-name');
                 var name = $.trim($nameInput.val());
 
                 // Every item row must have a name (after trim).
                 if (name === '') {
-                    hasError = true;
+                    hasNameError = true;
                     $nameInput.addClass('ihumbak-input-error');
                 } else {
                     $nameInput.removeClass('ihumbak-input-error');
                 }
+
+                // Get the corresponding values row to check VAT rate.
+                var $valuesRow = $('#ihumbak-items-body .ihumbak-item-row-values[data-index="' + index + '"]');
+                var $vatInput = $valuesRow.find('.item-tax-rate');
+                var vatValue = $.trim($vatInput.val());
+
+                // VAT rate must be specified (empty string is not allowed, but 0 is valid).
+                if (vatValue === '') {
+                    hasVatError = true;
+                    $vatInput.addClass('ihumbak-input-error');
+                } else {
+                    $vatInput.removeClass('ihumbak-input-error');
+                }
             });
 
-            if (hasError) {
-                alert(ihumbakInvoices.i18n.nameRequiredError || 'Please enter a product name for all items.');
+            if (hasNameError) {
+                this.showNotice('error', ihumbakInvoices.i18n.nameRequiredError || 'Please enter a product name for all items.');
+                return false;
+            }
+
+            if (hasVatError) {
+                this.showNotice('error', ihumbakInvoices.i18n.vatRequiredError || 'Please enter a VAT rate for all items.');
                 return false;
             }
 
@@ -314,7 +334,7 @@
                     quantity: parseFloat($valuesRow.find('.item-quantity').val()) || 1,
                     unit: $nameRow.find('.item-unit').val() || 'pcs',
                     unit_price_net: parseFloat($valuesRow.find('.item-price-net').val()) || 0,
-                    tax_rate: parseFloat($valuesRow.find('.item-tax-rate').val()) || 23,
+                    tax_rate: parseFloat($valuesRow.find('.item-tax-rate').val()) || 0,
                     price_type: 'net'
                 });
             });
@@ -562,7 +582,8 @@
             $rows.find('.item-quantity').val(itemData.quantity || 1);
             $rows.find('.item-unit').val(itemData.unit || 'pcs');
             $rows.find('.item-price-net').val((itemData.unit_price_net || 0).toFixed(2));
-            $rows.find('.item-tax-rate').val(itemData.tax_rate || 23);
+            // Use provided tax_rate (including 0 for VAT-exempt), or leave empty if not provided.
+            $rows.find('.item-tax-rate').val(itemData.tax_rate !== undefined && itemData.tax_rate !== null ? itemData.tax_rate : '');
             $rows.find('.item-price-gross').val((itemData.unit_price_gross || 0).toFixed(2));
             $rows.find('.item-total-net').val((itemData.line_total_net || 0).toFixed(2));
             $rows.find('.item-tax-amount').val((itemData.tax_amount || 0).toFixed(2));
@@ -1247,7 +1268,7 @@
                         name: item.name,
                         quantity: -Math.abs(item.quantity || 1),
                         unit_price_net: item.unit_price_net || 0,
-                        tax_rate: 23 // Default, will be recalculated.
+                        tax_rate: item.tax_rate // Use tax_rate from refund data or leave empty.
                     });
                 });
             }
