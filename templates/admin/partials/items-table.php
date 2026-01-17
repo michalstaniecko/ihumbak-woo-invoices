@@ -17,6 +17,17 @@ $can_edit                = $can_edit ?? true;
 $quantity_min_attr       = $allow_negative_quantity ? '' : ' min="0.001"';
 $default_quantity        = $allow_negative_quantity ? -1 : 1;
 $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
+
+// Calculate totals from items for server-side rendering.
+$calculated_subtotal  = 0.0;
+$calculated_tax_total = 0.0;
+$calculated_total     = 0.0;
+
+foreach ( $items as $item ) {
+	$calculated_subtotal  += (float) ( $item['line_total_net'] ?? 0 );
+	$calculated_tax_total += (float) ( $item['tax_amount'] ?? 0 );
+	$calculated_total     += (float) ( $item['line_total_gross'] ?? 0 );
+}
 ?>
 
 <div class="ihumbak-card ihumbak-items-card<?php echo esc_attr( $readonly_class ); ?>">
@@ -116,16 +127,16 @@ $readonly_class          = $can_edit ? '' : ' ihumbak-readonly';
 			<tr class="ihumbak-totals-row">
 				<td colspan="4" class="text-right"><strong><?php esc_html_e( 'Totals:', 'ihumbak-invoices' ); ?></strong></td>
 				<td class="column-total-net">
-					<strong id="document-subtotal-display">0,00</strong>
-					<input type="hidden" name="subtotal" id="document-subtotal" value="0">
+					<strong id="document-subtotal-display"><?php echo esc_html( number_format( $calculated_subtotal, 2, ',', ' ' ) ); ?></strong>
+					<input type="hidden" name="subtotal" id="document-subtotal" value="<?php echo esc_attr( $calculated_subtotal ); ?>">
 				</td>
 				<td class="column-tax-amount">
-					<strong id="document-tax-total-display">0,00</strong>
-					<input type="hidden" name="tax_total" id="document-tax-total" value="0">
+					<strong id="document-tax-total-display"><?php echo esc_html( number_format( $calculated_tax_total, 2, ',', ' ' ) ); ?></strong>
+					<input type="hidden" name="tax_total" id="document-tax-total" value="<?php echo esc_attr( $calculated_tax_total ); ?>">
 				</td>
 				<td class="column-total-gross">
-					<strong id="document-total-display">0,00</strong>
-					<input type="hidden" name="total" id="document-total" value="0">
+					<strong id="document-total-display"><?php echo esc_html( number_format( $calculated_total, 2, ',', ' ' ) ); ?></strong>
+					<input type="hidden" name="total" id="document-total" value="<?php echo esc_attr( $calculated_total ); ?>">
 				</td>
 				<td></td>
 			</tr>
