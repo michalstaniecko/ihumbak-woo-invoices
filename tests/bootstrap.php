@@ -656,6 +656,28 @@ if ( ! class_exists( 'WC_Order_Item_Product' ) ) {
         }
 
         /**
+         * Get total (after discounts).
+         *
+         * Falls back to subtotal if total is not set (for backward compatibility).
+         *
+         * @return string
+         */
+        public function get_total(): string {
+            return (string) ( $this->data['total'] ?? $this->data['subtotal'] ?? '0' );
+        }
+
+        /**
+         * Get total tax (after discounts).
+         *
+         * Falls back to subtotal_tax if total_tax is not set (for backward compatibility).
+         *
+         * @return string
+         */
+        public function get_total_tax(): string {
+            return (string) ( $this->data['total_tax'] ?? $this->data['subtotal_tax'] ?? '0' );
+        }
+
+        /**
          * Get product ID.
          *
          * @return int

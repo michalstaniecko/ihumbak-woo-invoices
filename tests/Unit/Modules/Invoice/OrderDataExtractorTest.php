@@ -948,6 +948,100 @@ class OrderDataExtractorTest extends TestCase {
 	}
 
 	// =========================================================================
+	// Tests for discounted items (issue #9)
+	// =========================================================================
+
+	/**
+	 * Test extracting items uses prices after discount (get_total instead of get_subtotal).
+	 *
+	 * This test verifies fix for issue #9: Product prices on invoices
+	 * should reflect applied discounts, not original prices.
+	 */
+	public function test_extract_items_uses_discounted_prices(): void {
+		$order = $this->createOrder();
+
+		$product = $this->createProduct( 'SKU-DISCOUNT' );
+		// Item with 20% discount applied:
+		// Original: 100.00 net, 23.00 tax (subtotal)
+		// After discount: 80.00 net, 18.40 tax (total).
+		$item = $this->createOrderItem(
+			array(
+				'product_id'   => 1,
+				'name'         => 'Discounted Product',
+				'quantity'     => 1,
+				'subtotal'     => '100.00',
+				'subtotal_tax' => '23.00',
+				'total'        => '80.00',
+				'total_tax'    => '18.40',
+			),
+			$product
+		);
+		$order->add_item( $item );
+
+		$result = $this->extractor->extractItems( $order );
+
+		// Should use discounted values (total), not original (subtotal).
+		$this->assertEquals( 80.00, $result[0]['unit_price_net'] );
+		$this->assertEquals( 98.40, $result[0]['unit_price_gross'] );
+		$this->assertEquals( 23.0, $result[0]['tax_rate'] );
+		$this->assertEquals( 18.40, $result[0]['tax_amount'] );
+		$this->assertEquals( 80.00, $result[0]['line_total_net'] );
+		$this->assertEquals( 98.40, $result[0]['line_total_gross'] );
+	}
+
+	/**
+	 * Test extracting multiple items with different discount percentages.
+	 *
+	 * Verifies that each item's discounted price is correctly calculated.
+	 */
+	public function test_extract_items_with_multiple_discounts(): void {
+		$order = $this->createOrder();
+
+		// Item 1: 10% discount (100 -> 90).
+		$product1 = $this->createProduct( 'SKU-001' );
+		$item1    = $this->createOrderItem(
+			array(
+				'product_id'   => 1,
+				'name'         => 'Product with 10% discount',
+				'quantity'     => 2,
+				'subtotal'     => '200.00',
+				'subtotal_tax' => '46.00',
+				'total'        => '180.00',
+				'total_tax'    => '41.40',
+			),
+			$product1
+		);
+
+		// Item 2: 50% discount (50 -> 25).
+		$product2 = $this->createProduct( 'SKU-002' );
+		$item2    = $this->createOrderItem(
+			array(
+				'product_id'   => 2,
+				'name'         => 'Product with 50% discount',
+				'quantity'     => 1,
+				'subtotal'     => '50.00',
+				'subtotal_tax' => '11.50',
+				'total'        => '25.00',
+				'total_tax'    => '5.75',
+			),
+			$product2
+		);
+
+		$order->add_item( $item1 );
+		$order->add_item( $item2 );
+
+		$result = $this->extractor->extractItems( $order );
+
+		// Item 1: 180 / 2 = 90 per unit.
+		$this->assertEquals( 90.00, $result[0]['unit_price_net'] );
+		$this->assertEquals( 180.00, $result[0]['line_total_net'] );
+
+		// Item 2: 25 / 1 = 25 per unit.
+		$this->assertEquals( 25.00, $result[1]['unit_price_net'] );
+		$this->assertEquals( 25.00, $result[1]['line_total_net'] );
+	}
+
+	// =========================================================================
 	// Tests for extractPaymentDate()
 	// =========================================================================
 
