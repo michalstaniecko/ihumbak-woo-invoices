@@ -333,14 +333,10 @@ class DocumentRepository {
 			'pdf_path'              => $document->getPdfPath(),
 			'notes'                 => $document->getNotes(),
 			'sent_at'               => $document->getSentAt()?->format( 'Y-m-d H:i:s' ),
+			'payment_method'        => $document->getPaymentMethod(),
+			'payment_method_id'     => $document->getPaymentMethodId(),
+			'payment_method_title'  => $document->getPaymentMethodTitle(),
 		);
-
-		// Add invoice specific fields.
-		if ( $document instanceof Invoice ) {
-			$data['payment_method']       = $document->getPaymentMethod();
-			$data['payment_method_id']    = $document->getPaymentMethodId();
-			$data['payment_method_title'] = $document->getPaymentMethodTitle();
-		}
 
 		// Add credit note specific fields.
 		if ( $document instanceof CreditNote ) {
