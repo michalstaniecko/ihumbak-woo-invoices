@@ -115,9 +115,9 @@ class OrderDataExtractor {
 			$quantity = 1.0;
 		}
 
-		// Get line totals from WooCommerce (these are net values).
-		$line_total_net = (float) $item->get_subtotal();
-		$tax_amount     = (float) $item->get_subtotal_tax();
+		// Get line totals from WooCommerce (net values after discounts).
+		$line_total_net = (float) $item->get_total();
+		$tax_amount     = (float) $item->get_total_tax();
 
 		// Calculate unit price net.
 		$unit_price_net = $line_total_net / $quantity;
