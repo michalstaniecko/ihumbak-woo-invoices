@@ -1313,3 +1313,190 @@ msgstr "REFUSJONSBELØP:"
 #: templates/pdf/default/receipt-return.php:230
 msgid "This receipt return was generated electronically and is valid without a signature."
 msgstr "Denne kvitteringsreturen er generert elektronisk og er gyldig uten signatur."
+
+#. =============================================================================
+#. Email translations - Added for issue #18
+#. =============================================================================
+
+#: src/Modules/Email/InvoiceEmail.php:43
+msgid "Invoice emails are sent to customers with the invoice PDF attached."
+msgstr "Fakturaer sendes til kunder med faktura-PDF vedlagt."
+
+#: src/Modules/Email/InvoiceEmail.php:70
+msgid "Your invoice {document_number} from {site_title}"
+msgstr "Din faktura {document_number} fra {site_title}"
+
+#: src/Modules/Email/InvoiceEmail.php:79
+msgid "Invoice {document_number}"
+msgstr "Faktura {document_number}"
+
+#: src/Modules/Email/ReceiptEmail.php:43
+msgid "Receipt emails are sent to customers with the receipt PDF attached."
+msgstr "Kvitteringer sendes til kunder med kvitterings-PDF vedlagt."
+
+#: src/Modules/Email/ReceiptEmail.php:70
+msgid "Your receipt {document_number} from {site_title}"
+msgstr "Din kvittering {document_number} fra {site_title}"
+
+#: src/Modules/Email/ReceiptEmail.php:79
+msgid "Receipt {document_number}"
+msgstr "Kvittering {document_number}"
+
+#: src/Modules/Email/CreditNoteEmail.php:43
+msgid "Credit note emails are sent to customers with the credit note PDF attached."
+msgstr "Kreditnotaer sendes til kunder med kreditnota-PDF vedlagt."
+
+#: src/Modules/Email/CreditNoteEmail.php:70
+msgid "Your credit note {document_number} from {site_title}"
+msgstr "Din kreditnota {document_number} fra {site_title}"
+
+#: src/Modules/Email/CreditNoteEmail.php:79
+msgid "Credit Note {document_number}"
+msgstr "Kreditnota {document_number}"
+
+#: src/Modules/Email/ReceiptReturnEmail.php:43
+msgid "Receipt return emails are sent to customers with the receipt return PDF attached."
+msgstr "Kvitteringsreturer sendes til kunder med kvitteringsretur-PDF vedlagt."
+
+#: src/Modules/Email/ReceiptReturnEmail.php:70
+msgid "Your receipt return {document_number} from {site_title}"
+msgstr "Din kvitteringsretur {document_number} fra {site_title}"
+
+#: src/Modules/Email/ReceiptReturnEmail.php:79
+msgid "Receipt Return {document_number}"
+msgstr "Kvitteringsretur {document_number}"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:180
+msgid "Your document from {site_title}"
+msgstr "Ditt dokument fra {site_title}"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:414
+#, php-format
+msgid "Available placeholders: %s"
+msgstr "Tilgjengelige plassholdere: %s"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:420
+msgid "Enable/Disable"
+msgstr "Aktiver/Deaktiver"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:422
+msgid "Enable this email notification"
+msgstr "Aktiver denne e-postvarslingen"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:426
+msgid "Subject"
+msgstr "Emne"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:434
+msgid "Email heading"
+msgstr "E-postoverskrift"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:442
+msgid "Email type"
+msgstr "E-posttype"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:444
+msgid "Choose which format of email to send."
+msgstr "Velg hvilket format e-posten skal sendes i."
+
+#: src/Modules/Email/AbstractDocumentEmail.php:342
+msgid "Sample Customer"
+msgstr "Eksempelkunde"
+
+#: src/Modules/Email/AbstractDocumentEmail.php:343
+msgid "123 Sample Street, Sample City"
+msgstr "Eksempelgate 123, Eksempelby"
+
+#. =============================================================================
+#. Email template translations
+#. =============================================================================
+
+#: templates/emails/invoice-email.php:25
+#: templates/emails/receipt-email.php:25
+#: templates/emails/credit-note-email.php:25
+#: templates/emails/receipt-return-email.php:25
+#, php-format
+msgid "Hi%s,"
+msgstr "Hei%s,"
+
+#: templates/emails/invoice-email.php:35
+#, php-format
+msgid "Please find attached your invoice %s."
+msgstr "Vennligst se vedlagt din faktura %s."
+
+#: templates/emails/invoice-email.php:48
+#, php-format
+msgid "This invoice is for order %s."
+msgstr "Denne fakturaen gjelder ordre %s."
+
+#: templates/emails/invoice-email.php:78
+#: templates/emails/receipt-email.php:78
+msgid "Total Amount"
+msgstr "Totalbeløp"
+
+#: templates/emails/invoice-email.php:108
+msgid "The invoice PDF is attached to this email."
+msgstr "Faktura-PDF er vedlagt denne e-posten."
+
+#: templates/emails/receipt-email.php:35
+#, php-format
+msgid "Please find attached your receipt %s."
+msgstr "Vennligst se vedlagt din kvittering %s."
+
+#: templates/emails/receipt-email.php:48
+#, php-format
+msgid "This receipt is for order %s."
+msgstr "Denne kvitteringen gjelder ordre %s."
+
+#: templates/emails/receipt-email.php:98
+msgid "The receipt PDF is attached to this email."
+msgstr "Kvitterings-PDF er vedlagt denne e-posten."
+
+#: templates/emails/credit-note-email.php:35
+#, php-format
+msgid "Please find attached your credit note %s."
+msgstr "Vennligst se vedlagt din kreditnota %s."
+
+#: templates/emails/credit-note-email.php:48
+#, php-format
+msgid "This credit note is for order %s."
+msgstr "Denne kreditnotaen gjelder ordre %s."
+
+#: templates/emails/credit-note-email.php:78
+msgid "Credit Amount"
+msgstr "Kreditbeløp"
+
+#: templates/emails/credit-note-email.php:87
+#: templates/emails/receipt-return-email.php:87
+msgid "Reason"
+msgstr "Årsak"
+
+#: templates/emails/credit-note-email.php:98
+msgid "The credit note PDF is attached to this email."
+msgstr "Kreditnota-PDF er vedlagt denne e-posten."
+
+#: templates/emails/receipt-return-email.php:35
+#, php-format
+msgid "Please find attached your receipt return %s."
+msgstr "Vennligst se vedlagt din kvitteringsretur %s."
+
+#: templates/emails/receipt-return-email.php:48
+#, php-format
+msgid "This receipt return is for order %s."
+msgstr "Denne kvitteringsreturen gjelder ordre %s."
+
+#: templates/emails/receipt-return-email.php:62
+msgid "Receipt Return Number"
+msgstr "Kvitteringsreturnummer"
+
+#: templates/emails/receipt-return-email.php:78
+msgid "Refund Amount"
+msgstr "Refusjonsbeløp"
+
+#: templates/emails/receipt-return-email.php:98
+msgid "This is an informational document, not an official accounting document."
+msgstr "Dette er et informasjonsdokument, ikke et offisielt regnskapsdokument."
+
+#: templates/emails/receipt-return-email.php:102
+msgid "The receipt return PDF is attached to this email."
+msgstr "Kvitteringsretur-PDF er vedlagt denne e-posten."

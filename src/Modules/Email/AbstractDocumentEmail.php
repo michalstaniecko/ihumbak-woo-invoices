@@ -14,12 +14,15 @@ namespace IHumbak\Invoices\Modules\Email;
 use IHumbak\Invoices\Models\Document;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
+use IHumbak\Invoices\Infrastructure\Traits\SiteLocaleTrait;
 use IHumbak\Invoices\Core\Plugin;
 
 /**
  * Abstract base class for document emails.
  */
 abstract class AbstractDocumentEmail extends \WC_Email {
+
+	use SiteLocaleTrait;
 
 	/**
 	 * Document being sent.
@@ -196,54 +199,57 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 	 * @return bool True if email was sent.
 	 */
 	public function trigger( $document_id, $document = null ): bool {
-		$this->setup_locale();
+		// Switch to site locale for email content.
+		// This ensures email uses site language instead of admin user language.
+		$locale_switched = $this->switchToSiteLocale( 'ihumbak_email_locale' );
 
-		if ( $document instanceof Document ) {
-			$this->document = $document;
-		} elseif ( $document_id ) {
-			$this->document = $this->getDocumentRepository()->find( (int) $document_id );
-		}
+		try {
+			if ( $document instanceof Document ) {
+				$this->document = $document;
+			} elseif ( $document_id ) {
+				$this->document = $this->getDocumentRepository()->find( (int) $document_id );
+			}
 
-		if ( ! $this->document ) {
-			$this->restore_locale();
-			return false;
-		}
+			if ( ! $this->document ) {
+				return false;
+			}
 
-		// Load document items if not already loaded.
-		if ( empty( $this->document->getItems() ) ) {
-			$items = $this->getItemRepository()->findByDocumentId( $this->document->getId() );
-			$this->document->setItems( $items );
-		}
+			// Load document items if not already loaded.
+			if ( empty( $this->document->getItems() ) ) {
+				$items = $this->getItemRepository()->findByDocumentId( $this->document->getId() );
+				$this->document->setItems( $items );
+			}
 
-		// Set placeholders.
-		$this->placeholders['{document_number}'] = $this->document->getDocumentNumber();
+			// Set placeholders.
+			$this->placeholders['{document_number}'] = $this->document->getDocumentNumber();
 
-		if ( $this->document->getOrderId() ) {
-			$order = wc_get_order( $this->document->getOrderId() );
-			if ( $order ) {
-				$this->placeholders['{order_number}'] = $order->get_order_number();
+			if ( $this->document->getOrderId() ) {
+				$order = wc_get_order( $this->document->getOrderId() );
+				if ( $order ) {
+					$this->placeholders['{order_number}'] = $order->get_order_number();
+				}
+			}
+
+			// Get recipient.
+			$this->recipient = $this->getEmailService()->getRecipientEmail( $this->document );
+
+			if ( ! $this->is_enabled() || ! $this->get_recipient() ) {
+				return false;
+			}
+
+			return $this->send(
+				$this->get_recipient(),
+				$this->get_subject(),
+				$this->get_content(),
+				$this->get_headers(),
+				$this->get_attachments()
+			);
+		} finally {
+			// Always restore locale, even if an exception occurs.
+			if ( $locale_switched ) {
+				$this->restoreLocale();
 			}
 		}
-
-		// Get recipient.
-		$this->recipient = $this->getEmailService()->getRecipientEmail( $this->document );
-
-		if ( ! $this->is_enabled() || ! $this->get_recipient() ) {
-			$this->restore_locale();
-			return false;
-		}
-
-		$result = $this->send(
-			$this->get_recipient(),
-			$this->get_subject(),
-			$this->get_content(),
-			$this->get_headers(),
-			$this->get_attachments()
-		);
-
-		$this->restore_locale();
-
-		return $result;
 	}
 
 	/**
