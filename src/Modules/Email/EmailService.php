@@ -163,32 +163,44 @@ class EmailService {
 	/**
 	 * Get recipient email address for document.
 	 *
-	 * Uses billing email from the linked WooCommerce order.
+	 * Uses billing email from the linked WooCommerce order, or falls back
+	 * to the buyer email when no order is linked (for manual documents).
 	 *
 	 * @param Document $document The document.
 	 * @return string|null Recipient email or null if not found.
 	 */
 	public function getRecipientEmail( Document $document ): ?string {
 		$order_id = $document->getOrderId();
+		$order    = null;
+		$email    = null;
 
-		if ( ! $order_id ) {
-			return null;
+		// Try to get email from linked order first.
+		if ( $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( $order ) {
+				$email = $order->get_billing_email();
+			}
 		}
 
-		$order = wc_get_order( $order_id );
-
-		if ( ! $order ) {
-			return null;
+		// Fallback to buyer email if no order email found.
+		if ( empty( $email ) ) {
+			$buyer = $document->getBuyer();
+			if ( $buyer ) {
+				$email = $buyer->getEmail();
+			}
 		}
 
-		$email = $order->get_billing_email();
+		if ( empty( $email ) ) {
+			return null;
+		}
 
 		/**
 		 * Filter the recipient email address for document emails.
 		 *
-		 * @param string   $email    Recipient email.
-		 * @param Document $document The document.
-		 * @param \WC_Order $order   The WooCommerce order.
+		 * @param string        $email    Recipient email.
+		 * @param Document      $document The document.
+		 * @param \WC_Order|null $order   The WooCommerce order or null for manual documents.
 		 */
 		return apply_filters( 'ihumbak_email_recipient', $email, $document, $order );
 	}
@@ -203,10 +215,11 @@ class EmailService {
 		$emails = WC()->mailer()->get_emails();
 
 		$email_class = match ( $document->getDocumentType() ) {
-			'invoice'     => 'IHumbak_Invoice_Email',
-			'receipt'     => 'IHumbak_Receipt_Email',
-			'credit_note' => 'IHumbak_Credit_Note_Email',
-			default       => null,
+			'invoice'        => 'IHumbak_Invoice_Email',
+			'receipt'        => 'IHumbak_Receipt_Email',
+			'credit_note'    => 'IHumbak_Credit_Note_Email',
+			'receipt_return' => 'IHumbak_Receipt_Return_Email',
+			default          => null,
 		};
 
 		if ( ! $email_class || ! isset( $emails[ $email_class ] ) ) {
