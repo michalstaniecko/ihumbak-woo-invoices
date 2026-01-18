@@ -223,8 +223,10 @@ class DocumentListTable extends \WP_List_Table {
 				esc_html__( 'Regenerate PDF', 'ihumbak-invoices' )
 			);
 
-			// Add send email action for issued documents with linked order (not for already sent).
-			if ( $item->getOrderId() && ! $item->wasSent() ) {
+			// Add send email action for issued documents with email recipient available.
+			// Show when document has linked order OR buyer email (for manual documents).
+			$has_buyer_email = $item->getBuyer() && $item->getBuyer()->getEmail();
+			if ( ( $item->getOrderId() || $has_buyer_email ) && ! $item->wasSent() ) {
 				$email_url = add_query_arg(
 					array(
 						'page'   => 'ihumbak-invoices',
