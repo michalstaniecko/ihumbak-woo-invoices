@@ -3,7 +3,7 @@
  * Plugin Name: iHumbak WooCommerce Invoices
  * Plugin URI: https://ihumbak.com/plugins/woo-invoices
  * Description: Generate VAT invoices, receipts and corrections for WooCommerce orders.
- * Version: 0.4.8
+ * Version: 0.4.9
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: iHumbak
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants.
-define( 'IHUMBAK_INVOICES_VERSION', '0.4.8' );
+define( 'IHUMBAK_INVOICES_VERSION', '0.4.9' );
 define( 'IHUMBAK_INVOICES_FILE', __FILE__ );
 define( 'IHUMBAK_INVOICES_PATH', plugin_dir_path( __FILE__ ) );
 define( 'IHUMBAK_INVOICES_URL', plugin_dir_url( __FILE__ ) );
