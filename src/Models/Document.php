@@ -406,6 +406,24 @@ abstract class Document {
 	}
 
 	/**
+	 * Check if document can be sent via email.
+	 *
+	 * Returns true if document has a linked WooCommerce order
+	 * or has a buyer with a non-empty email address.
+	 *
+	 * @return bool
+	 */
+	public function canSendEmail(): bool {
+		if ( $this->getOrderId() ) {
+			return true;
+		}
+
+		$buyer = $this->getBuyer();
+
+		return $buyer && ! empty( $buyer->getEmail() );
+	}
+
+	/**
 	 * Get seller.
 	 *
 	 * @return Seller|null
