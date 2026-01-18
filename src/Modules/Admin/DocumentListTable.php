@@ -224,9 +224,7 @@ class DocumentListTable extends \WP_List_Table {
 			);
 
 			// Add send email action for issued documents with email recipient available.
-			// Show when document has linked order OR buyer email (for manual documents).
-			$has_buyer_email = $item->getBuyer() && $item->getBuyer()->getEmail();
-			if ( ( $item->getOrderId() || $has_buyer_email ) && ! $item->wasSent() ) {
+			if ( $item->canSendEmail() && ! $item->wasSent() ) {
 				$email_url = add_query_arg(
 					array(
 						'page'   => 'ihumbak-invoices',

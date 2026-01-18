@@ -268,7 +268,7 @@ $page_title = $is_new
                                 <?php esc_html_e( 'Regenerate PDF', 'ihumbak-invoices' ); ?>
                             </a>
                         </p>
-                        <?php if ( $document->getOrderId() ) : ?>
+                        <?php if ( $document->canSendEmail() ) : ?>
                             <?php
                             $email_url = add_query_arg(
                                 array(

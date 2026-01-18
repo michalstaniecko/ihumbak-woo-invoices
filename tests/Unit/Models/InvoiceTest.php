@@ -683,4 +683,68 @@ class InvoiceTest extends TestCase {
 		$this->assertNull( $invoice->getPaymentDate() );
 		$this->assertFalse( $invoice->isPaid() );
 	}
+
+	/**
+	 * Test canSendEmail returns true when document has order ID.
+	 */
+	public function test_can_send_email_returns_true_with_order_id(): void {
+		$invoice = new Invoice();
+		$invoice->setOrderId( 100 );
+
+		$this->assertTrue( $invoice->canSendEmail() );
+	}
+
+	/**
+	 * Test canSendEmail returns true when document has buyer with email.
+	 */
+	public function test_can_send_email_returns_true_with_buyer_email(): void {
+		$invoice = new Invoice();
+		$buyer   = new Buyer( name: 'Test Buyer', email: 'test@example.com' );
+		$invoice->setBuyer( $buyer );
+
+		$this->assertTrue( $invoice->canSendEmail() );
+	}
+
+	/**
+	 * Test canSendEmail returns false when document has no order and no buyer.
+	 */
+	public function test_can_send_email_returns_false_without_order_and_buyer(): void {
+		$invoice = new Invoice();
+
+		$this->assertFalse( $invoice->canSendEmail() );
+	}
+
+	/**
+	 * Test canSendEmail returns false when document has buyer without email.
+	 */
+	public function test_can_send_email_returns_false_with_buyer_without_email(): void {
+		$invoice = new Invoice();
+		$buyer   = new Buyer( name: 'Test Buyer' );
+		$invoice->setBuyer( $buyer );
+
+		$this->assertFalse( $invoice->canSendEmail() );
+	}
+
+	/**
+	 * Test canSendEmail returns false when document has buyer with empty email.
+	 */
+	public function test_can_send_email_returns_false_with_buyer_empty_email(): void {
+		$invoice = new Invoice();
+		$buyer   = new Buyer( name: 'Test Buyer', email: '' );
+		$invoice->setBuyer( $buyer );
+
+		$this->assertFalse( $invoice->canSendEmail() );
+	}
+
+	/**
+	 * Test canSendEmail returns true when document has both order ID and buyer email.
+	 */
+	public function test_can_send_email_returns_true_with_both_order_and_buyer_email(): void {
+		$invoice = new Invoice();
+		$invoice->setOrderId( 100 );
+		$buyer = new Buyer( name: 'Test Buyer', email: 'test@example.com' );
+		$invoice->setBuyer( $buyer );
+
+		$this->assertTrue( $invoice->canSendEmail() );
+	}
 }
