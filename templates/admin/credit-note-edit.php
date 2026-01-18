@@ -398,7 +398,11 @@ $page_title = $is_new
 								<?php esc_html_e( 'Regenerate PDF', 'ihumbak-invoices' ); ?>
 							</a>
 						</p>
-						<?php if ( $document->getOrderId() ) : ?>
+						<?php
+						// Show Send Email when document has linked order OR buyer email (for manual documents).
+						$has_buyer_email = $document->getBuyer() && $document->getBuyer()->getEmail();
+						if ( $document->getOrderId() || $has_buyer_email ) :
+							?>
 							<?php
 							$email_url = add_query_arg(
 								array(
