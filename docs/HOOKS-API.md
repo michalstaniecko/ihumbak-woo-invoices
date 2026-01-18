@@ -95,6 +95,33 @@ do_action('ihumbak_send_credit_note_email', int $document_id, Document $document
 | $document_id | int | Document ID |
 | $document | Document | The document (optional) |
 
+### Translation / Localization
+
+#### `ihumbak_translation_file_missing`
+Fired when a translation file (.mo) is not found for the target locale during PDF generation or email sending.
+
+```php
+do_action('ihumbak_translation_file_missing', string $locale, string $plugin_mo_file, string $global_mo_file);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $locale | string | The target locale (e.g., 'nb_NO') |
+| $plugin_mo_file | string | Path to plugin language file checked |
+| $global_mo_file | string | Path to global language file checked |
+
+**Example:**
+```php
+// Log missing translations to a monitoring service
+add_action('ihumbak_translation_file_missing', function($locale, $plugin_mo, $global_mo) {
+    // Send alert to monitoring system
+    error_log("Missing translation for {$locale}");
+
+    // Or attempt to download from translate.wordpress.org
+    // wp_download_language_pack($locale);
+}, 10, 3);
+```
+
 ---
 
 ## Filters
@@ -327,3 +354,4 @@ add_filter('ihumbak_is_user_super_admin', function($is_super_admin, $user_id) {
 - `src/Modules/PDF/PdfGenerator.php` - PDF hooks
 - `src/Modules/Email/EmailService.php` - Email hooks
 - `src/Modules/Email/AbstractDocumentEmail.php` - Email template hooks
+- `src/Infrastructure/Traits/SiteLocaleTrait.php` - Translation/locale hooks

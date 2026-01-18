@@ -142,6 +142,20 @@ trait SiteLocaleTrait {
 			load_textdomain( 'ihumbak-invoices', $global_mo_file );
 		} elseif ( 'en_US' !== $locale ) {
 			// Log warning only for non-English locales (English doesn't need .mo file).
+			/**
+			 * Fires when a translation file is not found for the target locale.
+			 *
+			 * Allows developers to handle missing translations (e.g., download from translate.wordpress.org,
+			 * log to monitoring system, or notify administrators).
+			 *
+			 * @since 0.4.9
+			 *
+			 * @param string $locale         The target locale (e.g., 'nb_NO').
+			 * @param string $plugin_mo_file Path to plugin language file checked.
+			 * @param string $global_mo_file Path to global language file checked.
+			 */
+			do_action( 'ihumbak_translation_file_missing', $locale, $plugin_mo_file, $global_mo_file );
+
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			error_log(
 				sprintf(
