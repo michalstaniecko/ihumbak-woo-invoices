@@ -215,13 +215,13 @@ class PdfGeneratorLocaleTest extends TestCase {
 		$mock_current_locale       = 'en_US';
 
 		$method = $this->getPrivateMethod( 'switchToSiteLocale' );
-		$method->invoke( $this->generator );
+		$method->invoke( $this->generator, 'ihumbak_pdf_locale' );
 
 		$original_locale = $this->getPrivateProperty( 'original_locale' );
-		$pdf_locale      = $this->getPrivateProperty( 'pdf_locale' );
+		$target_locale   = $this->getPrivateProperty( 'target_locale' );
 
 		$this->assertSame( 'en_US', $original_locale );
-		$this->assertSame( 'nb_NO', $pdf_locale );
+		$this->assertSame( 'nb_NO', $target_locale );
 	}
 
 	/**
@@ -251,13 +251,13 @@ class PdfGeneratorLocaleTest extends TestCase {
 	public function test_restore_locale_clears_state(): void {
 		// Set up initial state.
 		$this->setPrivateProperty( 'original_locale', 'en_US' );
-		$this->setPrivateProperty( 'pdf_locale', 'nb_NO' );
+		$this->setPrivateProperty( 'target_locale', 'nb_NO' );
 
 		$method = $this->getPrivateMethod( 'restoreLocale' );
 		$method->invoke( $this->generator );
 
 		$this->assertNull( $this->getPrivateProperty( 'original_locale' ) );
-		$this->assertNull( $this->getPrivateProperty( 'pdf_locale' ) );
+		$this->assertNull( $this->getPrivateProperty( 'target_locale' ) );
 	}
 
 	/**
@@ -278,10 +278,10 @@ class PdfGeneratorLocaleTest extends TestCase {
 		);
 
 		$method = $this->getPrivateMethod( 'switchToSiteLocale' );
-		$method->invoke( $this->generator );
+		$method->invoke( $this->generator, 'ihumbak_pdf_locale' );
 
-		$pdf_locale = $this->getPrivateProperty( 'pdf_locale' );
-		$this->assertSame( 'de_DE', $pdf_locale );
+		$target_locale = $this->getPrivateProperty( 'target_locale' );
+		$this->assertSame( 'de_DE', $target_locale );
 
 		// Clean up filter.
 		$mock_wp_filters = array();

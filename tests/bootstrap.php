@@ -1102,3 +1102,233 @@ if ( ! function_exists( 'load_textdomain' ) ) {
         return file_exists( $mofile );
     }
 }
+
+// =============================================================================
+// Mock WC_Email class for unit tests.
+// =============================================================================
+
+if ( ! class_exists( 'WC_Email' ) ) {
+    /**
+     * Mock WC_Email class for unit tests.
+     */
+    class WC_Email {
+        /**
+         * Email ID.
+         *
+         * @var string
+         */
+        public string $id = '';
+
+        /**
+         * Email title.
+         *
+         * @var string
+         */
+        public string $title = '';
+
+        /**
+         * Email description.
+         *
+         * @var string
+         */
+        public string $description = '';
+
+        /**
+         * HTML template path.
+         *
+         * @var string
+         */
+        public string $template_html = '';
+
+        /**
+         * Plain text template path.
+         *
+         * @var string
+         */
+        public string $template_plain = '';
+
+        /**
+         * Template base path.
+         *
+         * @var string
+         */
+        public string $template_base = '';
+
+        /**
+         * Placeholders.
+         *
+         * @var array<string, string>
+         */
+        public array $placeholders = array();
+
+        /**
+         * Recipient email address.
+         *
+         * @var string
+         */
+        public string $recipient = '';
+
+        /**
+         * Email settings storage.
+         *
+         * @var array<string, mixed>
+         */
+        protected array $settings = array();
+
+        /**
+         * Constructor.
+         */
+        public function __construct() {
+            // Do nothing in tests.
+        }
+
+        /**
+         * Get option value.
+         *
+         * @param string $key     Option key.
+         * @param mixed  $default Default value.
+         * @return mixed
+         */
+        public function get_option( string $key, $default = null ) {
+            return $this->settings[ $key ] ?? $default;
+        }
+
+        /**
+         * Get blog name.
+         *
+         * @return string
+         */
+        public function get_blogname(): string {
+            return get_option( 'blogname', 'Test Site' );
+        }
+
+        /**
+         * Check if email is enabled.
+         *
+         * @return bool
+         */
+        public function is_enabled(): bool {
+            return $this->get_option( 'enabled', 'yes' ) === 'yes';
+        }
+
+        /**
+         * Get recipient.
+         *
+         * @return string
+         */
+        public function get_recipient(): string {
+            return $this->recipient;
+        }
+
+        /**
+         * Send email.
+         *
+         * @param string $to          Recipient.
+         * @param string $subject     Subject.
+         * @param string $message     Message.
+         * @param string $headers     Headers.
+         * @param array  $attachments Attachments.
+         * @return bool
+         */
+        public function send( string $to, string $subject, string $message, string $headers = '', array $attachments = array() ): bool {
+            return true;
+        }
+
+        /**
+         * Get email type options.
+         *
+         * @return array<string, string>
+         */
+        public function get_email_type_options(): array {
+            return array(
+                'plain'     => 'Plain text',
+                'html'      => 'HTML',
+                'multipart' => 'Multipart',
+            );
+        }
+
+        /**
+         * Format string with placeholders.
+         *
+         * @param string $string String to format.
+         * @return string
+         */
+        public function format_string( string $string ): string {
+            return str_replace( array_keys( $this->placeholders ), array_values( $this->placeholders ), $string );
+        }
+
+        /**
+         * Get attachments.
+         *
+         * @return array<string>
+         */
+        public function get_attachments(): array {
+            return array();
+        }
+
+        /**
+         * Get content.
+         *
+         * @return string
+         */
+        public function get_content(): string {
+            return '';
+        }
+
+        /**
+         * Get headers.
+         *
+         * @return string
+         */
+        public function get_headers(): string {
+            return '';
+        }
+    }
+}
+
+// =============================================================================
+// Mock WooCommerce functions for email tests.
+// =============================================================================
+
+// Mock WooCommerce orders storage.
+global $mock_wc_orders;
+$mock_wc_orders = array();
+
+if ( ! function_exists( 'wc_get_order' ) ) {
+    /**
+     * Mock wc_get_order function.
+     *
+     * @param int $order_id Order ID.
+     * @return WC_Order|false
+     */
+    function wc_get_order( int $order_id ) {
+        global $mock_wc_orders;
+        return $mock_wc_orders[ $order_id ] ?? false;
+    }
+}
+
+if ( ! function_exists( 'wc_get_template_html' ) ) {
+    /**
+     * Mock wc_get_template_html function.
+     *
+     * @param string $template_name Template name.
+     * @param array  $args          Template arguments.
+     * @param string $template_path Template path.
+     * @param string $default_path  Default path.
+     * @return string
+     */
+    function wc_get_template_html( string $template_name, array $args = array(), string $template_path = '', string $default_path = '' ): string {
+        return '<html><body>Mock email template: ' . esc_html( $template_name ) . '</body></html>';
+    }
+}
+
+if ( ! function_exists( 'get_woocommerce_currency' ) ) {
+    /**
+     * Mock get_woocommerce_currency function.
+     *
+     * @return string
+     */
+    function get_woocommerce_currency(): string {
+        return get_option( 'woocommerce_currency', 'PLN' );
+    }
+}
