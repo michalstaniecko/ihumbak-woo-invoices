@@ -14,6 +14,7 @@ use IHumbak\Invoices\Models\Invoice;
 use IHumbak\Invoices\Models\Receipt;
 use IHumbak\Invoices\Models\CreditNote;
 use IHumbak\Invoices\Models\Document;
+use IHumbak\Invoices\Models\Buyer;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -148,12 +149,49 @@ class EmailServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test getRecipientEmail returns null when document has no order.
+	 * Test getRecipientEmail returns null when document has no order and no buyer email.
 	 */
-	public function test_get_recipient_email_returns_null_without_order(): void {
+	public function test_get_recipient_email_returns_null_without_order_and_buyer_email(): void {
 		$service  = $this->createEmailServiceWithMocks();
 		$document = new Invoice();
 		$document->setId( 1 );
+
+		$email = $service->getRecipientEmail( $document );
+
+		$this->assertNull( $email );
+	}
+
+	/**
+	 * Test getRecipientEmail returns buyer email when document has no order but has buyer with email.
+	 */
+	public function test_get_recipient_email_returns_buyer_email_for_manual_document(): void {
+		$service  = $this->createEmailServiceWithMocks();
+		$document = new Invoice();
+		$document->setId( 1 );
+
+		$buyer = new Buyer(
+			name: 'Test Customer',
+			email: 'customer@example.com'
+		);
+		$document->setBuyer( $buyer );
+
+		$email = $service->getRecipientEmail( $document );
+
+		$this->assertSame( 'customer@example.com', $email );
+	}
+
+	/**
+	 * Test getRecipientEmail returns null when document has buyer without email.
+	 */
+	public function test_get_recipient_email_returns_null_when_buyer_has_no_email(): void {
+		$service  = $this->createEmailServiceWithMocks();
+		$document = new Invoice();
+		$document->setId( 1 );
+
+		$buyer = new Buyer(
+			name: 'Test Customer'
+		);
+		$document->setBuyer( $buyer );
 
 		$email = $service->getRecipientEmail( $document );
 
