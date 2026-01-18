@@ -201,6 +201,7 @@ Types: feat, fix, docs, refactor, test, chore
 | `/devops` | CI/CD and automation |
 | `/docs` | Documentation |
 | `/qa` | Tests and QA |
+| `/new-issue <message>` | Create GitHub issue from brief description |
 
 ---
 
