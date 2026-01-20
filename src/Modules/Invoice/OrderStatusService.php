@@ -28,14 +28,37 @@ class OrderStatusService {
 	);
 
 	/**
+	 * Cached order status settings.
+	 *
+	 * @var array<string, mixed>|null
+	 */
+	private ?array $order_status_settings = null;
+
+	/**
+	 * Get order status settings from plugin configuration.
+	 *
+	 * Settings are cached for performance optimization.
+	 *
+	 * @return array<string, mixed> Order status settings array.
+	 */
+	private function getOrderStatusSettings(): array {
+		if ( null === $this->order_status_settings ) {
+			$settings                    = Plugin::get_instance()->get_settings();
+			$this->order_status_settings = $settings['display']['order_status'] ?? array();
+		}
+
+		return $this->order_status_settings;
+	}
+
+	/**
 	 * Check if automatic order status change feature is enabled.
 	 *
 	 * @return bool True if enabled.
 	 */
 	public function isEnabled(): bool {
-		$settings = Plugin::get_instance()->get_settings();
+		$order_status_settings = $this->getOrderStatusSettings();
 
-		return ! empty( $settings['display']['order_status']['enabled'] );
+		return ! empty( $order_status_settings['enabled'] );
 	}
 
 	/**
@@ -44,9 +67,9 @@ class OrderStatusService {
 	 * @return string Target status (without 'wc-' prefix).
 	 */
 	public function getTargetStatus(): string {
-		$settings = Plugin::get_instance()->get_settings();
+		$order_status_settings = $this->getOrderStatusSettings();
 
-		return $settings['display']['order_status']['target'] ?? 'completed';
+		return $order_status_settings['target'] ?? 'completed';
 	}
 
 	/**
@@ -142,15 +165,12 @@ class OrderStatusService {
 			return false;
 		}
 
-		// Check if change should happen.
+		// Check if change should happen (includes order_id validation).
 		if ( ! $this->shouldChangeStatus( $document ) ) {
 			return false;
 		}
 
 		$order_id = $document->getOrderId();
-		if ( ! $order_id ) {
-			return false;
-		}
 
 		// Get the order.
 		$order = wc_get_order( $order_id );
