@@ -48,6 +48,7 @@
             this.initFetchOrder();
             this.initCreditNote();
             this.initReceiptReturn();
+            this.initOrderStatusCheckbox();
 
             // Form validation before submit.
             $('#ihumbak-document-form').on('submit', function(e) {
@@ -415,6 +416,40 @@
                     self.fetchOrderData(orderId);
                 }
             });
+        },
+
+        /**
+         * Initialize order status checkbox visibility toggle.
+         *
+         * Shows/hides the order status change checkbox based on whether
+         * an order ID is entered in the form.
+         */
+        initOrderStatusCheckbox: function() {
+            var $orderIdInput = $('#order_id');
+            var $checkboxWrapper = $('#ihumbak-order-status-change-wrapper');
+
+            // Skip if no checkbox wrapper (feature disabled or not on invoice/receipt page).
+            if (!$checkboxWrapper.length) {
+                return;
+            }
+
+            /**
+             * Toggle checkbox visibility based on order ID.
+             */
+            function toggleCheckboxVisibility() {
+                var orderId = parseInt($orderIdInput.val(), 10);
+                if (orderId && orderId > 0) {
+                    $checkboxWrapper.show();
+                } else {
+                    $checkboxWrapper.hide();
+                }
+            }
+
+            // Bind to order_id input changes.
+            $orderIdInput.on('input change', toggleCheckboxVisibility);
+
+            // Set initial state.
+            toggleCheckboxVisibility();
         },
 
         /**

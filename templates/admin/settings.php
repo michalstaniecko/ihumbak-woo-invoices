@@ -238,6 +238,53 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                 </tr>
             </table>
 
+            <h2><?php esc_html_e( 'Order Status Change', 'ihumbak-invoices' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Configure automatic order status change when manually issuing invoices or receipts.', 'ihumbak-invoices' ); ?>
+            </p>
+
+            <?php
+            $order_status_service = new \IHumbak\Invoices\Modules\Invoice\OrderStatusService();
+            $order_statuses       = $order_status_service->getOrderStatuses();
+            $current_status       = $settings['display']['order_status']['target'] ?? 'completed';
+            $is_enabled           = ! empty( $settings['display']['order_status']['enabled'] );
+            ?>
+            <table class="form-table">
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Enable Status Change', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   id="order_status_enabled"
+                                   name="ihumbak_invoices_settings[display][order_status][enabled]"
+                                   value="1"
+                                   <?php checked( $is_enabled ); ?>>
+                            <?php esc_html_e( 'Enable automatic order status change when generating documents', 'ihumbak-invoices' ); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e( 'When enabled, a checkbox will appear on invoice/receipt edit pages allowing you to change the order status when issuing a document.', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="order_status_target"><?php esc_html_e( 'Target Status', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <select id="order_status_target" name="ihumbak_invoices_settings[display][order_status][target]">
+                            <?php foreach ( $order_statuses as $status_slug => $status_label ) : ?>
+                                <option value="<?php echo esc_attr( $status_slug ); ?>" <?php selected( $current_status, $status_slug ); ?>>
+                                    <?php echo esc_html( $status_label ); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="description">
+                            <?php esc_html_e( 'Select the order status to set when issuing a document.', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
         <?php elseif ( 'permissions' === $active_tab ) : ?>
             <?php $current_role = $settings['permissions']['minimum_role'] ?? $permission_default_role; ?>
             <table class="form-table">

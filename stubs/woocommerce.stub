@@ -122,6 +122,15 @@ class WC_Order {
     public function get_shipping_method(): string {}
     /** @return WC_Order_Refund[] */
     public function get_refunds(): array {}
+    /**
+     * Update order status.
+     *
+     * @param string $new_status Status to change to (without wc- prefix).
+     * @param string $note       Optional order note.
+     * @param bool   $manual     Is this a manual status change.
+     * @return bool
+     */
+    public function update_status( string $new_status, string $note = '', bool $manual = false ): bool {}
 }
 
 class WC_Order_Item_Product {

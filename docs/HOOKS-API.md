@@ -30,6 +30,35 @@ do_action('ihumbak_document_reverted_to_draft', Document $document, int $user_id
 | $document | Document | The reverted document |
 | $user_id | int | User ID who performed the action |
 
+### Order Status Change
+
+#### `ihumbak_before_order_status_change`
+Fired before an order status is changed when issuing a document.
+
+```php
+do_action('ihumbak_before_order_status_change', int $order_id, string $new_status, Document $document);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $order_id | int | WooCommerce order ID |
+| $new_status | string | New status being set |
+| $document | Document | The issued document |
+
+#### `ihumbak_after_order_status_change`
+Fired after an order status is changed when issuing a document.
+
+```php
+do_action('ihumbak_after_order_status_change', int $order_id, string $new_status, string $old_status, Document $document);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $order_id | int | WooCommerce order ID |
+| $new_status | string | New status that was set |
+| $old_status | string | Previous order status |
+| $document | Document | The issued document |
+
 ### PDF Generation
 
 #### `ihumbak_before_pdf_render`
@@ -344,13 +373,85 @@ add_filter('ihumbak_is_user_super_admin', function($is_super_admin, $user_id) {
 }, 10, 2);
 ```
 
+### Order Status Change
+
+#### `ihumbak_order_status_change_enabled`
+Override whether automatic order status change should happen for a specific document.
+
+```php
+apply_filters('ihumbak_order_status_change_enabled', bool $enabled, int $order_id, Document $document);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $enabled | bool | Whether status change is enabled |
+| $order_id | int | WooCommerce order ID |
+| $document | Document | The document being issued |
+
+**Example:**
+```php
+// Disable status change for orders from specific customer
+add_filter('ihumbak_order_status_change_enabled', function($enabled, $order_id, $document) {
+    $order = wc_get_order($order_id);
+    if ($order && $order->get_customer_id() === 123) {
+        return false;
+    }
+    return $enabled;
+}, 10, 3);
+```
+
+#### `ihumbak_order_status_change_target`
+Override the target order status for a specific document.
+
+```php
+apply_filters('ihumbak_order_status_change_target', string $status, int $order_id, Document $document);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $status | string | Target order status |
+| $order_id | int | WooCommerce order ID |
+| $document | Document | The document being issued |
+
+**Example:**
+```php
+// Set different status for receipts
+add_filter('ihumbak_order_status_change_target', function($status, $order_id, $document) {
+    if ($document->getDocumentType() === 'receipt') {
+        return 'processing';
+    }
+    return $status;
+}, 10, 3);
+```
+
+#### `ihumbak_order_status_change_checkbox_default`
+Change the default checkbox state for order status change.
+
+```php
+apply_filters('ihumbak_order_status_change_checkbox_default', bool $checked, int|null $order_id);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $checked | bool | Default checked state |
+| $order_id | int\|null | WooCommerce order ID or null for new documents |
+
+**Example:**
+```php
+// Default to unchecked for all documents
+add_filter('ihumbak_order_status_change_checkbox_default', function($checked, $order_id) {
+    return false;
+}, 10, 2);
+```
+
 ---
 
 ## Related Files
 
 - `src/Modules/Invoice/NumberingService.php` - Numbering hooks
 - `src/Modules/Invoice/OrderDataExtractor.php` - Payment method hooks
-- `src/Modules/Admin/SuperAdminService.php` - Super-admin hooks
+- `src/Modules/Invoice/OrderStatusService.php` - Order status change hooks
+- `src/Modules/Invoice/SuperAdminService.php` - Super-admin hooks
 - `src/Modules/PDF/PdfGenerator.php` - PDF hooks
 - `src/Modules/Email/EmailService.php` - Email hooks
 - `src/Modules/Email/AbstractDocumentEmail.php` - Email template hooks
