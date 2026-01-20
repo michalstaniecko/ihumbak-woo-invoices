@@ -204,6 +204,7 @@ Types: feat, fix, docs, refactor, test, chore
 | `/new-issue <message>` | Create GitHub issue from brief description |
 | `/new-branch issue-<ID>` | Create git branch from GitHub issue |
 | `/new-worktree issue-<ID>` | Create git worktree with branch from GitHub issue |
+| `/commit-tag-release <version>` | Bump version, commit, tag, and push release |
 
 ---
 
