@@ -77,25 +77,24 @@ class Activator {
 
 		if ( false === $existing ) {
 			$defaults = array(
-				'seller'     => array(
+				'seller'    => array(
 					'name'    => get_bloginfo( 'name' ),
 					'details' => '',
 				),
-				'numbering'  => array(
+				'numbering' => array(
 					'invoice_pattern'    => 'FV/{YYYY}/{MM}/{NNNN}',
 					'receipt_pattern'    => 'PAR/{YYYY}/{MM}/{NNNN}',
 					'correction_pattern' => 'FK/{YYYY}/{MM}/{NNNN}',
 					'reset_monthly'      => true,
 				),
-				'pdf'        => array(
+				'pdf'       => array(
 					'template'    => 'default',
 					'logo_id'     => 0,
 					'footer_text' => '',
 				),
-				'automation' => array(
-					'auto_generate_invoice' => false,
-					'auto_generate_receipt' => false,
-					'trigger_status'        => 'completed',
+				'display'   => array(
+					'show_order_column' => true,
+					'nip_meta_key'      => '_billing_nip',
 				),
 			);
 

@@ -178,32 +178,29 @@ class PluginTest extends TestCase {
 	}
 
 	/**
-	 * Test sanitize_settings preserves all five tabs independently.
+	 * Test sanitize_settings preserves all tabs independently.
 	 *
 	 * @return void
 	 */
-	public function test_sanitize_settings_preserves_all_five_tabs(): void {
-		// Setup: all five tabs have data.
+	public function test_sanitize_settings_preserves_all_tabs(): void {
+		// Setup: all tabs have data.
 		update_option(
 			'ihumbak_invoices_settings',
 			array(
-				'seller'     => array(
+				'seller'    => array(
 					'name'    => 'Seller Name',
 					'details' => 'Seller Details',
 				),
-				'numbering'  => array(
+				'numbering' => array(
 					'invoice_pattern' => 'FV/{YYYY}/{NNNN}',
 					'reset_monthly'   => true,
 				),
-				'pdf'        => array(
+				'pdf'       => array(
 					'template' => 'default',
 				),
-				'automation' => array(
-					'auto_generate_invoice' => true,
-					'trigger_status'        => 'completed',
-				),
-				'display'    => array(
+				'display'   => array(
 					'show_order_column' => true,
+					'nip_meta_key'      => '_billing_nip',
 				),
 			)
 		);
@@ -214,6 +211,7 @@ class PluginTest extends TestCase {
 		$input = array(
 			'display' => array(
 				'show_order_column' => false,
+				'nip_meta_key'      => '_vat_number',
 			),
 		);
 
@@ -221,11 +219,11 @@ class PluginTest extends TestCase {
 
 		// Assert: display is updated.
 		$this->assertFalse( $result['display']['show_order_column'] );
+		$this->assertEquals( '_vat_number', $result['display']['nip_meta_key'] );
 
 		// Assert: all other tabs are preserved.
 		$this->assertEquals( 'Seller Name', $result['seller']['name'] );
 		$this->assertEquals( 'FV/{YYYY}/{NNNN}', $result['numbering']['invoice_pattern'] );
 		$this->assertEquals( 'default', $result['pdf']['template'] );
-		$this->assertTrue( $result['automation']['auto_generate_invoice'] );
 	}
 }
