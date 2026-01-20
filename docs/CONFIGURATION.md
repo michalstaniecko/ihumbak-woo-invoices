@@ -42,10 +42,8 @@ Access in admin: **WooCommerce > Invoices > Settings**
         'logo_id' => 0,
         'footer_text' => '',
     ],
-    'automation' => [
-        'auto_generate_invoice' => false,
-        'auto_generate_receipt' => false,
-        'trigger_status' => 'completed',
+    'display' => [
+        'show_order_column' => true,
         'nip_meta_key' => '_billing_nip',
     ],
 ]
@@ -107,13 +105,11 @@ Email: invoices@example.com
 2. `wp-content/themes/{parent-theme}/ihumbak-invoices/{template}/`
 3. `{plugin}/templates/pdf/{template}/`
 
-### 4. Automation Tab
+### 4. Display Tab
 
 | Option | Type | Description |
 |--------|------|-------------|
-| auto_generate_invoice | boolean | Auto-generate invoice on order status change |
-| auto_generate_receipt | boolean | Auto-generate receipt on order status change |
-| trigger_status | string | Order status that triggers auto-generation |
+| show_order_column | boolean | Show documents column in WooCommerce orders list |
 | nip_meta_key | string | Order meta key for buyer NIP/VAT number |
 
 ---

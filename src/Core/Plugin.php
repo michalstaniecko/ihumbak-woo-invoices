@@ -270,9 +270,6 @@ final class Plugin {
 		// Frontend hooks.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 
-		// WooCommerce hooks.
-		add_action( 'woocommerce_order_status_changed', array( $this, 'handle_order_status_change' ), 10, 4 );
-
 		// Register WooCommerce email classes.
 		add_filter( 'woocommerce_email_classes', array( $this, 'register_email_classes' ) );
 
@@ -739,35 +736,6 @@ final class Plugin {
 	}
 
 	/**
-	 * Handle order status change.
-	 *
-	 * @param int       $order_id   Order ID.
-	 * @param string    $old_status Old status.
-	 * @param string    $new_status New status.
-	 * @param \WC_Order $order      Order object.
-	 * @return void
-	 */
-	public function handle_order_status_change( int $order_id, string $old_status, string $new_status, \WC_Order $order ): void {
-		$settings = $this->get_settings();
-
-		if ( empty( $settings['automation']['auto_generate_invoice'] ) ) {
-			return;
-		}
-
-		$trigger_status = $settings['automation']['trigger_status'] ?? 'completed';
-
-		if ( $new_status === $trigger_status ) {
-			/**
-			 * Fires when an invoice should be auto-generated.
-			 *
-			 * @param int       $order_id Order ID.
-			 * @param \WC_Order $order    Order object.
-			 */
-			do_action( 'ihumbak_auto_generate_invoice', $order_id, $order );
-		}
-	}
-
-	/**
 	 * Get plugin settings.
 	 *
 	 * @return array<string, mixed>
@@ -801,14 +769,9 @@ final class Plugin {
 				'logo_id'     => 0,
 				'footer_text' => '',
 			),
-			'automation'  => array(
-				'auto_generate_invoice' => false,
-				'auto_generate_receipt' => false,
-				'trigger_status'        => 'completed',
-				'nip_meta_key'          => '_billing_nip',
-			),
 			'display'     => array(
 				'show_order_column' => true,
+				'nip_meta_key'      => '_billing_nip',
 			),
 			'permissions' => array(
 				'minimum_role' => PermissionService::DEFAULT_ROLE,
@@ -862,20 +825,11 @@ final class Plugin {
 			);
 		}
 
-		// Sanitize automation settings.
-		if ( isset( $input['automation'] ) && is_array( $input['automation'] ) ) {
-			$sanitized['automation'] = array(
-				'auto_generate_invoice' => ! empty( $input['automation']['auto_generate_invoice'] ),
-				'auto_generate_receipt' => ! empty( $input['automation']['auto_generate_receipt'] ),
-				'trigger_status'        => sanitize_text_field( $input['automation']['trigger_status'] ?? 'completed' ),
-				'nip_meta_key'          => sanitize_text_field( $input['automation']['nip_meta_key'] ?? '_billing_nip' ),
-			);
-		}
-
 		// Sanitize display settings.
 		if ( isset( $input['display'] ) && is_array( $input['display'] ) ) {
 			$sanitized['display'] = array(
 				'show_order_column' => ! empty( $input['display']['show_order_column'] ),
+				'nip_meta_key'      => sanitize_text_field( $input['display']['nip_meta_key'] ?? '_billing_nip' ),
 			);
 		}
 

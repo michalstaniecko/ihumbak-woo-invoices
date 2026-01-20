@@ -27,10 +27,6 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
            class="nav-tab <?php echo 'pdf' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'PDF', 'ihumbak-invoices' ); ?>
         </a>
-        <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices-settings&tab=automation' ) ); ?>"
-           class="nav-tab <?php echo 'automation' === $active_tab ? 'nav-tab-active' : ''; ?>">
-            <?php esc_html_e( 'Automation', 'ihumbak-invoices' ); ?>
-        </a>
         <a href="<?php echo esc_url( admin_url( 'admin.php?page=ihumbak-invoices-settings&tab=display' ) ); ?>"
            class="nav-tab <?php echo 'display' === $active_tab ? 'nav-tab-active' : ''; ?>">
             <?php esc_html_e( 'Display', 'ihumbak-invoices' ); ?>
@@ -207,68 +203,6 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                 </tr>
             </table>
 
-        <?php elseif ( 'automation' === $active_tab ) : ?>
-            <table class="form-table">
-                <tr>
-                    <th scope="row"><?php esc_html_e( 'Auto-generate Invoice', 'ihumbak-invoices' ); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox"
-                                   name="ihumbak_invoices_settings[automation][auto_generate_invoice]"
-                                   value="1"
-                                   <?php checked( ! empty( $settings['automation']['auto_generate_invoice'] ) ); ?>>
-                            <?php esc_html_e( 'Automatically generate invoice when order status changes', 'ihumbak-invoices' ); ?>
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row"><?php esc_html_e( 'Auto-generate Receipt', 'ihumbak-invoices' ); ?></th>
-                    <td>
-                        <label>
-                            <input type="checkbox"
-                                   name="ihumbak_invoices_settings[automation][auto_generate_receipt]"
-                                   value="1"
-                                   <?php checked( ! empty( $settings['automation']['auto_generate_receipt'] ) ); ?>>
-                            <?php esc_html_e( 'Automatically generate receipt for orders without NIP', 'ihumbak-invoices' ); ?>
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="trigger_status"><?php esc_html_e( 'Trigger Status', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <select id="trigger_status" name="ihumbak_invoices_settings[automation][trigger_status]">
-                            <option value="processing" <?php selected( ( $settings['automation']['trigger_status'] ?? 'completed' ), 'processing' ); ?>>
-                                <?php esc_html_e( 'Processing', 'ihumbak-invoices' ); ?>
-                            </option>
-                            <option value="completed" <?php selected( ( $settings['automation']['trigger_status'] ?? 'completed' ), 'completed' ); ?>>
-                                <?php esc_html_e( 'Completed', 'ihumbak-invoices' ); ?>
-                            </option>
-                        </select>
-                        <p class="description">
-                            <?php esc_html_e( 'Order status that triggers automatic document generation', 'ihumbak-invoices' ); ?>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="nip_meta_key"><?php esc_html_e( 'NIP Meta Key', 'ihumbak-invoices' ); ?></label>
-                    </th>
-                    <td>
-                        <input type="text"
-                               id="nip_meta_key"
-                               name="ihumbak_invoices_settings[automation][nip_meta_key]"
-                               value="<?php echo esc_attr( $settings['automation']['nip_meta_key'] ?? '_billing_nip' ); ?>"
-                               class="regular-text"
-                               placeholder="_billing_nip">
-                        <p class="description">
-                            <?php esc_html_e( 'Order meta key where customer NIP/Tax ID is stored. Common values: _billing_nip, billing_nip, _vat_number', 'ihumbak-invoices' ); ?>
-                        </p>
-                    </td>
-                </tr>
-            </table>
-
         <?php elseif ( 'display' === $active_tab ) : ?>
             <table class="form-table">
                 <tr>
@@ -283,6 +217,22 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                         </label>
                         <p class="description">
                             <?php esc_html_e( 'Displays invoice, receipt and credit note numbers directly in the orders list.', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="nip_meta_key"><?php esc_html_e( 'NIP Meta Key', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <input type="text"
+                               id="nip_meta_key"
+                               name="ihumbak_invoices_settings[display][nip_meta_key]"
+                               value="<?php echo esc_attr( $settings['display']['nip_meta_key'] ?? '_billing_nip' ); ?>"
+                               class="regular-text"
+                               placeholder="_billing_nip">
+                        <p class="description">
+                            <?php esc_html_e( 'Order meta key where customer NIP/Tax ID is stored. Common values: _billing_nip, billing_nip, _vat_number', 'ihumbak-invoices' ); ?>
                         </p>
                     </td>
                 </tr>

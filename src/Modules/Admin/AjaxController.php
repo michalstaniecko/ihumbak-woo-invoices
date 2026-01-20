@@ -264,7 +264,7 @@ class AjaxController {
 
 		// Get NIP meta key from settings.
 		$settings     = Plugin::get_instance()->get_settings();
-		$nip_meta_key = $settings['automation']['nip_meta_key'] ?? '_billing_nip';
+		$nip_meta_key = $settings['display']['nip_meta_key'] ?? '_billing_nip';
 
 		$data = $this->order_extractor->extractAll( $order, $nip_meta_key );
 
