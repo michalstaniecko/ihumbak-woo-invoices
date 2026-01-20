@@ -241,6 +241,11 @@ $page_title = $is_new
                                 <?php esc_html_e( 'Save and Issue', 'ihumbak-invoices' ); ?>
                             </button>
                         </p>
+                        <?php
+                        // Order status change checkbox.
+                        $order_id_value = $document ? $document->getOrderId() : ( $pre_filled_order_id ?? null );
+                        include IHUMBAK_INVOICES_PATH . 'templates/admin/partials/order-status-checkbox.php';
+                        ?>
                     <?php endif; ?>
 
                     <?php include IHUMBAK_INVOICES_PATH . 'templates/admin/partials/revert-button.php'; ?>

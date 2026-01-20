@@ -772,6 +772,10 @@ final class Plugin {
 			'display'     => array(
 				'show_order_column' => true,
 				'nip_meta_key'      => '_billing_nip',
+				'order_status'      => array(
+					'enabled' => false,
+					'target'  => 'completed',
+				),
 			),
 			'permissions' => array(
 				'minimum_role' => PermissionService::DEFAULT_ROLE,
@@ -827,10 +831,36 @@ final class Plugin {
 
 		// Sanitize display settings.
 		if ( isset( $input['display'] ) && is_array( $input['display'] ) ) {
+			// Preserve existing order_status settings if not being updated.
+			$existing_order_status = $sanitized['display']['order_status'] ?? array(
+				'enabled' => false,
+				'target'  => 'completed',
+			);
+
 			$sanitized['display'] = array(
 				'show_order_column' => ! empty( $input['display']['show_order_column'] ),
 				'nip_meta_key'      => sanitize_text_field( $input['display']['nip_meta_key'] ?? '_billing_nip' ),
+				'order_status'      => $existing_order_status,
 			);
+
+			// Sanitize order_status settings if provided.
+			if ( isset( $input['display']['order_status'] ) && is_array( $input['display']['order_status'] ) ) {
+				$order_status_input = $input['display']['order_status'];
+				$target_status      = sanitize_text_field( $order_status_input['target'] ?? 'completed' );
+
+				// Validate target against WooCommerce order statuses.
+				if ( function_exists( 'wc_get_order_statuses' ) ) {
+					$valid_statuses = array_keys( wc_get_order_statuses() );
+					if ( ! in_array( 'wc-' . $target_status, $valid_statuses, true ) && ! in_array( $target_status, $valid_statuses, true ) ) {
+						$target_status = 'completed';
+					}
+				}
+
+				$sanitized['display']['order_status'] = array(
+					'enabled' => ! empty( $order_status_input['enabled'] ),
+					'target'  => $target_status,
+				);
+			}
 		}
 
 		// Sanitize permissions settings.

@@ -20,6 +20,7 @@ use IHumbak\Invoices\Models\DocumentItem;
 use IHumbak\Invoices\Models\Buyer;
 use IHumbak\Invoices\Models\Seller;
 use IHumbak\Invoices\Modules\Invoice\NumberingService;
+use IHumbak\Invoices\Modules\Invoice\OrderStatusService;
 use IHumbak\Invoices\Modules\Invoice\RefundDataExtractor;
 use IHumbak\Invoices\Modules\Invoice\SuperAdminService;
 use IHumbak\Invoices\Core\Plugin;
@@ -533,6 +534,14 @@ class DocumentController {
 
 			if ( 'issue' === $save_action ) {
 				do_action( 'ihumbak_document_issued', $document );
+
+				// Handle order status change if requested.
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified above.
+				$change_status = ! empty( $_POST['change_order_status'] );
+				if ( $change_status ) {
+					$order_status_service = new OrderStatusService();
+					$order_status_service->maybeChangeOrderStatus( $document, $change_status );
+				}
 			}
 
 			// Redirect back with success message.
