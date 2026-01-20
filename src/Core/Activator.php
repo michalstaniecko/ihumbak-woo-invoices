@@ -101,8 +101,46 @@ class Activator {
 			add_option( 'ihumbak_invoices_settings', $defaults );
 		}
 
+		// Run migrations for existing installations.
+		self::migrate_settings();
+
 		// Store plugin version.
 		update_option( 'ihumbak_invoices_version', IHUMBAK_INVOICES_VERSION );
+	}
+
+	/**
+	 * Migrate settings from older versions.
+	 *
+	 * @return void
+	 */
+	private static function migrate_settings(): void {
+		$settings = get_option( 'ihumbak_invoices_settings' );
+
+		if ( ! is_array( $settings ) ) {
+			return;
+		}
+
+		$updated = false;
+
+		// Migrate nip_meta_key from automation to display section.
+		if ( isset( $settings['automation']['nip_meta_key'] ) ) {
+			// Only migrate if display.nip_meta_key is not set or is default value.
+			if ( ! isset( $settings['display']['nip_meta_key'] )
+				|| '_billing_nip' === $settings['display']['nip_meta_key'] ) {
+				$settings['display']['nip_meta_key'] = $settings['automation']['nip_meta_key'];
+				$updated                             = true;
+			}
+		}
+
+		// Clean up deprecated automation section.
+		if ( isset( $settings['automation'] ) ) {
+			unset( $settings['automation'] );
+			$updated = true;
+		}
+
+		if ( $updated ) {
+			update_option( 'ihumbak_invoices_settings', $settings );
+		}
 	}
 
 	/**
