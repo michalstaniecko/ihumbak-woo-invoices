@@ -162,7 +162,7 @@ class UpdateService {
 		 *
 		 * @since 0.6.0
 		 *
-		 * @param string $branch Branch name. Default 'main'.
+		 * @param string $branch Branch name. Default 'develop'.
 		 */
 		return apply_filters( 'ihumbak_update_branch', self::DEFAULT_BRANCH );
 	}

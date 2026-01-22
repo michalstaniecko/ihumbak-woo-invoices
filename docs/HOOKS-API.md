@@ -496,7 +496,7 @@ apply_filters('ihumbak_update_branch', string $branch);
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| $branch | string | Branch name (default: 'main') |
+| $branch | string | Branch name (default: 'develop') |
 
 **Example:**
 ```php

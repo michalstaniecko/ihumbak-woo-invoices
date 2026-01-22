@@ -21,10 +21,10 @@ The plugin supports automatic updates from GitHub releases. Configure these opti
 
 #### `IHUMBAK_UPDATE_BRANCH`
 
-Branch to check for updates. Default is `main`.
+Branch to check for updates. Default is `develop`.
 
 ```php
-define('IHUMBAK_UPDATE_BRANCH', 'main');
+define('IHUMBAK_UPDATE_BRANCH', 'develop');
 ```
 
 #### `IHUMBAK_GITHUB_ACCESS_TOKEN`
