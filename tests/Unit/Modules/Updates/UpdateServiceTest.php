@@ -73,7 +73,7 @@ class UpdateServiceTest extends TestCase {
 	 * Test default branch constant.
 	 */
 	public function test_default_branch_constant(): void {
-		$this->assertSame( 'main', UpdateService::DEFAULT_BRANCH );
+		$this->assertSame( 'develop', UpdateService::DEFAULT_BRANCH );
 	}
 
 	/**

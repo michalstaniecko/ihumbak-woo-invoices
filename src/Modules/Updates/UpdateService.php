@@ -21,7 +21,7 @@ class UpdateService {
 	/**
 	 * Default GitHub repository URL.
 	 */
-	public const DEFAULT_REPOSITORY_URL = 'https://github.com/michalstaniecko/ihumbak-woo-invoces/';
+	public const DEFAULT_REPOSITORY_URL = 'https://github.com/michalstaniecko/ihumbak-woo-invoices/';
 
 	/**
 	 * Default branch to check for updates.
