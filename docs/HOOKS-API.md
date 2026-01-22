@@ -444,6 +444,112 @@ add_filter('ihumbak_order_status_change_checkbox_default', function($checked, $o
 }, 10, 2);
 ```
 
+### Automatic Updates
+
+#### `ihumbak_updates_enabled`
+Override whether automatic updates are enabled.
+
+```php
+apply_filters('ihumbak_updates_enabled', bool $enabled);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $enabled | bool | Whether updates are enabled (default: true) |
+
+**Example:**
+```php
+// Disable updates in development environment
+add_filter('ihumbak_updates_enabled', function($enabled) {
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        return false;
+    }
+    return $enabled;
+});
+```
+
+#### `ihumbak_update_repository_url`
+Override the GitHub repository URL.
+
+```php
+apply_filters('ihumbak_update_repository_url', string $url);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $url | string | Repository URL |
+
+**Example:**
+```php
+// Use a fork repository
+add_filter('ihumbak_update_repository_url', function($url) {
+    return 'https://github.com/my-org/my-fork/';
+});
+```
+
+#### `ihumbak_update_branch`
+Override the branch to check for updates.
+
+```php
+apply_filters('ihumbak_update_branch', string $branch);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $branch | string | Branch name (default: 'main') |
+
+**Example:**
+```php
+// Check develop branch for beta updates
+add_filter('ihumbak_update_branch', function($branch) {
+    if (get_option('ihumbak_beta_updates')) {
+        return 'develop';
+    }
+    return $branch;
+});
+```
+
+#### `ihumbak_github_access_token`
+Provide GitHub access token programmatically.
+
+```php
+apply_filters('ihumbak_github_access_token', string $token);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $token | string | GitHub personal access token |
+
+**Example:**
+```php
+// Get token from options instead of constant
+add_filter('ihumbak_github_access_token', function($token) {
+    return get_option('ihumbak_github_token', '');
+});
+```
+
+#### `ihumbak_update_info`
+Modify update information before it's displayed or used.
+
+```php
+apply_filters('ihumbak_update_info', object $info);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| $info | object | Update info (version, download URL, changelog, etc.) |
+
+**Example:**
+```php
+// Modify changelog display
+add_filter('ihumbak_update_info', function($info) {
+    if (isset($info->sections['changelog'])) {
+        $info->sections['changelog'] = '<h4>Changes</h4>' . $info->sections['changelog'];
+    }
+    return $info;
+});
+```
+
 ---
 
 ## Related Files
@@ -456,3 +562,4 @@ add_filter('ihumbak_order_status_change_checkbox_default', function($checked, $o
 - `src/Modules/Email/EmailService.php` - Email hooks
 - `src/Modules/Email/AbstractDocumentEmail.php` - Email template hooks
 - `src/Infrastructure/Traits/SiteLocaleTrait.php` - Translation/locale hooks
+- `src/Modules/Updates/UpdateService.php` - Automatic update hooks
