@@ -25,6 +25,7 @@ use IHumbak\Invoices\Modules\Email\ReceiptEmail;
 use IHumbak\Invoices\Modules\Email\CreditNoteEmail;
 use IHumbak\Invoices\Modules\Email\ReceiptReturnEmail;
 use IHumbak\Invoices\Modules\Portal\PortalController;
+use IHumbak\Invoices\Modules\Updates\UpdateService;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 
@@ -81,6 +82,13 @@ final class Plugin {
 	 * @var PortalController|null
 	 */
 	private ?PortalController $portal_controller = null;
+
+	/**
+	 * Update service.
+	 *
+	 * @var UpdateService|null
+	 */
+	private ?UpdateService $update_service = null;
 
 	/**
 	 * Plugin instance.
@@ -185,6 +193,13 @@ final class Plugin {
 	 * @return void
 	 */
 	private function register_services(): void {
+		// Register update service first (per library requirements, must be during plugins_loaded).
+		$this->update_service = new UpdateService();
+		if ( $this->update_service->is_enabled() ) {
+			$this->update_service->init();
+		}
+		$this->container->register( 'update.service', fn() => $this->update_service );
+
 		// Register core services.
 		$this->container->register( 'installer', fn() => new Installer() );
 
@@ -912,6 +927,15 @@ final class Plugin {
 	 */
 	public function getEmailService(): ?EmailService {
 		return $this->email_service;
+	}
+
+	/**
+	 * Get the update service.
+	 *
+	 * @return UpdateService|null
+	 */
+	public function getUpdateService(): ?UpdateService {
+		return $this->update_service;
 	}
 
 	/**

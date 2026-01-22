@@ -15,6 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', '/tmp/wordpress/' );
 }
 
+if ( ! defined( 'WP_PLUGIN_DIR' ) ) {
+    define( 'WP_PLUGIN_DIR', '/tmp/wordpress/wp-content/plugins' );
+}
+
+// Disable update checker in tests to avoid PucFactory initialization issues.
+if ( ! defined( 'IHUMBAK_DISABLE_UPDATES' ) ) {
+    define( 'IHUMBAK_DISABLE_UPDATES', true );
+}
+
 if ( ! defined( 'IHUMBAK_INVOICES_VERSION' ) ) {
     define( 'IHUMBAK_INVOICES_VERSION', '0.2.0' );
 }

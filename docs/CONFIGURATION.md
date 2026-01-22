@@ -15,6 +15,41 @@ define('IHUMBAK_SUPER_ADMIN_IDS', '1,5,12');
 
 See [super-admin-configuration.md](super-admin-configuration.md) for detailed setup instructions.
 
+### Automatic Updates
+
+The plugin supports automatic updates from GitHub releases. Configure these options to customize update behavior:
+
+#### `IHUMBAK_UPDATE_BRANCH`
+
+Branch to check for updates. Default is `develop`.
+
+```php
+define('IHUMBAK_UPDATE_BRANCH', 'develop');
+```
+
+#### `IHUMBAK_GITHUB_ACCESS_TOKEN`
+
+GitHub personal access token for private repositories or to increase API rate limits.
+
+```php
+define('IHUMBAK_GITHUB_ACCESS_TOKEN', 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+```
+
+**Note:** For public repositories, this is optional. For private repositories or to avoid rate limiting, create a token at GitHub > Settings > Developer settings > Personal access tokens with `repo` scope.
+
+#### `IHUMBAK_DISABLE_UPDATES`
+
+Disable automatic update checks entirely.
+
+```php
+define('IHUMBAK_DISABLE_UPDATES', true);
+```
+
+**Use cases:**
+- Development environments where you manage updates manually
+- When using a different update mechanism (e.g., WordPress.org)
+- Testing specific plugin versions
+
 ---
 
 ## Plugin Settings (wp_options)
