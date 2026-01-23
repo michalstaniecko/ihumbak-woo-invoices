@@ -17,15 +17,7 @@ See [super-admin-configuration.md](super-admin-configuration.md) for detailed se
 
 ### Automatic Updates
 
-The plugin supports automatic updates from GitHub releases. Configure these options to customize update behavior:
-
-#### `IHUMBAK_UPDATE_BRANCH`
-
-Branch to check for updates. Default is `develop`.
-
-```php
-define('IHUMBAK_UPDATE_BRANCH', 'develop');
-```
+The plugin supports automatic updates from GitHub releases. Updates are downloaded from release assets (production-ready ZIP files without development files).
 
 #### `IHUMBAK_GITHUB_ACCESS_TOKEN`
 

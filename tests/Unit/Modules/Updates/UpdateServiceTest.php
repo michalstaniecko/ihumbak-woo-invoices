@@ -70,13 +70,6 @@ class UpdateServiceTest extends TestCase {
 	}
 
 	/**
-	 * Test default branch constant.
-	 */
-	public function test_default_branch_constant(): void {
-		$this->assertSame( 'develop', UpdateService::DEFAULT_BRANCH );
-	}
-
-	/**
 	 * Test plugin slug constant.
 	 */
 	public function test_plugin_slug_constant(): void {
@@ -172,35 +165,6 @@ class UpdateServiceTest extends TestCase {
 
 		$result = $this->service->get_repository_url();
 		$this->assertSame( $custom_url, $result );
-	}
-
-	// ==========================================================================
-	// get_branch() tests
-	// ==========================================================================
-
-	/**
-	 * Test get_branch returns default branch.
-	 */
-	public function test_get_branch_returns_default(): void {
-		$result = $this->service->get_branch();
-		$this->assertSame( UpdateService::DEFAULT_BRANCH, $result );
-	}
-
-	/**
-	 * Test get_branch filter can override branch.
-	 */
-	public function test_get_branch_filter_can_override(): void {
-		$custom_branch = 'develop';
-
-		add_filter(
-			'ihumbak_update_branch',
-			function () use ( $custom_branch ) {
-				return $custom_branch;
-			}
-		);
-
-		$result = $this->service->get_branch();
-		$this->assertSame( $custom_branch, $result );
 	}
 
 	// ==========================================================================

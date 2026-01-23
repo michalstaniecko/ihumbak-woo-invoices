@@ -24,11 +24,6 @@ class UpdateService {
 	public const DEFAULT_REPOSITORY_URL = 'https://github.com/michalstaniecko/ihumbak-woo-invoices/';
 
 	/**
-	 * Default branch to check for updates.
-	 */
-	public const DEFAULT_BRANCH = 'develop';
-
-	/**
 	 * Plugin slug.
 	 */
 	public const PLUGIN_SLUG = 'ihumbak-invoices';
@@ -72,7 +67,6 @@ class UpdateService {
 		}
 
 		$repository_url = $this->get_repository_url();
-		$branch         = $this->get_branch();
 		$plugin_file    = $this->get_plugin_file();
 
 		$this->update_checker = PucFactory::buildUpdateChecker(
@@ -80,9 +74,6 @@ class UpdateService {
 			$plugin_file,
 			self::PLUGIN_SLUG
 		);
-
-		// Set the branch.
-		$this->update_checker->setBranch( $branch );
 
 		// Enable release assets for ZIP downloads.
 		// The getVcsApi() returns GitHubApi when using GitHub URL, which has enableReleaseAssets().
@@ -144,27 +135,6 @@ class UpdateService {
 		 * @param string $url Repository URL.
 		 */
 		return apply_filters( 'ihumbak_update_repository_url', self::DEFAULT_REPOSITORY_URL );
-	}
-
-	/**
-	 * Get the branch to check for updates.
-	 *
-	 * @return string
-	 */
-	public function get_branch(): string {
-		// Check for constant first.
-		if ( defined( 'IHUMBAK_UPDATE_BRANCH' ) && is_string( IHUMBAK_UPDATE_BRANCH ) ) {
-			return IHUMBAK_UPDATE_BRANCH;
-		}
-
-		/**
-		 * Filter the branch name to check for updates.
-		 *
-		 * @since 0.6.0
-		 *
-		 * @param string $branch Branch name. Default 'develop'.
-		 */
-		return apply_filters( 'ihumbak_update_branch', self::DEFAULT_BRANCH );
 	}
 
 	/**
