@@ -80,7 +80,7 @@ class UpdateServiceTest extends TestCase {
 	 * Test plugin slug constant.
 	 */
 	public function test_plugin_slug_constant(): void {
-		$this->assertSame( 'ihumbak-woo-invoices', UpdateService::PLUGIN_SLUG );
+		$this->assertSame( 'ihumbak-invoices', UpdateService::PLUGIN_SLUG );
 	}
 
 	// ==========================================================================

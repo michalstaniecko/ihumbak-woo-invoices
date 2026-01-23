@@ -31,7 +31,7 @@ class UpdateService {
 	/**
 	 * Plugin slug.
 	 */
-	public const PLUGIN_SLUG = 'ihumbak-woo-invoices';
+	public const PLUGIN_SLUG = 'ihumbak-invoices';
 
 	/**
 	 * Update checker instance.
