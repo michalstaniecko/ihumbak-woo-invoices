@@ -435,6 +435,13 @@ final class Plugin {
 					'nameRequiredError'      => __( 'Please enter a product name for all items with values.', 'ihumbak-invoices' ),
 					'vatRequiredError'       => __( 'Please enter a VAT rate for all items.', 'ihumbak-invoices' ),
 					'selectOriginalDocument' => __( 'Please select the original document to correct.', 'ihumbak-invoices' ),
+					'adjust'                 => __( 'Adjust', 'ihumbak-invoices' ),
+					'nextNumber'             => __( 'Next number', 'ihumbak-invoices' ),
+					'minAllowed'             => __( 'Minimum allowed', 'ihumbak-invoices' ),
+					'numberTooLow'           => __( 'The next number must be at least 1.', 'ihumbak-invoices' ),
+					/* translators: %1$d: current next number, %2$d: new next number */
+					'confirmAdjust'          => __( 'Are you sure you want to change the next number from %1$d to %2$d?', 'ihumbak-invoices' ),
+					'counterAdjusted'        => __( 'Counter adjusted successfully.', 'ihumbak-invoices' ),
 				),
 			)
 		);

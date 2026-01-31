@@ -142,6 +142,30 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                 </tr>
             </table>
 
+            <?php
+            $super_admin_service = new \IHumbak\Invoices\Modules\Invoice\SuperAdminService();
+            if ( $super_admin_service->isCurrentUserSuperAdmin() ) :
+            ?>
+            <h2><?php esc_html_e( 'Counter Adjustment', 'ihumbak-invoices' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Adjust the next document number. Use when documents were deleted after being reverted to draft.', 'ihumbak-invoices' ); ?>
+            </p>
+
+            <div class="notice notice-warning inline" style="margin: 10px 0;">
+                <p>
+                    <strong><?php esc_html_e( 'Warning:', 'ihumbak-invoices' ); ?></strong>
+                    <?php esc_html_e( 'Changing these values may cause numbering gaps or duplicates. Use with caution.', 'ihumbak-invoices' ); ?>
+                </p>
+            </div>
+
+            <table class="form-table" id="ihumbak-numbering-adjustment">
+                <tbody>
+                    <!-- Populated via JavaScript -->
+                </tbody>
+            </table>
+            <p id="ihumbak-numbering-loading"><?php esc_html_e( 'Loading...', 'ihumbak-invoices' ); ?></p>
+            <?php endif; ?>
+
         <?php elseif ( 'pdf' === $active_tab ) : ?>
             <?php
             $template_registry   = \IHumbak\Invoices\Core\Plugin::get_instance()->container()->get( 'pdf.template_registry' );
