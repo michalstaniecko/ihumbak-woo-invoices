@@ -13,6 +13,7 @@ use IHumbak\Invoices\Modules\Invoice\CalculationService;
 use IHumbak\Invoices\Modules\Invoice\NumberingService;
 use IHumbak\Invoices\Modules\Invoice\OrderDataExtractor;
 use IHumbak\Invoices\Modules\Invoice\RefundDataExtractor;
+use IHumbak\Invoices\Modules\Invoice\SuperAdminService;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 use IHumbak\Invoices\Core\Plugin;
@@ -74,6 +75,8 @@ class AjaxController {
 		add_action( 'wp_ajax_ihumbak_fetch_invoice_data', array( $this, 'fetch_invoice_data' ) );
 		add_action( 'wp_ajax_ihumbak_fetch_receipt_data', array( $this, 'fetch_receipt_data' ) );
 		add_action( 'wp_ajax_ihumbak_fetch_refund_data', array( $this, 'fetch_refund_data' ) );
+		add_action( 'wp_ajax_ihumbak_get_numbering_state', array( $this, 'get_numbering_state' ) );
+		add_action( 'wp_ajax_ihumbak_adjust_numbering', array( $this, 'adjust_numbering' ) );
 	}
 
 	/**
@@ -432,5 +435,130 @@ class AjaxController {
 		}
 
 		wp_send_json_success( $refund_data );
+	}
+
+	/**
+	 * Get numbering state for all document types.
+	 *
+	 * Returns current counter state for super-admins to view and manage.
+	 *
+	 * @return void
+	 */
+	public function get_numbering_state(): void {
+		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
+
+		// Check super-admin permission.
+		$super_admin = new SuperAdminService();
+		if ( ! $super_admin->isCurrentUserSuperAdmin() ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
+		}
+
+		$settings      = Plugin::get_instance()->get_settings();
+		$reset_monthly = $settings['numbering']['reset_monthly'] ?? true;
+
+		$types  = array( 'invoice', 'receipt', 'credit_note', 'receipt_return' );
+		$states = array();
+
+		foreach ( $types as $type ) {
+			$state           = $this->numbering_service->getCounterState( $type, $reset_monthly );
+			$states[ $type ] = array(
+				'label'        => $this->get_document_type_label( $type ),
+				'current_next' => $state['next_number'],
+				'last_number'  => $state['last_number'],
+				'year'         => $state['year'],
+				'month'        => $state['month'],
+				'min_allowed'  => 1,
+			);
+		}
+
+		wp_send_json_success( $states );
+	}
+
+	/**
+	 * Adjust numbering counter for a document type.
+	 *
+	 * Allows super-admins to manually set the next document number.
+	 *
+	 * @return void
+	 */
+	public function adjust_numbering(): void {
+		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
+
+		// Check super-admin permission.
+		$super_admin = new SuperAdminService();
+		if ( ! $super_admin->isCurrentUserSuperAdmin() ) {
+			wp_send_json_error( array( 'message' => __( 'Only super-admins can adjust numbering.', 'ihumbak-invoices' ) ) );
+		}
+
+		$document_type = isset( $_POST['document_type'] ) ? sanitize_text_field( wp_unslash( $_POST['document_type'] ) ) : '';
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- absint sanitizes.
+		$next_number = isset( $_POST['next_number'] ) ? absint( wp_unslash( $_POST['next_number'] ) ) : 0;
+
+		/**
+		 * Fires when a numbering adjustment is attempted.
+		 *
+		 * Useful for logging all adjustment attempts, including failed ones.
+		 *
+		 * @since 0.5.7
+		 *
+		 * @param string $document_type Requested document type.
+		 * @param int    $next_number   Requested next number.
+		 * @param int    $user_id       ID of the user attempting the adjustment.
+		 */
+		do_action(
+			'ihumbak_numbering_adjustment_attempted',
+			$document_type,
+			$next_number,
+			get_current_user_id()
+		);
+
+		// Validate document type.
+		$valid_types = array( 'invoice', 'receipt', 'credit_note', 'receipt_return' );
+		if ( ! in_array( $document_type, $valid_types, true ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid document type.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Validate next_number (must be at least 1).
+		if ( $next_number < 1 ) {
+			wp_send_json_error( array( 'message' => __( 'Next number must be at least 1.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Set last_number = next_number - 1.
+		$settings      = Plugin::get_instance()->get_settings();
+		$reset_monthly = $settings['numbering']['reset_monthly'] ?? true;
+
+		$result = $this->numbering_service->setLastNumber(
+			$document_type,
+			$next_number - 1,
+			$reset_monthly
+		);
+
+		if ( $result ) {
+			wp_send_json_success(
+				array(
+					'message'     => __( 'Counter adjusted successfully.', 'ihumbak-invoices' ),
+					'next_number' => $next_number,
+				)
+			);
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to adjust counter.', 'ihumbak-invoices' ) ) );
+		}
+	}
+
+	/**
+	 * Get human-readable label for document type.
+	 *
+	 * @param string $type Document type key.
+	 * @return string Translated label.
+	 */
+	private function get_document_type_label( string $type ): string {
+		$labels = array(
+			'invoice'        => __( 'Invoice', 'ihumbak-invoices' ),
+			'receipt'        => __( 'Receipt', 'ihumbak-invoices' ),
+			'credit_note'    => __( 'Credit Note', 'ihumbak-invoices' ),
+			'receipt_return' => __( 'Receipt Return', 'ihumbak-invoices' ),
+		);
+
+		return $labels[ $type ] ?? $type;
 	}
 }

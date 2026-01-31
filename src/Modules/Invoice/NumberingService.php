@@ -115,17 +115,7 @@ class NumberingService {
 
 		try {
 			// Build WHERE clause.
-			$where = $this->wpdb->prepare(
-				'document_type = %s AND year = %d',
-				$document_type,
-				$year
-			);
-
-			if ( null !== $month ) {
-				$where .= $this->wpdb->prepare( ' AND month = %d', $month );
-			} else {
-				$where .= ' AND month IS NULL';
-			}
+			$where = $this->buildWhereClause( $document_type, $year, $month );
 
 			// Use SELECT ... FOR UPDATE for row-level locking (if supported).
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -178,6 +168,24 @@ class NumberingService {
 	 * @return int
 	 */
 	private function getLastNumber( string $document_type, int $year, ?int $month ): int {
+		$where = $this->buildWhereClause( $document_type, $year, $month );
+
+		$last_number = $this->wpdb->get_var(
+			"SELECT last_number FROM {$this->table} WHERE {$where}"
+		);
+
+		return (int) ( $last_number ?? 0 );
+	}
+
+	/**
+	 * Build WHERE clause for document type and period.
+	 *
+	 * @param string   $document_type Document type.
+	 * @param int      $year          Year.
+	 * @param int|null $month         Month (null if not resetting monthly).
+	 * @return string WHERE clause (without WHERE keyword).
+	 */
+	private function buildWhereClause( string $document_type, int $year, ?int $month ): string {
 		$where = $this->wpdb->prepare(
 			'document_type = %s AND year = %d',
 			$document_type,
@@ -190,11 +198,7 @@ class NumberingService {
 			$where .= ' AND month IS NULL';
 		}
 
-		$last_number = $this->wpdb->get_var(
-			"SELECT last_number FROM {$this->table} WHERE {$where}"
-		);
-
-		return (int) ( $last_number ?? 0 );
+		return $where;
 	}
 
 	/**
@@ -238,5 +242,114 @@ class NumberingService {
 			'correction'     => 'FK/{YYYY}/{MM}/{NNNN}', // Legacy - kept for backward compatibility.
 			default          => 'DOC/{YYYY}/{MM}/{NNNN}',
 		};
+	}
+
+	/**
+	 * Get counter state for a document type.
+	 *
+	 * Returns information about the current numbering counter state
+	 * including last number used, next number that will be assigned,
+	 * and the year/month context.
+	 *
+	 * @param string $document_type Document type (invoice, receipt, credit_note, receipt_return).
+	 * @param bool   $reset_monthly Whether numbering resets monthly.
+	 * @return array{last_number: int, next_number: int, year: int, month: int|null}
+	 */
+	public function getCounterState( string $document_type, bool $reset_monthly = true ): array {
+		$year  = (int) gmdate( 'Y' );
+		$month = $reset_monthly ? (int) gmdate( 'n' ) : null;
+		$last  = $this->getLastNumber( $document_type, $year, $month );
+
+		return array(
+			'last_number' => $last,
+			'next_number' => $last + 1,
+			'year'        => $year,
+			'month'       => $month,
+		);
+	}
+
+	/**
+	 * Set the last used number for a document type.
+	 *
+	 * This allows manual adjustment of the numbering counter, typically
+	 * used when documents are deleted after being issued and the admin
+	 * wants to reclaim the number to avoid gaps.
+	 *
+	 * @param string $document_type Document type (invoice, receipt, credit_note, receipt_return).
+	 * @param int    $last_number   The new last number value (next will be last+1).
+	 * @param bool   $reset_monthly Whether numbering resets monthly.
+	 * @return bool True on success, false on failure.
+	 */
+	public function setLastNumber( string $document_type, int $last_number, bool $reset_monthly = true ): bool {
+		// Validate last_number is non-negative.
+		if ( $last_number < 0 ) {
+			return false;
+		}
+
+		$year  = (int) gmdate( 'Y' );
+		$month = $reset_monthly ? (int) gmdate( 'n' ) : null;
+
+		// Get current last number for the action hook.
+		$old_last_number = $this->getLastNumber( $document_type, $year, $month );
+
+		// Build WHERE clause.
+		$where = $this->buildWhereClause( $document_type, $year, $month );
+
+		// Check if row exists.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$row = $this->wpdb->get_row(
+			"SELECT id FROM {$this->table} WHERE {$where}",
+			ARRAY_A
+		);
+
+		if ( $row ) {
+			// Update existing counter.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$result = $this->wpdb->update(
+				$this->table,
+				array( 'last_number' => $last_number ),
+				array( 'id' => $row['id'] ),
+				array( '%d' ),
+				array( '%d' )
+			);
+		} else {
+			// Insert new counter.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$result = $this->wpdb->insert(
+				$this->table,
+				array(
+					'document_type' => $document_type,
+					'year'          => $year,
+					'month'         => $month,
+					'last_number'   => $last_number,
+					'pattern'       => self::getDefaultPattern( $document_type ),
+				),
+				array( '%s', '%d', '%d', '%d', '%s' )
+			);
+		}
+
+		if ( false !== $result ) {
+			/**
+			 * Fires when a document numbering counter is manually adjusted.
+			 *
+			 * @since 0.5.7
+			 *
+			 * @param string $document_type Document type that was adjusted.
+			 * @param int    $old_number    Previous last number value.
+			 * @param int    $new_number    New last number value.
+			 * @param int    $user_id       ID of the user who made the adjustment.
+			 */
+			do_action(
+				'ihumbak_numbering_adjusted',
+				$document_type,
+				$old_last_number,
+				$last_number,
+				get_current_user_id()
+			);
+
+			return true;
+		}
+
+		return false;
 	}
 }
