@@ -143,7 +143,12 @@
                     if (response.success) {
                         self.renderTable(response.data);
                     } else {
-                        self.showError(response.data.message || ihumbakInvoices.i18n.error);
+                        var message = response.data.message || ihumbakInvoices.i18n.error;
+                        if (message.toLowerCase().indexOf('nonce') !== -1 ||
+                            message.toLowerCase().indexOf('session') !== -1) {
+                            message = ihumbakInvoices.i18n.sessionExpired || 'Session expired. Please refresh the page.';
+                        }
+                        self.showError(message);
                     }
                 },
                 error: function() {
@@ -248,7 +253,12 @@
                         $input.data('original', newValue);
                         alert(ihumbakInvoices.i18n.counterAdjusted);
                     } else {
-                        alert(response.data.message || ihumbakInvoices.i18n.error);
+                        var message = response.data.message || ihumbakInvoices.i18n.error;
+                        if (message.toLowerCase().indexOf('nonce') !== -1 ||
+                            message.toLowerCase().indexOf('session') !== -1) {
+                            message = ihumbakInvoices.i18n.sessionExpired || 'Session expired. Please refresh the page.';
+                        }
+                        alert(message);
                         $input.val(originalValue);
                     }
                 },
@@ -261,9 +271,8 @@
         },
 
         showError: function(message) {
-            this.$table.find('tbody').html(
-                '<tr><td colspan="2" style="color: #d63638;">' + message + '</td></tr>'
-            );
+            var $cell = $('<td colspan="2" style="color: #d63638;"></td>').text(message);
+            this.$table.find('tbody').html($('<tr></tr>').append($cell));
         }
     };
 

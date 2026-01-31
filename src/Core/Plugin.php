@@ -442,6 +442,7 @@ final class Plugin {
 					/* translators: %1$d: current next number, %2$d: new next number */
 					'confirmAdjust'          => __( 'Are you sure you want to change the next number from %1$d to %2$d?', 'ihumbak-invoices' ),
 					'counterAdjusted'        => __( 'Counter adjusted successfully.', 'ihumbak-invoices' ),
+					'sessionExpired'         => __( 'Session expired. Please refresh the page.', 'ihumbak-invoices' ),
 				),
 			)
 		);

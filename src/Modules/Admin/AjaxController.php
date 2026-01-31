@@ -494,6 +494,24 @@ class AjaxController {
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- absint sanitizes.
 		$next_number = isset( $_POST['next_number'] ) ? absint( wp_unslash( $_POST['next_number'] ) ) : 0;
 
+		/**
+		 * Fires when a numbering adjustment is attempted.
+		 *
+		 * Useful for logging all adjustment attempts, including failed ones.
+		 *
+		 * @since 0.5.7
+		 *
+		 * @param string $document_type Requested document type.
+		 * @param int    $next_number   Requested next number.
+		 * @param int    $user_id       ID of the user attempting the adjustment.
+		 */
+		do_action(
+			'ihumbak_numbering_adjustment_attempted',
+			$document_type,
+			$next_number,
+			get_current_user_id()
+		);
+
 		// Validate document type.
 		$valid_types = array( 'invoice', 'receipt', 'credit_note', 'receipt_return' );
 		if ( ! in_array( $document_type, $valid_types, true ) ) {

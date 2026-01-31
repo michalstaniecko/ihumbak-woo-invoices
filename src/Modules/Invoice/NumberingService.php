@@ -115,17 +115,7 @@ class NumberingService {
 
 		try {
 			// Build WHERE clause.
-			$where = $this->wpdb->prepare(
-				'document_type = %s AND year = %d',
-				$document_type,
-				$year
-			);
-
-			if ( null !== $month ) {
-				$where .= $this->wpdb->prepare( ' AND month = %d', $month );
-			} else {
-				$where .= ' AND month IS NULL';
-			}
+			$where = $this->buildWhereClause( $document_type, $year, $month );
 
 			// Use SELECT ... FOR UPDATE for row-level locking (if supported).
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
@@ -178,6 +168,24 @@ class NumberingService {
 	 * @return int
 	 */
 	private function getLastNumber( string $document_type, int $year, ?int $month ): int {
+		$where = $this->buildWhereClause( $document_type, $year, $month );
+
+		$last_number = $this->wpdb->get_var(
+			"SELECT last_number FROM {$this->table} WHERE {$where}"
+		);
+
+		return (int) ( $last_number ?? 0 );
+	}
+
+	/**
+	 * Build WHERE clause for document type and period.
+	 *
+	 * @param string   $document_type Document type.
+	 * @param int      $year          Year.
+	 * @param int|null $month         Month (null if not resetting monthly).
+	 * @return string WHERE clause (without WHERE keyword).
+	 */
+	private function buildWhereClause( string $document_type, int $year, ?int $month ): string {
 		$where = $this->wpdb->prepare(
 			'document_type = %s AND year = %d',
 			$document_type,
@@ -190,11 +198,7 @@ class NumberingService {
 			$where .= ' AND month IS NULL';
 		}
 
-		$last_number = $this->wpdb->get_var(
-			"SELECT last_number FROM {$this->table} WHERE {$where}"
-		);
-
-		return (int) ( $last_number ?? 0 );
+		return $where;
 	}
 
 	/**
@@ -277,6 +281,11 @@ class NumberingService {
 	 * @return bool True on success, false on failure.
 	 */
 	public function setLastNumber( string $document_type, int $last_number, bool $reset_monthly = true ): bool {
+		// Validate last_number is non-negative.
+		if ( $last_number < 0 ) {
+			return false;
+		}
+
 		$year  = (int) gmdate( 'Y' );
 		$month = $reset_monthly ? (int) gmdate( 'n' ) : null;
 
@@ -284,17 +293,7 @@ class NumberingService {
 		$old_last_number = $this->getLastNumber( $document_type, $year, $month );
 
 		// Build WHERE clause.
-		$where = $this->wpdb->prepare(
-			'document_type = %s AND year = %d',
-			$document_type,
-			$year
-		);
-
-		if ( null !== $month ) {
-			$where .= $this->wpdb->prepare( ' AND month = %d', $month );
-		} else {
-			$where .= ' AND month IS NULL';
-		}
+		$where = $this->buildWhereClause( $document_type, $year, $month );
 
 		// Check if row exists.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
