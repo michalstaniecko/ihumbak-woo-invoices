@@ -269,6 +269,8 @@ class EmailService {
 			$pdf_content = $this->getPdfGenerator()->generateContent( $document );
 
 			if ( empty( $pdf_content ) ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] PDF content is empty for document: ' . $document->getDocumentNumber() );
 				return null;
 			}
 
@@ -276,6 +278,8 @@ class EmailService {
 			$temp_file = wp_tempnam( 'ihumbak_' . $document->getDocumentType() . '_' );
 
 			if ( ! $temp_file ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] Failed to create temp file for document: ' . $document->getDocumentNumber() );
 				return null;
 			}
 
@@ -284,17 +288,46 @@ class EmailService {
 			$written = file_put_contents( $temp_file, $pdf_content );
 
 			if ( false === $written ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] Failed to write PDF content to temp file: ' . $temp_file );
 				return null;
 			}
 
 			// Rename to .pdf extension.
 			$pdf_file = $temp_file . '.pdf';
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Renaming temp file.
-			rename( $temp_file, $pdf_file );
+
+			// Try rename first, fallback to copy+unlink if rename fails.
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged -- Silencing intentional, using fallback.
+			$renamed = @rename( $temp_file, $pdf_file );
+
+			if ( ! $renamed ) {
+				// Fallback: copy and delete original.
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors.Discouraged -- Silencing intentional, checking return value.
+				$copied = @copy( $temp_file, $pdf_file );
+				if ( $copied ) {
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink, WordPress.PHP.NoSilencedErrors.Discouraged -- Cleanup temp file after successful copy.
+					@unlink( $temp_file );
+				} else {
+					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+					error_log( '[iHumbak Invoices] Failed to rename/copy temp file to PDF: ' . $temp_file . ' -> ' . $pdf_file );
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink, WordPress.PHP.NoSilencedErrors.Discouraged -- Cleanup failed temp file.
+					@unlink( $temp_file );
+					return null;
+				}
+			}
+
+			// Verify file exists.
+			if ( ! file_exists( $pdf_file ) ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] PDF file does not exist after creation: ' . $pdf_file );
+				return null;
+			}
 
 			return $pdf_file;
 
 		} catch ( \Exception $e ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+			error_log( '[iHumbak Invoices] Exception generating PDF attachment: ' . $e->getMessage() );
 			return null;
 		}
 	}

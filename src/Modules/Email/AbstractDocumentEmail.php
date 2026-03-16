@@ -371,6 +371,9 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 			if ( $pdf_path && file_exists( $pdf_path ) ) {
 				$attachments[] = $pdf_path;
 
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] PDF attachment added: ' . $pdf_path . ' for document: ' . $this->document->getDocumentNumber() );
+
 				// Schedule cleanup of temp file.
 				add_action(
 					'shutdown',
@@ -381,6 +384,9 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 						}
 					}
 				);
+			} else {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] PDF attachment NOT added for document: ' . $this->document->getDocumentNumber() . ' (path: ' . ( $pdf_path ?: 'null' ) . ')' );
 			}
 		}
 
