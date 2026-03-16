@@ -290,19 +290,6 @@ final class Plugin {
 
 		// Auto-send email on document issue.
 		add_action( 'ihumbak_document_issued', array( $this, 'handle_document_issued' ) );
-
-		// Debug: log PHPMailer attachments.
-		add_action(
-			'phpmailer_init',
-			function ( $phpmailer ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-				error_log( '[iHumbak Invoices] DEBUG: PHPMailer attachments count: ' . count( $phpmailer->getAttachments() ) );
-				foreach ( $phpmailer->getAttachments() as $attachment ) {
-					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-					error_log( '[iHumbak Invoices] DEBUG: PHPMailer attachment: ' . wp_json_encode( $attachment ) );
-				}
-			}
-		);
 	}
 
 	/**

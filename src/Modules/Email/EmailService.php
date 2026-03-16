@@ -16,6 +16,7 @@ use IHumbak\Invoices\Models\Invoice;
 use IHumbak\Invoices\Models\Receipt;
 use IHumbak\Invoices\Models\CreditNote;
 use IHumbak\Invoices\Modules\PDF\PdfGenerator;
+use IHumbak\Invoices\Modules\PDF\PdfCacheManager;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Core\Plugin;
 
@@ -37,6 +38,13 @@ class EmailService {
 	 * @var DocumentRepository|null
 	 */
 	private ?DocumentRepository $document_repository = null;
+
+	/**
+	 * PDF cache manager instance (lazy loaded).
+	 *
+	 * @var PdfCacheManager|null
+	 */
+	private ?PdfCacheManager $cache_manager = null;
 
 	/**
 	 * Constructor.
@@ -77,6 +85,18 @@ class EmailService {
 			$this->document_repository = new DocumentRepository();
 		}
 		return $this->document_repository;
+	}
+
+	/**
+	 * Get PDF cache manager instance (lazy loaded).
+	 *
+	 * @return PdfCacheManager
+	 */
+	private function getCacheManager(): PdfCacheManager {
+		if ( null === $this->cache_manager ) {
+			$this->cache_manager = Plugin::get_instance()->container()->get( 'pdf.cache_manager' );
+		}
+		return $this->cache_manager;
 	}
 
 	/**
@@ -259,13 +279,22 @@ class EmailService {
 	/**
 	 * Generate PDF attachment file path.
 	 *
-	 * Creates a temporary PDF file for email attachment.
+	 * Uses cached PDF from uploads directory if available, otherwise generates and caches.
 	 *
 	 * @param Document $document The document.
-	 * @return string|null Path to temporary PDF file or null on failure.
+	 * @return string|null Path to PDF file in uploads directory or null on failure.
 	 */
 	public function generatePdfAttachment( Document $document ): ?string {
 		try {
+			$cache_manager = $this->getCacheManager();
+			$pdf_path      = $cache_manager->getCachePath( $document );
+
+			// Use cached PDF if exists.
+			if ( $cache_manager->hasCachedPdf( $document ) ) {
+				return $pdf_path;
+			}
+
+			// Generate PDF content.
 			$pdf_content = $this->getPdfGenerator()->generateContent( $document );
 
 			if ( empty( $pdf_content ) ) {
@@ -274,68 +303,10 @@ class EmailService {
 				return null;
 			}
 
-			// Create temp file.
-			$temp_file = wp_tempnam( 'ihumbak_' . $document->getDocumentType() . '_' );
+			// Save to uploads directory.
+			$saved_path = $cache_manager->savePdf( $document, $pdf_content );
 
-			if ( ! $temp_file ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-				error_log( '[iHumbak Invoices] Failed to create temp file for document: ' . $document->getDocumentNumber() );
-				return null;
-			}
-
-			// Write PDF content.
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Temp file for email attachment.
-			$written = file_put_contents( $temp_file, $pdf_content );
-
-			if ( false === $written ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-				error_log( '[iHumbak Invoices] Failed to write PDF content to temp file: ' . $temp_file );
-				return null;
-			}
-
-			// Rename to .pdf extension.
-			$pdf_file = $temp_file . '.pdf';
-
-			// Debug logging for filesystem diagnostics.
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-			error_log( '[iHumbak Invoices] DEBUG: Temp dir used by WordPress: ' . get_temp_dir() );
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-			error_log( '[iHumbak Invoices] DEBUG: Temp file created: ' . $temp_file );
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-			error_log( '[iHumbak Invoices] DEBUG: Target PDF file: ' . $pdf_file );
-
-			// Try rename first, fallback to copy+unlink if rename fails.
-			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged -- Silencing intentional, using fallback.
-			$renamed = @rename( $temp_file, $pdf_file );
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-			error_log( '[iHumbak Invoices] DEBUG: rename() result: ' . ( $renamed ? 'success' : 'failed' ) );
-
-			if ( ! $renamed ) {
-				// Fallback: copy and delete original.
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors.Discouraged -- Silencing intentional, checking return value.
-				$copied = @copy( $temp_file, $pdf_file );
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-				error_log( '[iHumbak Invoices] DEBUG: copy() fallback result: ' . ( $copied ? 'success' : 'failed' ) );
-				if ( $copied ) {
-					// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink, WordPress.PHP.NoSilencedErrors.Discouraged -- Cleanup temp file after successful copy.
-					@unlink( $temp_file );
-				} else {
-					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-					error_log( '[iHumbak Invoices] Failed to rename/copy temp file to PDF: ' . $temp_file . ' -> ' . $pdf_file );
-					// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink, WordPress.PHP.NoSilencedErrors.Discouraged -- Cleanup failed temp file.
-					@unlink( $temp_file );
-					return null;
-				}
-			}
-
-			// Verify file exists.
-			if ( ! file_exists( $pdf_file ) ) {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-				error_log( '[iHumbak Invoices] PDF file does not exist after creation: ' . $pdf_file );
-				return null;
-			}
-
-			return $pdf_file;
+			return $saved_path;
 
 		} catch ( \Exception $e ) {
 			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.

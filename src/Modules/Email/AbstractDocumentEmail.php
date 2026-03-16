@@ -370,22 +370,8 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 
 			if ( $pdf_path && file_exists( $pdf_path ) ) {
 				$attachments[] = $pdf_path;
-
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-				error_log( '[iHumbak Invoices] PDF attachment added: ' . $pdf_path . ' for document: ' . $this->document->getDocumentNumber() );
-
-				// Schedule cleanup of temp file.
-				add_action(
-					'shutdown',
-					function () use ( $pdf_path ) {
-						if ( file_exists( $pdf_path ) ) {
-							// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Cleanup temp file.
-							unlink( $pdf_path );
-						}
-					}
-				);
 			} else {
-				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Log when PDF attachment fails.
 				error_log( '[iHumbak Invoices] PDF attachment NOT added for document: ' . $this->document->getDocumentNumber() . ' (path: ' . ( $pdf_path ?: 'null' ) . ')' );
 			}
 		}
@@ -397,12 +383,7 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 		 * @param Document $document    The document.
 		 * @param self     $email       Email instance.
 		 */
-		$final_attachments = apply_filters( 'ihumbak_email_attachments', $attachments, $this->document, $this );
-
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
-		error_log( '[iHumbak Invoices] DEBUG: get_attachments() returning: ' . wp_json_encode( $final_attachments ) );
-
-		return $final_attachments;
+		return apply_filters( 'ihumbak_email_attachments', $attachments, $this->document, $this );
 	}
 
 	/**
