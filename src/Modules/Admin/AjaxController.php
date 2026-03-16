@@ -14,6 +14,7 @@ use IHumbak\Invoices\Modules\Invoice\NumberingService;
 use IHumbak\Invoices\Modules\Invoice\OrderDataExtractor;
 use IHumbak\Invoices\Modules\Invoice\RefundDataExtractor;
 use IHumbak\Invoices\Modules\Invoice\SuperAdminService;
+use IHumbak\Invoices\Modules\Email\EmailService;
 use IHumbak\Invoices\Infrastructure\Database\DocumentRepository;
 use IHumbak\Invoices\Infrastructure\Database\DocumentItemRepository;
 use IHumbak\Invoices\Core\Plugin;
@@ -77,6 +78,7 @@ class AjaxController {
 		add_action( 'wp_ajax_ihumbak_fetch_refund_data', array( $this, 'fetch_refund_data' ) );
 		add_action( 'wp_ajax_ihumbak_get_numbering_state', array( $this, 'get_numbering_state' ) );
 		add_action( 'wp_ajax_ihumbak_adjust_numbering', array( $this, 'adjust_numbering' ) );
+		add_action( 'wp_ajax_ihumbak_send_debug_email', array( $this, 'send_debug_email' ) );
 	}
 
 	/**
@@ -560,5 +562,101 @@ class AjaxController {
 		);
 
 		return $labels[ $type ] ?? $type;
+	}
+
+	/**
+	 * Send debug email with PDF attachment.
+	 *
+	 * Sends a test email to verify SMTP configuration and PDF generation.
+	 *
+	 * @return void
+	 */
+	public function send_debug_email(): void {
+		check_ajax_referer( 'ihumbak_invoices_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Validate email.
+		$email = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
+
+		if ( empty( $email ) || ! is_email( $email ) ) {
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Find a suitable document (not draft, not cancelled).
+		$repository = new DocumentRepository();
+		$documents  = $repository->findAll( array(), 10, 0 );
+		$document   = null;
+
+		foreach ( $documents as $doc ) {
+			if ( ! $doc->isDraft() && ! $doc->isCancelled() ) {
+				$document = $doc;
+				break;
+			}
+		}
+
+		if ( ! $document ) {
+			wp_send_json_error( array( 'message' => __( 'No issued documents found. Please issue at least one document first.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Load document items.
+		$item_repository = new DocumentItemRepository();
+		$items           = $item_repository->findByDocumentId( $document->getId() );
+		$document->setItems( $items );
+
+		// Generate PDF attachment.
+		$email_service = new EmailService();
+		$pdf_path      = $email_service->generatePdfAttachment( $document );
+
+		if ( ! $pdf_path ) {
+			wp_send_json_error( array( 'message' => __( 'Failed to generate PDF attachment.', 'ihumbak-invoices' ) ) );
+		}
+
+		// Prepare email.
+		$subject = sprintf(
+			/* translators: %s: document number */
+			__( '[Debug] Test email - Document %s', 'ihumbak-invoices' ),
+			$document->getDocumentNumber()
+		);
+
+		/* translators: 1: document type, 2: document number */
+		$message_template = __(
+			"This is a debug email from iHumbak WooCommerce Invoices plugin.\n\nDocument type: %1\$s\nDocument number: %2\$s\n\nIf you received this email with a PDF attachment, your email configuration is working correctly.",
+			'ihumbak-invoices'
+		);
+
+		$message = sprintf(
+			$message_template,
+			$this->get_document_type_label( $document->getDocumentType() ),
+			$document->getDocumentNumber()
+		);
+
+		$headers = array( 'Content-Type: text/plain; charset=UTF-8' );
+
+		// Get PDF filename.
+		$pdf_filename = $email_service->getPdfFilename( $document );
+
+		// Send email.
+		$result = wp_mail( $email, $subject, $message, $headers, array( $pdf_path ) );
+
+		// Cleanup temp file.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink, WordPress.PHP.NoSilencedErrors.Discouraged -- Cleanup temp file after sending.
+		@unlink( $pdf_path );
+
+		if ( $result ) {
+			wp_send_json_success(
+				array(
+					'message' => sprintf(
+						/* translators: %s: email address */
+						__( 'Debug email sent successfully to %s', 'ihumbak-invoices' ),
+						$email
+					),
+				)
+			);
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to send email. Please check your SMTP configuration.', 'ihumbak-invoices' ) ) );
+		}
 	}
 }

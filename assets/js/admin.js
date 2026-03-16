@@ -114,6 +114,70 @@
     };
 
     /**
+     * Debug email handler.
+     */
+    var debugEmailHandler = {
+        init: function() {
+            var $button = $('#ihumbak_send_debug_email');
+            if (!$button.length) {
+                return;
+            }
+
+            this.$button = $button;
+            this.$input = $('#ihumbak_debug_email');
+            this.$result = $('#ihumbak_debug_email_result');
+            this.originalText = $button.text();
+
+            $button.on('click', this.handleSend.bind(this));
+        },
+
+        handleSend: function(e) {
+            e.preventDefault();
+
+            var self = this;
+            var email = this.$input.val().trim();
+
+            // Validate email.
+            if (!email) {
+                this.showResult(ihumbakInvoices.i18n.debugEmailRequired || 'Please enter an email address.', 'error');
+                return;
+            }
+
+            // Disable button and show loading state.
+            this.$button.prop('disabled', true).text(ihumbakInvoices.i18n.debugEmailSending || 'Sending...');
+            this.$result.empty();
+
+            $.ajax({
+                url: ihumbakInvoices.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'ihumbak_send_debug_email',
+                    nonce: ihumbakInvoices.nonce,
+                    email: email
+                },
+                success: function(response) {
+                    self.$button.prop('disabled', false).text(self.originalText);
+                    if (response.success) {
+                        self.showResult(response.data.message, 'success');
+                    } else {
+                        var message = response.data.message || ihumbakInvoices.i18n.error;
+                        self.showResult(message, 'error');
+                    }
+                },
+                error: function() {
+                    self.$button.prop('disabled', false).text(self.originalText);
+                    self.showResult(ihumbakInvoices.i18n.error, 'error');
+                }
+            });
+        },
+
+        showResult: function(message, type) {
+            var className = type === 'success' ? 'notice notice-success' : 'notice notice-error';
+            this.$result.html('<div class="' + className + '" style="padding: 10px; margin: 0;"><p>' + message + '</p></div>');
+        }
+    };
+
+    /**
      * Counter adjustment handler for super-admins.
      */
     var counterAdjustmentHandler = {
@@ -293,6 +357,9 @@
 
         // Initialize counter adjustment handler.
         counterAdjustmentHandler.init();
+
+        // Initialize debug email handler.
+        debugEmailHandler.init();
     });
 
 })(jQuery);

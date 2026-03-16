@@ -412,6 +412,29 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                 );
                 ?>
             </p>
+
+            <h2><?php esc_html_e( 'Debug Email', 'ihumbak-invoices' ); ?></h2>
+            <p class="description">
+                <?php esc_html_e( 'Send a test email with a PDF attachment to verify your email configuration. Uses the most recent issued document.', 'ihumbak-invoices' ); ?>
+            </p>
+
+            <table class="form-table">
+                <tr>
+                    <th scope="row">
+                        <label for="ihumbak_debug_email"><?php esc_html_e( 'Recipient Email', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <input type="email"
+                               id="ihumbak_debug_email"
+                               class="regular-text"
+                               placeholder="<?php echo esc_attr( wp_get_current_user()->user_email ); ?>">
+                        <button type="button" class="button" id="ihumbak_send_debug_email">
+                            <?php esc_html_e( 'Send Debug Email', 'ihumbak-invoices' ); ?>
+                        </button>
+                        <div id="ihumbak_debug_email_result" style="margin-top: 10px;"></div>
+                    </td>
+                </tr>
+            </table>
         <?php endif; ?>
 
         <?php submit_button(); ?>
