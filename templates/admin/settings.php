@@ -43,6 +43,7 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
 
     <form method="post" action="options.php">
         <?php settings_fields( 'ihumbak_invoices_settings' ); ?>
+        <input type="hidden" name="ihumbak_invoices_settings[_tab]" value="<?php echo esc_attr( $active_tab ); ?>">
 
         <?php if ( 'seller' === $active_tab ) : ?>
             <table class="form-table">

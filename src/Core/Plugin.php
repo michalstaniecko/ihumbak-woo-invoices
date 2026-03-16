@@ -815,10 +815,12 @@ final class Plugin {
 	/**
 	 * Sanitize settings.
 	 *
-	 * @param array<string, mixed> $input Raw settings input.
+	 * @param array<string, mixed>|null $input Raw settings input (null when no fields submitted).
 	 * @return array<string, mixed>
 	 */
-	public function sanitize_settings( array $input ): array {
+	public function sanitize_settings( ?array $input ): array {
+		$input = $input ?? array();
+
 		// Retrieve existing settings to avoid overwriting values from other tabs.
 		$existing  = get_option( 'ihumbak_invoices_settings', array() );
 		$sanitized = is_array( $existing ) ? $existing : array();
@@ -898,12 +900,22 @@ final class Plugin {
 		}
 
 		// Sanitize email settings.
+		$submitted_tab = $input['_tab'] ?? '';
+
 		if ( isset( $input['email'] ) && is_array( $input['email'] ) ) {
 			$sanitized['email'] = array(
 				'auto_send_invoice'        => ! empty( $input['email']['auto_send_invoice'] ),
 				'auto_send_receipt'        => ! empty( $input['email']['auto_send_receipt'] ),
 				'auto_send_credit_note'    => ! empty( $input['email']['auto_send_credit_note'] ),
 				'auto_send_receipt_return' => ! empty( $input['email']['auto_send_receipt_return'] ),
+			);
+		} elseif ( 'email' === $submitted_tab ) {
+			// Email tab submitted but no checkboxes checked - set all to false.
+			$sanitized['email'] = array(
+				'auto_send_invoice'        => false,
+				'auto_send_receipt'        => false,
+				'auto_send_credit_note'    => false,
+				'auto_send_receipt_return' => false,
 			);
 		}
 
