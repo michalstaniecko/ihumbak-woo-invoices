@@ -397,7 +397,12 @@ abstract class AbstractDocumentEmail extends \WC_Email {
 		 * @param Document $document    The document.
 		 * @param self     $email       Email instance.
 		 */
-		return apply_filters( 'ihumbak_email_attachments', $attachments, $this->document, $this );
+		$final_attachments = apply_filters( 'ihumbak_email_attachments', $attachments, $this->document, $this );
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+		error_log( '[iHumbak Invoices] DEBUG: get_attachments() returning: ' . wp_json_encode( $final_attachments ) );
+
+		return $final_attachments;
 	}
 
 	/**
