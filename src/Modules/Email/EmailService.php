@@ -296,14 +296,26 @@ class EmailService {
 			// Rename to .pdf extension.
 			$pdf_file = $temp_file . '.pdf';
 
+			// Debug logging for filesystem diagnostics.
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+			error_log( '[iHumbak Invoices] DEBUG: Temp dir used by WordPress: ' . get_temp_dir() );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+			error_log( '[iHumbak Invoices] DEBUG: Temp file created: ' . $temp_file );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+			error_log( '[iHumbak Invoices] DEBUG: Target PDF file: ' . $pdf_file );
+
 			// Try rename first, fallback to copy+unlink if rename fails.
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged -- Silencing intentional, using fallback.
 			$renamed = @rename( $temp_file, $pdf_file );
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+			error_log( '[iHumbak Invoices] DEBUG: rename() result: ' . ( $renamed ? 'success' : 'failed' ) );
 
 			if ( ! $renamed ) {
 				// Fallback: copy and delete original.
 				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors.Discouraged -- Silencing intentional, checking return value.
 				$copied = @copy( $temp_file, $pdf_file );
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug logging for production issue.
+				error_log( '[iHumbak Invoices] DEBUG: copy() fallback result: ' . ( $copied ? 'success' : 'failed' ) );
 				if ( $copied ) {
 					// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink, WordPress.PHP.NoSilencedErrors.Discouraged -- Cleanup temp file after successful copy.
 					@unlink( $temp_file );
