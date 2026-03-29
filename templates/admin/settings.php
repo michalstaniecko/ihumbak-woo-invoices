@@ -393,6 +393,34 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['ta
                         </label>
                     </td>
                 </tr>
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Send Copy to Admin', 'ihumbak-invoices' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox"
+                                   name="ihumbak_invoices_settings[email][send_copy_to_admin]"
+                                   value="1"
+                                   <?php checked( ! empty( $settings['email']['send_copy_to_admin'] ) ); ?>>
+                            <?php esc_html_e( 'Send a copy of all document emails to admin addresses', 'ihumbak-invoices' ); ?>
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="admin_email_addresses"><?php esc_html_e( 'Admin Email Address(es)', 'ihumbak-invoices' ); ?></label>
+                    </th>
+                    <td>
+                        <input type="text"
+                               id="admin_email_addresses"
+                               name="ihumbak_invoices_settings[email][admin_email_addresses]"
+                               value="<?php echo esc_attr( $settings['email']['admin_email_addresses'] ?? '' ); ?>"
+                               class="regular-text"
+                               placeholder="<?php esc_attr_e( 'admin@example.com, billing@example.com', 'ihumbak-invoices' ); ?>">
+                        <p class="description">
+                            <?php esc_html_e( 'Enter email addresses separated by commas. Leave empty to disable.', 'ihumbak-invoices' ); ?>
+                        </p>
+                    </td>
+                </tr>
             </table>
 
             <div class="notice notice-info inline" style="margin: 20px 0;">

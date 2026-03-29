@@ -153,6 +153,9 @@ class EmailService {
 
 			// Update document status to sent.
 			$this->updateDocumentStatus( $document );
+
+			// Send admin copy if enabled.
+			$this->sendAdminCopy( $document, $email );
 		} else {
 			do_action( 'ihumbak_email_failed', $document, __( 'Email sending failed.', 'ihumbak-invoices' ) );
 		}
@@ -274,6 +277,76 @@ class EmailService {
 		}
 
 		$this->getDocumentRepository()->save( $document );
+	}
+
+	/**
+	 * Send admin copy of the document email for debugging purposes.
+	 *
+	 * @param Document              $document The document.
+	 * @param AbstractDocumentEmail $email    The email instance used for the customer email.
+	 * @return void
+	 */
+	private function sendAdminCopy( Document $document, AbstractDocumentEmail $email ): void {
+		$settings = Plugin::get_instance()->get_settings();
+
+		// Check if admin copy is enabled.
+		if ( empty( $settings['email']['send_copy_to_admin'] ) ) {
+			return;
+		}
+
+		// Get admin email addresses.
+		$admin_emails_string = $settings['email']['admin_email_addresses'] ?? '';
+		if ( empty( $admin_emails_string ) ) {
+			return;
+		}
+
+		// Parse comma-separated emails.
+		$admin_emails = array_map( 'trim', explode( ',', $admin_emails_string ) );
+		$admin_emails = array_filter( $admin_emails, 'is_email' );
+
+		if ( empty( $admin_emails ) ) {
+			return;
+		}
+
+		// Generate PDF attachment for admin copy.
+		$pdf_path = $this->generatePdfAttachment( $document );
+		if ( ! $pdf_path || ! file_exists( $pdf_path ) ) {
+			return;
+		}
+
+		// Prepare email content.
+		$subject = sprintf(
+			/* translators: %s: original email subject */
+			__( 'Debug mode: %s', 'ihumbak-invoices' ),
+			$email->get_subject()
+		);
+
+		$content = $email->get_content();
+		$headers = $email->get_headers();
+
+		// Send to each admin address.
+		foreach ( $admin_emails as $admin_email ) {
+			$result = $email->send(
+				$admin_email,
+				$subject,
+				$content,
+				$headers,
+				array( $pdf_path )
+			);
+
+			/**
+			 * Fires after admin copy email is sent.
+			 *
+			 * @param Document $document    The document.
+			 * @param string   $admin_email Admin email address.
+			 * @param bool     $result      Whether email was sent successfully.
+			 */
+			do_action( 'ihumbak_admin_copy_sent', $document, $admin_email, $result );
+		}
+
+		// Clean up temp PDF file.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Cleanup temp file.
+		unlink( $pdf_path );
 	}
 
 	/**

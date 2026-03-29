@@ -811,6 +811,8 @@ final class Plugin {
 				'auto_send_receipt'        => false,
 				'auto_send_credit_note'    => false,
 				'auto_send_receipt_return' => false,
+				'send_copy_to_admin'       => false,
+				'admin_email_addresses'    => '',
 			),
 		);
 	}
@@ -906,11 +908,23 @@ final class Plugin {
 		$submitted_tab = $input['_tab'] ?? '';
 
 		if ( isset( $input['email'] ) && is_array( $input['email'] ) ) {
+			// Sanitize comma-separated admin email addresses.
+			$admin_emails = '';
+			if ( ! empty( $input['email']['admin_email_addresses'] ) ) {
+				$raw_emails       = sanitize_text_field( $input['email']['admin_email_addresses'] );
+				$email_array      = array_map( 'trim', explode( ',', $raw_emails ) );
+				$valid_emails     = array_filter( $email_array, 'is_email' );
+				$sanitized_emails = array_map( 'sanitize_email', $valid_emails );
+				$admin_emails     = implode( ', ', $sanitized_emails );
+			}
+
 			$sanitized['email'] = array(
 				'auto_send_invoice'        => ! empty( $input['email']['auto_send_invoice'] ),
 				'auto_send_receipt'        => ! empty( $input['email']['auto_send_receipt'] ),
 				'auto_send_credit_note'    => ! empty( $input['email']['auto_send_credit_note'] ),
 				'auto_send_receipt_return' => ! empty( $input['email']['auto_send_receipt_return'] ),
+				'send_copy_to_admin'       => ! empty( $input['email']['send_copy_to_admin'] ),
+				'admin_email_addresses'    => $admin_emails,
 			);
 		} elseif ( 'email' === $submitted_tab ) {
 			// Email tab submitted but no checkboxes checked - set all to false.
